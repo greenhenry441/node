@@ -6,7 +6,10 @@ export function SiteHeader() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <div className="size-5 bg-ink rounded-sm" />
-          <span className="text-sm font-semibold tracking-tight">Node</span>
+          <div className="leading-tight">
+            <div className="text-sm font-semibold tracking-tight">Node FMS</div>
+            <div className="text-[10px] text-muted-foreground -mt-0.5">A division of Node</div>
+          </div>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
           <Link to="/features" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">Features</Link>

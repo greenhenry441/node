@@ -6,7 +6,7 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
         <Link to="/" className="flex items-center gap-2">
           <div className="size-4 bg-ink rounded-sm" />
-          <span className="text-sm font-semibold tracking-tight">Node</span>
+          <span className="text-sm font-semibold tracking-tight">Node File Management Suite</span>
         </Link>
         <div className="flex gap-8 text-xs font-medium text-muted-foreground">
           <Link to="/security" className="hover:text-ink">Security</Link>
@@ -14,7 +14,7 @@ export function SiteFooter() {
           <a href="#" className="hover:text-ink">Privacy</a>
           <a href="#" className="hover:text-ink">Status</a>
         </div>
-        <span className="text-xs text-muted-foreground">© 2026 Node, Inc.</span>
+        <span className="text-xs text-muted-foreground">© 2026 Node FMS — a division of Node, Inc.</span>
       </div>
     </footer>
   );

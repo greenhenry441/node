@@ -17,8 +17,8 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Node — Secure file storage for small businesses" },
-      { name: "description", content: "The single source of truth for your team's files. Node is secure cloud storage built for small businesses." },
+      { title: "Node FMS — File Management Suite for small businesses" },
+      { name: "description", content: "Node File Management Suite — a division of Node. Secure file storage, syncing, and editing built for small businesses." },
     ],
   }),
   component: Index,
@@ -33,13 +33,13 @@ function Index() {
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-ink/10 text-xs font-medium text-muted-foreground mb-6">
             <span className="size-1.5 rounded-full bg-emerald-500" />
-            New: Client portals are now live
+            Node File Management Suite — a division of Node
           </div>
           <h1 className="text-4xl md:text-6xl font-semibold leading-tight tracking-tight text-balance max-w-[22ch] mx-auto">
             The single source of truth for your business's files.
           </h1>
           <p className="mt-8 text-lg md:text-xl text-muted-foreground text-pretty max-w-[56ch] mx-auto">
-            Node is secure cloud storage purpose-built for small businesses.
+            Node FMS is secure cloud storage purpose-built for small businesses.
             Keep client deliverables, contracts, and brand libraries in one
             protected, organized space.
           </p>
@@ -163,24 +163,57 @@ function Index() {
         </div>
       </section>
 
-      <section className="py-24 bg-muted/50 border-t border-border/60">
+      <section id="pricing" className="py-24 bg-muted/50 border-t border-border/60">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-12">
-            <div className="max-w-[35ch]">
-              <h2 className="text-3xl font-semibold leading-tight text-balance">
-                Predictable pricing for growing teams.
-              </h2>
-              <p className="mt-4 text-muted-foreground text-pretty">
-                Flat per-team pricing. No surprise per-seat charges as you hire.
-              </p>
-              <Link to="/pricing" className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-ink hover:gap-3 transition-all">
-                Compare all plans <ArrowRight className="size-4" />
-              </Link>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-6 w-full max-w-2xl">
-              <PricingCard tier="Essential" price="$29" desc="Up to 2 TB and 5 users. Perfect for boutique studios." cta="Start trial" />
-              <PricingCard tier="Professional" price="$79" desc="10 TB, unlimited users, client portals, and SSO." cta="Upgrade now" featured />
-            </div>
+          <div className="max-w-[44ch] mx-auto text-center">
+            <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Node FMS Price List</span>
+            <h2 className="mt-3 text-3xl md:text-4xl font-semibold leading-tight text-balance">
+              Pricing that scales with your business.
+            </h2>
+            <p className="mt-4 text-muted-foreground text-pretty">
+              Upgrade or cancel anytime. Every plan includes file syncing and editing.
+            </p>
+          </div>
+          <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <PricingCard
+              tier="Free"
+              price="$0"
+              cadence="forever"
+              useCase="Personal projects and temporary businesses"
+              features={["Up to 100 files", "File syncing", "File editing"]}
+              cta="Get started"
+            />
+            <PricingCard
+              tier="Starter"
+              price="$25.99"
+              cadence="/month"
+              useCase="Very small businesses"
+              features={["Up to 500 files", "File syncing", "File editing", "More file types supported"]}
+              cta="Start trial"
+            />
+            <PricingCard
+              tier="Steady"
+              price="$50.99"
+              cadence="/month"
+              useCase="Small businesses"
+              features={["Up to 1,000 files", "Advanced file syncing & editing", "More file types supported"]}
+              cta="Start trial"
+              featured
+            />
+            <PricingCard
+              tier="Node Suite"
+              price="$75.99"
+              cadence="/month"
+              useCase="Small and medium businesses"
+              features={["All Node File Management", "Node Task Management", "Later: Node Intelligence features"]}
+              cta="Start trial"
+            />
+          </div>
+          <div className="mt-10 text-center">
+            <Link to="/pricing" className="inline-flex items-center gap-2 text-sm font-medium text-ink hover:gap-3 transition-all">
+              Compare all plans <ArrowRight className="size-4" />
+            </Link>
+            <p className="mt-4 text-xs uppercase tracking-widest text-muted-foreground">Upgrade or cancel anytime</p>
           </div>
         </div>
       </section>
@@ -191,18 +224,35 @@ function Index() {
 }
 
 function PricingCard({
-  tier, price, desc, cta, featured = false,
-}: { tier: string; price: string; desc: string; cta: string; featured?: boolean }) {
+  tier, price, cadence, useCase, features, cta, featured = false,
+}: {
+  tier: string;
+  price: string;
+  cadence: string;
+  useCase: string;
+  features: string[];
+  cta: string;
+  featured?: boolean;
+}) {
   return (
     <div className={`p-8 rounded-2xl flex flex-col ${featured ? "bg-ink text-surface ring-1 ring-ink" : "bg-card ring-1 ring-black/5"}`}>
       <span className={`text-xs font-semibold uppercase tracking-wider ${featured ? "opacity-60" : "text-muted-foreground"}`}>{tier}</span>
       <div className="mt-4 flex items-baseline gap-1">
         <span className="text-3xl font-semibold">{price}</span>
-        <span className={`text-sm ${featured ? "opacity-60" : "text-muted-foreground"}`}>/mo</span>
+        <span className={`text-sm ${featured ? "opacity-60" : "text-muted-foreground"}`}>{cadence}</span>
       </div>
-      <p className={`mt-4 text-sm ${featured ? "opacity-80" : "text-muted-foreground"}`}>{desc}</p>
+      <p className={`mt-4 text-xs uppercase tracking-wider ${featured ? "opacity-70" : "text-muted-foreground"}`}>Use case</p>
+      <p className={`mt-1 text-sm ${featured ? "opacity-90" : "text-ink/80"}`}>{useCase}</p>
+      <ul className={`mt-5 space-y-2 text-sm ${featured ? "opacity-90" : "text-ink/80"}`}>
+        {features.map((f) => (
+          <li key={f} className="flex items-start gap-2">
+            <CheckCircle2 className={`size-4 mt-0.5 shrink-0 ${featured ? "opacity-80" : "text-ink/60"}`} strokeWidth={1.5} />
+            <span>{f}</span>
+          </li>
+        ))}
+      </ul>
       <Link
-        to="/app"
+        to="/signup"
         className={`mt-8 w-full py-2.5 px-4 rounded-full text-sm font-medium text-center transition-colors ${
           featured ? "bg-surface text-ink hover:bg-zinc-100" : "border border-ink/10 hover:bg-ink hover:text-surface"
         }`}
