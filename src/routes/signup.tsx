@@ -1,9 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, type FormEvent } from "react";
 import { z } from "zod";
+import { toast } from "sonner";
 import { AuthShell } from "@/components/auth-shell";
-import { Field, Divider, SocialButton } from "./login";
-import { Check, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Field, Divider, GoogleIcon } from "./login";
+import { Check, Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
@@ -29,7 +32,7 @@ function pwStrength(pw: string) {
   if (/[A-Z]/.test(pw)) score++;
   if (/[0-9]/.test(pw)) score++;
   if (/[^A-Za-z0-9]/.test(pw)) score++;
-  return score; // 0-4
+  return score;
 }
 
 function SignupPage() {
@@ -39,6 +42,8 @@ function SignupPage() {
   const [showPw, setShowPw] = useState(false);
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [checkInbox, setCheckInbox] = useState(false);
 
   const score = useMemo(() => pwStrength(form.password), [form.password]);
   const strengthLabel = ["Too weak", "Weak", "Okay", "Strong", "Excellent"][score];
@@ -46,7 +51,7 @@ function SignupPage() {
   const update = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     const result = schema.safeParse({ ...form, terms });
     if (!result.success) {
@@ -62,11 +67,65 @@ function SignupPage() {
     }
     setErrors({});
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigate({ to: "/app" });
-    }, 700);
+    const { data, error } = await supabase.auth.signUp({
+      email: form.email,
+      password: form.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/app`,
+        data: { full_name: form.name, company: form.company },
+      },
+    });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    // If email confirmation is required, there's no session yet.
+    if (!data.session) {
+      setCheckInbox(true);
+      return;
+    }
+    toast.success("Workspace created");
+    navigate({ to: "/app" });
   };
+
+  const signUpWithGoogle = async () => {
+    setGoogleLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin + "/app",
+    });
+    if (result.error) {
+      setGoogleLoading(false);
+      toast.error("Google sign-up failed. Please try again.");
+      return;
+    }
+    if (result.redirected) return;
+    navigate({ to: "/app" });
+  };
+
+  if (checkInbox) {
+    return (
+      <AuthShell
+        title="Check your inbox"
+        subtitle={`We sent a confirmation link to ${form.email}. Click it to activate your workspace.`}
+        footer={
+          <Link to="/login" className="text-ink font-medium hover:underline underline-offset-4">
+            Back to sign in
+          </Link>
+        }
+      >
+        <div className="rounded-lg border border-border bg-card p-5 flex items-start gap-3">
+          <MailCheck className="size-5 text-emerald-600 mt-0.5" />
+          <div className="text-sm">
+            <div className="font-medium text-ink">Confirmation email sent</div>
+            <p className="text-muted-foreground mt-1">
+              Didn't get it? Check spam, or wait a minute and try again.
+            </p>
+          </div>
+        </div>
+      </AuthShell>
+    );
+  }
 
   return (
     <AuthShell
@@ -81,10 +140,15 @@ function SignupPage() {
         </>
       }
     >
-      <div className="space-y-3">
-        <SocialButton provider="Google" />
-        <SocialButton provider="Microsoft" />
-      </div>
+      <button
+        type="button"
+        onClick={signUpWithGoogle}
+        disabled={googleLoading}
+        className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
+      >
+        {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
+        Continue with Google
+      </button>
       <Divider>or sign up with email</Divider>
 
       <form onSubmit={submit} noValidate className="space-y-4">

@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { z } from "zod";
+import { toast } from "sonner";
 import { AuthShell } from "@/components/auth-shell";
 import { Field } from "./login";
 import { ArrowLeft, Loader2, MailCheck } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
@@ -23,7 +25,7 @@ function ForgotPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     const r = schema.safeParse({ email });
     if (!r.success) {
@@ -32,10 +34,15 @@ function ForgotPage() {
     }
     setError(undefined);
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSent(true);
-    }, 600);
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setLoading(false);
+    if (err) {
+      toast.error(err.message);
+      return;
+    }
+    setSent(true);
   };
 
   return (
