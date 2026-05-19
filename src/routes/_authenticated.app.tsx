@@ -1,8 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import {
   Folder, FileText, Image as ImageIcon, Film, Search, Upload, Plus,
-  Star, Clock, Users, Trash2, Settings, ChevronRight, MoreHorizontal, Download, Share2,
+  Star, Clock, Users, Trash2, Settings, ChevronRight, MoreHorizontal, Download, Share2, LogOut,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app")({
@@ -41,9 +44,20 @@ const iconFor: Record<string, { Icon: typeof FileText; cls: string; label: strin
 
 function AppPage() {
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const all = [...folders, ...files].filter((r) => r.name.toLowerCase().includes(query.toLowerCase()));
   const fl = all.filter((r) => r.type === "folder");
   const fi = all.filter((r) => r.type !== "folder");
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Signed out");
+      navigate({ to: "/" });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-surface text-ink flex">
@@ -120,10 +134,22 @@ function AppPage() {
             <button className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 bg-ink text-surface rounded-md hover:bg-ink/90">
               <Upload className="size-4" /> Upload
             </button>
-            <button className="size-9 grid place-items-center rounded-md hover:bg-muted">
+            <button className="size-9 grid place-items-center rounded-md hover:bg-muted" title="Settings">
               <Settings className="size-4" />
             </button>
-            <div className="size-8 rounded-full bg-zinc-300 ml-1" />
+            <button
+              onClick={signOut}
+              className="size-9 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
+              title="Sign out"
+            >
+              <LogOut className="size-4" />
+            </button>
+            <div
+              className="size-8 rounded-full bg-ink text-surface grid place-items-center text-xs font-semibold ml-1"
+              title={user?.email ?? ""}
+            >
+              {(user?.email ?? "?").slice(0, 1).toUpperCase()}
+            </div>
           </div>
         </header>
 
