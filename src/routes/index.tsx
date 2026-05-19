@@ -17,8 +17,8 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Node — Secure file storage for small businesses" },
-      { name: "description", content: "The single source of truth for your team's files. Node is secure cloud storage built for small businesses." },
+      { title: "Node FMS — File Management Suite for small businesses" },
+      { name: "description", content: "Node File Management Suite — a division of Node. Secure file storage, syncing, and editing built for small businesses." },
     ],
   }),
   component: Index,
@@ -33,13 +33,13 @@ function Index() {
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-ink/10 text-xs font-medium text-muted-foreground mb-6">
             <span className="size-1.5 rounded-full bg-emerald-500" />
-            New: Client portals are now live
+            Node File Management Suite — a division of Node
           </div>
           <h1 className="text-4xl md:text-6xl font-semibold leading-tight tracking-tight text-balance max-w-[22ch] mx-auto">
             The single source of truth for your business's files.
           </h1>
           <p className="mt-8 text-lg md:text-xl text-muted-foreground text-pretty max-w-[56ch] mx-auto">
-            Node is secure cloud storage purpose-built for small businesses.
+            Node FMS is secure cloud storage purpose-built for small businesses.
             Keep client deliverables, contracts, and brand libraries in one
             protected, organized space.
           </p>
