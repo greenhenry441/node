@@ -5,7 +5,7 @@ import {
   Star, Clock, Users, Trash2, Settings, ChevronRight, MoreHorizontal, Download, Share2,
 } from "lucide-react";
 
-export const Route = createFileRoute("/app")({
+export const Route = createFileRoute("/_authenticated/app")({
   head: () => ({ meta: [{ title: "Workspace — Node" }] }),
   component: AppPage,
 });
