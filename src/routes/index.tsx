@@ -90,12 +90,12 @@ function Index() {
                   Teams
                 </div>
                 {[
-                  ["Design", "emerald"],
-                  ["Operations", "amber"],
-                  ["Finance", "blue"],
-                ].map(([name, color]) => (
+                  ["Design", "bg-emerald-500"],
+                  ["Operations", "bg-amber-500"],
+                  ["Finance", "bg-blue-500"],
+                ].map(([name, dot]) => (
                   <div key={name} className="px-3 py-1.5 flex items-center gap-2 text-xs">
-                    <div className={`size-2 rounded-full bg-${color}-500`} />
+                    <div className={`size-2 rounded-full ${dot}`} />
                     <span className="text-ink/80">{name}</span>
                   </div>
                 ))}
