@@ -8,11 +8,14 @@ export function SiteFooter() {
           <div className="size-4 bg-ink rounded-sm" />
           <span className="text-sm font-semibold tracking-tight">Node File Management Suite</span>
         </Link>
-        <div className="flex gap-8 text-xs font-medium text-muted-foreground">
-          <Link to="/security" className="hover:text-ink">Security</Link>
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-medium text-muted-foreground">
+          <Link to="/features" className="hover:text-ink">Features</Link>
           <Link to="/pricing" className="hover:text-ink">Pricing</Link>
-          <a href="#" className="hover:text-ink">Privacy</a>
-          <a href="#" className="hover:text-ink">Status</a>
+          <Link to="/security" className="hover:text-ink">Security</Link>
+          <Link to="/about" className="hover:text-ink">About</Link>
+          <Link to="/contact" className="hover:text-ink">Contact</Link>
+          <Link to="/privacy" className="hover:text-ink">Privacy</Link>
+          <Link to="/status" className="hover:text-ink">Status</Link>
         </div>
         <span className="text-xs text-muted-foreground">© 2026 Node FMS — a division of Node, Inc.</span>
       </div>

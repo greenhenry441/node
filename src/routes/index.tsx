@@ -19,7 +19,11 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Node FMS — File Management Suite for small businesses" },
       { name: "description", content: "Node File Management Suite — a division of Node. Secure file storage, syncing, and editing built for small businesses." },
+      { property: "og:title", content: "Node FMS — File Management Suite for small businesses" },
+      { property: "og:description", content: "Secure file storage, syncing, and editing built for small businesses." },
+      { property: "og:url", content: "https://nodefms.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://nodefms.lovable.app/" }],
   }),
   component: Index,
 });

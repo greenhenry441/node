@@ -6,9 +6,13 @@ import { Check } from "lucide-react";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — Node" },
-      { name: "description", content: "Simple, flat pricing for Node file management. Start free, upgrade or cancel anytime." },
+      { title: "Pricing — Node FMS" },
+      { name: "description", content: "Simple, flat pricing for Node FMS. Start free, upgrade or cancel anytime." },
+      { property: "og:title", content: "Pricing — Node FMS" },
+      { property: "og:description", content: "Simple, flat pricing for Node FMS. Start free, upgrade or cancel anytime." },
+      { property: "og:url", content: "https://nodefms.lovable.app/pricing" },
     ],
+    links: [{ rel: "canonical", href: "https://nodefms.lovable.app/pricing" }],
   }),
   component: PricingPage,
 });

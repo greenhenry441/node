@@ -15,7 +15,8 @@ export function SiteHeader() {
           <Link to="/features" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">Features</Link>
           <Link to="/pricing" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">Pricing</Link>
           <Link to="/security" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">Security</Link>
-          <Link to="/app" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">Product</Link>
+          <Link to="/about" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">About</Link>
+          <Link to="/contact" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">Contact</Link>
         </nav>
         <div className="flex items-center gap-2">
           <Link to="/login" className="hidden sm:inline-flex text-sm font-medium px-4 py-2 border border-ink/10 rounded-full hover:bg-ink/5 transition-colors">

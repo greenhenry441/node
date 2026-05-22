@@ -6,9 +6,13 @@ import { Shield, Lock, Server, FileCheck2, KeyRound, Eye } from "lucide-react";
 export const Route = createFileRoute("/security")({
   head: () => ({
     meta: [
-      { title: "Security — Node" },
+      { title: "Security — Node FMS" },
       { name: "description", content: "SOC 2 Type II, end-to-end encryption, SSO, and granular audit logs. Security your business and your clients can trust." },
+      { property: "og:title", content: "Security — Node FMS" },
+      { property: "og:description", content: "SOC 2 Type II, end-to-end encryption, SSO, and granular audit logs." },
+      { property: "og:url", content: "https://nodefms.lovable.app/security" },
     ],
+    links: [{ rel: "canonical", href: "https://nodefms.lovable.app/security" }],
   }),
   component: SecurityPage,
 });
