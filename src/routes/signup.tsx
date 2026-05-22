@@ -71,7 +71,7 @@ function SignupPage() {
       email: form.email,
       password: form.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/app`,
+        emailRedirectTo: `${window.location.origin}/onboarding`,
         data: { full_name: form.name, company: form.company },
       },
     });
@@ -86,13 +86,13 @@ function SignupPage() {
       return;
     }
     toast.success("Workspace created");
-    navigate({ to: "/app" });
+    navigate({ to: "/onboarding" });
   };
 
   const signUpWithGoogle = async () => {
     setGoogleLoading(true);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/app",
+      redirect_uri: window.location.origin + "/onboarding",
     });
     if (result.error) {
       setGoogleLoading(false);
@@ -100,7 +100,7 @@ function SignupPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/app" });
+    navigate({ to: "/onboarding" });
   };
 
   if (checkInbox) {
