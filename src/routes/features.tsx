@@ -6,9 +6,13 @@ import { FolderTree, Lock, Users, History, Zap, CheckCircle2, Share2, Cloud, Sea
 export const Route = createFileRoute("/features")({
   head: () => ({
     meta: [
-      { title: "Features — Node" },
+      { title: "Features — Node FMS" },
       { name: "description", content: "Team folders, client portals, granular permissions, version history, and audit logs — built for small businesses." },
+      { property: "og:title", content: "Features — Node FMS" },
+      { property: "og:description", content: "Team folders, client portals, granular permissions, version history, and audit logs — built for small businesses." },
+      { property: "og:url", content: "https://nodefms.lovable.app/features" },
     ],
+    links: [{ rel: "canonical", href: "https://nodefms.lovable.app/features" }],
   }),
   component: FeaturesPage,
 });
