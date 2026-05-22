@@ -23,21 +23,21 @@ const tiers = [
     price: "$0",
     per: "forever",
     useCase: "Personal projects and temporary businesses.",
-    features: ["Up to 100 files", "File syncing", "File editing"],
+    features: ["100 GB storage", "File syncing", "File editing"],
   },
   {
     name: "Starter",
     price: "$25.99",
     per: "per month",
     useCase: "Very small businesses.",
-    features: ["Up to 500 files", "File syncing", "File editing", "More file types supported"],
+    features: ["500 GB storage", "File syncing", "File editing", "More file types supported"],
   },
   {
     name: "Steady",
     price: "$50.99",
     per: "per month",
     useCase: "Small businesses.",
-    features: ["Up to 1,000 files", "Advanced file syncing and editing", "More file types supported"],
+    features: ["1 TB storage", "Advanced file syncing and editing", "More file types supported"],
     featured: true,
   },
   {
@@ -46,6 +46,7 @@ const tiers = [
     per: "per month",
     useCase: "Small and medium businesses.",
     features: [
+      "Unlimited storage",
       "All Node File Management",
       "Node Task Management",
       "Later: Node Intelligence features",
