@@ -1,7 +1,10 @@
 import { Link } from "@tanstack/react-router";
+import { LaunchBanner } from "@/components/launch-banner";
 
 export function SiteHeader() {
   return (
+    <>
+    <LaunchBanner />
     <header className="w-full py-6 border-b border-border/60">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
@@ -28,5 +31,6 @@ export function SiteHeader() {
         </div>
       </div>
     </header>
+    </>
   );
 }

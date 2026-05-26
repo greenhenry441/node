@@ -16,6 +16,7 @@ export function SiteFooter() {
           <Link to="/contact" className="hover:text-ink">Contact</Link>
           <Link to="/privacy" className="hover:text-ink">Privacy</Link>
           <Link to="/status" className="hover:text-ink">Status</Link>
+          <Link to="/changelog" className="hover:text-ink">Changelog</Link>
         </div>
         <span className="text-xs text-muted-foreground">© 2026 Node FMS — a division of Node, Inc.</span>
       </div>

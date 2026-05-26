@@ -17,7 +17,7 @@ export const Route = createFileRoute("/about")({
 });
 
 const stats = [
-  { k: "12k+", v: "Small businesses using Node FMS" },
+  { k: "June 1, 2026", v: "Public launch date" },
   { k: "180 days", v: "File history on every plan" },
   { k: "3 regions", v: "Data residency: US, EU, AU" },
 ];
@@ -35,7 +35,9 @@ function AboutPage() {
           <p className="mt-6 text-lg text-muted-foreground text-pretty">
             Node FMS is the File Management Suite division of Node — a software studio focused on operational tools for
             small and medium businesses. We started Node FMS because the leading file platforms either treat small
-            teams as an afterthought or charge them like a Fortune 500.
+            teams as an afterthought or charge them like a Fortune 500. Node FMS is a new product launching{" "}
+            <span className="text-ink font-medium">June 1, 2026</span> — we don't have customers or reviews yet, and
+            we'd rather say that plainly than fake it.
           </p>
 
           <div className="mt-14 grid sm:grid-cols-3 gap-6">

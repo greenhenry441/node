@@ -22,7 +22,7 @@ const features = [
   { icon: Users, title: "Client portals", body: "Share branded folders with clients — no Node account required on their side." },
   { icon: Lock, title: "Granular permissions", body: "View, comment, edit, or admin. Set link expirations and revoke access in one click." },
   { icon: History, title: "Version history", body: "180 days of file history on every plan. Restore folders to a previous state." },
-  { icon: Zap, title: "Fast sync", body: "Native Mac & Windows apps with selective sync to keep laptops light." },
+  { icon: Zap, title: "Fast sync", body: "Web-first today. Native Mac & Windows desktop apps with selective sync arrive in 2027." },
   { icon: CheckCircle2, title: "Audit log", body: "See exactly who did what, when. Export logs for compliance reviews." },
   { icon: Share2, title: "Smart links", body: "Send any file as a link. Track views, downloads, and add passwords." },
   { icon: Cloud, title: "Anywhere access", body: "Web, desktop, and mobile. Your files follow you, securely." },
