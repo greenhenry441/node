@@ -154,7 +154,7 @@ function Index() {
               { icon: Users, title: "Client portals", body: "Share a branded folder with clients — they upload and download without needing a Node account." },
               { icon: Lock, title: "Granular permissions", body: "View, comment, edit, or admin. Set expirations on links and revoke access in one click." },
               { icon: History, title: "Version history", body: "180 days of file history on every plan. Restore any file or folder to a previous state." },
-              { icon: Zap, title: "Fast sync", body: "Native desktop apps for Mac and Windows. Selective sync keeps laptops light." },
+              { icon: Zap, title: "Fast sync", body: "Web-first today, with native Mac and Windows desktop apps coming in 2027." },
               { icon: CheckCircle2, title: "Audit log", body: "See exactly who did what, when. Export logs for compliance reviews." },
             ].map((f) => (
               <div key={f.title} className="p-6 bg-card rounded-2xl ring-1 ring-black/5">
