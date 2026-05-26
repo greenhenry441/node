@@ -1,54 +1,60 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import {
-  Folder, FileText, Image as ImageIcon, Film, Search, Upload, Plus,
-  Star, Clock, Users, Trash2, Settings, ChevronRight, MoreHorizontal, Download, Share2, LogOut,
+  Folder, FileText, Image as ImageIcon, Film, Music, Archive, Upload, Trash2,
+  Settings, ChevronRight, Download, LogOut, Loader2, AlertCircle, Crown, FileIcon,
 } from "lucide-react";
+import {
+  getStorageState, listFiles, uploadFile, deleteFile, setPlan, getDownloadUrl,
+  type StoredFile,
+} from "@/lib/storage.functions";
+import { formatBytes, PLAN_LABEL } from "@/lib/storage-format";
 
 export const Route = createFileRoute("/_authenticated/app")({
-  head: () => ({ meta: [{ title: "Workspace — Node" }] }),
+  head: () => ({ meta: [{ title: "Workspace — Node FMS" }] }),
   component: AppPage,
 });
 
-type Row =
-  | { type: "folder"; name: string; meta: string; size: string }
-  | { type: "pdf" | "doc" | "xls" | "fig" | "mp4" | "img"; name: string; meta: string; size: string };
-
-const folders: Row[] = [
-  { type: "folder", name: "Clients", meta: "12 subfolders • shared with team", size: "486 GB" },
-  { type: "folder", name: "Operations", meta: "Internal • 5 members", size: "112 GB" },
-  { type: "folder", name: "Finance & Legal", meta: "Restricted • 3 members", size: "38 GB" },
-  { type: "folder", name: "Brand & Marketing", meta: "Shared with team", size: "208 GB" },
-];
-
-const files: Row[] = [
-  { type: "pdf", name: "Master_Services_Agreement_v4.pdf", meta: "Marcus updated • 2h ago", size: "2.4 MB" },
-  { type: "fig", name: "Brand_Guidelines_2026.fig", meta: "Sarah shared • Yesterday", size: "42.1 MB" },
-  { type: "mp4", name: "Onboarding_Walkthrough.mp4", meta: "Elena uploaded • Oct 12", size: "318 MB" },
-  { type: "xls", name: "Q4_Forecast.xlsx", meta: "David edited • Oct 11", size: "1.1 MB" },
-  { type: "doc", name: "Northstar_Proposal_Final.docx", meta: "Approved • Oct 10", size: "612 KB" },
-  { type: "img", name: "Product_Photography_Batch_03", meta: "Camille added • Oct 9", size: "1.2 GB" },
-];
-
-const iconFor: Record<string, { Icon: typeof FileText; cls: string; label: string }> = {
-  pdf: { Icon: FileText, cls: "bg-red-50 text-red-700", label: "PDF" },
-  doc: { Icon: FileText, cls: "bg-blue-50 text-blue-700", label: "DOC" },
-  xls: { Icon: FileText, cls: "bg-emerald-50 text-emerald-700", label: "XLS" },
-  fig: { Icon: ImageIcon, cls: "bg-violet-50 text-violet-700", label: "FIG" },
-  mp4: { Icon: Film, cls: "bg-amber-50 text-amber-700", label: "MP4" },
-  img: { Icon: ImageIcon, cls: "bg-zinc-100 text-zinc-700", label: "IMG" },
-};
-
 function AppPage() {
-  const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const { user } = useAuth();
-  const all = [...folders, ...files].filter((r) => r.name.toLowerCase().includes(query.toLowerCase()));
-  const fl = all.filter((r) => r.type === "folder");
-  const fi = all.filter((r) => r.type !== "folder");
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const getStateFn = useServerFn(getStorageState);
+  const listFn = useServerFn(listFiles);
+  const uploadFn = useServerFn(uploadFile);
+  const deleteFn = useServerFn(deleteFile);
+  const setPlanFn = useServerFn(setPlan);
+  const downloadFn = useServerFn(getDownloadUrl);
+
+  const stateQ = useQuery({ queryKey: ["storage-state"], queryFn: () => getStateFn() });
+  const filesQ = useQuery({ queryKey: ["files"], queryFn: () => listFn() });
+
+  const planMut = useMutation({
+    mutationFn: (plan: "free" | "starter" | "steady" | "suite") =>
+      setPlanFn({ data: { plan } }),
+    onSuccess: (r) => {
+      toast.success(`Plan changed to ${PLAN_LABEL[r.plan]}`);
+      qc.invalidateQueries({ queryKey: ["storage-state"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: (id: string) => deleteFn({ data: { id } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["files"] });
+      qc.invalidateQueries({ queryKey: ["storage-state"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -59,54 +65,112 @@ function AppPage() {
     }
   };
 
+  const handleFiles = async (selected: FileList | null) => {
+    if (!selected || selected.length === 0) return;
+    setUploading(true);
+    try {
+      for (const file of Array.from(selected)) {
+        const state = stateQ.data;
+        if (state && file.size > state.maxFileBytes) {
+          toast.error(`${file.name}: exceeds ${formatBytes(state.maxFileBytes)} per-file limit.`);
+          continue;
+        }
+        const fd = new FormData();
+        fd.append("file", file);
+        try {
+          await uploadFn({ data: fd });
+          toast.success(`Uploaded ${file.name}`);
+        } catch (e) {
+          toast.error(`${file.name}: ${(e as Error).message}`);
+        }
+      }
+      qc.invalidateQueries({ queryKey: ["files"] });
+      qc.invalidateQueries({ queryKey: ["storage-state"] });
+    } finally {
+      setUploading(false);
+      if (fileInput.current) fileInput.current.value = "";
+    }
+  };
+
+  const download = async (id: string) => {
+    try {
+      const { url } = await downloadFn({ data: { id } });
+      window.location.href = url;
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
+
+  const state = stateQ.data;
+  const used = state?.usedBytes ?? 0;
+  const cap = state?.capBytes ?? null;
+  const pct = cap === null ? 0 : Math.min(100, (used / cap) * 100);
+  const overLimit = cap !== null && used >= cap;
+  const nearLimit = cap !== null && pct >= 80 && !overLimit;
+
   return (
     <div className="min-h-screen bg-surface text-ink flex">
       <aside className="w-64 border-r border-border bg-card flex flex-col">
         <Link to="/" className="px-6 py-5 flex items-center gap-2 border-b border-border">
           <div className="size-5 bg-ink rounded-sm" />
-          <span className="text-sm font-semibold tracking-tight">Node</span>
+          <span className="text-sm font-semibold tracking-tight">Node FMS</span>
         </Link>
-        <nav className="p-3 space-y-0.5 text-sm">
-          {[
-            { icon: Folder, label: "All files", active: true },
-            { icon: Star, label: "Starred" },
-            { icon: Clock, label: "Recent" },
-            { icon: Users, label: "Shared" },
-            { icon: Trash2, label: "Trash" },
-          ].map((n) => (
-            <div
-              key={n.label}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-default ${
-                n.active ? "bg-ink text-surface" : "text-muted-foreground hover:bg-muted"
+
+        <div className="p-4 space-y-1 text-xs uppercase tracking-widest text-muted-foreground font-semibold">
+          Plan
+        </div>
+        <div className="px-4 space-y-1">
+          {(["free", "starter", "steady", "suite"] as const).map((p) => (
+            <button
+              key={p}
+              onClick={() => planMut.mutate(p)}
+              disabled={planMut.isPending || state?.plan === p}
+              className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between ${
+                state?.plan === p
+                  ? "bg-ink text-surface"
+                  : "text-muted-foreground hover:bg-muted"
               }`}
             >
-              <n.icon className="size-4" strokeWidth={1.75} />
-              {n.label}
-            </div>
-          ))}
-        </nav>
-        <div className="px-3 mt-4">
-          <div className="px-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Teams</div>
-          {[
-            ["Design Lab", "bg-emerald-500"],
-            ["Operations", "bg-amber-500"],
-            ["Marketing HQ", "bg-blue-500"],
-            ["Finance", "bg-violet-500"],
-          ].map(([name, dot]) => (
-            <div key={name} className="px-3 py-1.5 flex items-center gap-2 text-sm text-muted-foreground">
-              <div className={`size-2 rounded-full ${dot}`} />
-              {name}
-            </div>
+              <span className="flex items-center gap-2">
+                {p === "suite" && <Crown className="size-3.5" />}
+                {PLAN_LABEL[p]}
+              </span>
+              <span className="text-[10px] opacity-70">
+                {formatBytes(
+                  p === "free" ? 107_374_182_400 :
+                  p === "starter" ? 536_870_912_000 :
+                  p === "steady" ? 1_099_511_627_776 : null
+                )}
+              </span>
+            </button>
           ))}
         </div>
+
         <div className="mt-auto p-4 m-3 rounded-xl bg-muted">
-          <div className="text-xs text-muted-foreground">Storage</div>
-          <div className="mt-2 h-1.5 w-full bg-card rounded-full overflow-hidden">
-            <div className="h-full w-[24%] bg-ink" />
+          <div className="text-xs text-muted-foreground flex items-center justify-between">
+            <span>Storage</span>
+            {state && <span className="font-medium text-ink">{PLAN_LABEL[state.plan]}</span>}
           </div>
-          <div className="mt-2 text-xs"><span className="font-semibold">2.4 TB</span> of 10 TB used</div>
+          <div className="mt-2 h-1.5 w-full bg-card rounded-full overflow-hidden">
+            <div
+              className={`h-full transition-all ${overLimit ? "bg-destructive" : nearLimit ? "bg-amber-500" : "bg-ink"}`}
+              style={{ width: `${cap === null ? 4 : pct}%` }}
+            />
+          </div>
+          <div className="mt-2 text-xs">
+            <span className="font-semibold">{formatBytes(used)}</span>{" "}
+            <span className="text-muted-foreground">
+              of {formatBytes(cap)} used
+            </span>
+          </div>
+          {overLimit && (
+            <div className="mt-2 text-[11px] text-destructive flex items-start gap-1">
+              <AlertCircle className="size-3 mt-0.5 shrink-0" />
+              Over limit. Delete files or upgrade.
+            </div>
+          )}
           <Link to="/pricing" className="mt-3 inline-block text-xs font-medium text-ink underline-offset-2 hover:underline">
-            Upgrade plan
+            See plans
           </Link>
         </div>
       </aside>
@@ -114,25 +178,26 @@ function AppPage() {
       <main className="flex-1 flex flex-col min-w-0">
         <header className="h-16 border-b border-border flex items-center justify-between px-8 gap-6">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link to="/app" className="hover:text-ink">Workspace</Link>
+            <span>Workspace</span>
             <ChevronRight className="size-3.5" />
-            <span className="text-ink font-medium">All files</span>
-          </div>
-          <div className="relative flex-1 max-w-md">
-            <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search files, folders, and clients…"
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-md bg-muted border border-transparent focus:border-ink/20 focus:bg-card outline-none"
-            />
+            <span className="text-ink font-medium">My files</span>
           </div>
           <div className="flex items-center gap-2">
-            <button className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 border border-ink/10 rounded-md hover:bg-muted">
-              <Plus className="size-4" /> New folder
-            </button>
-            <button className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 bg-ink text-surface rounded-md hover:bg-ink/90">
-              <Upload className="size-4" /> Upload
+            <input
+              ref={fileInput}
+              type="file"
+              multiple
+              hidden
+              onChange={(e) => handleFiles(e.target.files)}
+            />
+            <button
+              onClick={() => fileInput.current?.click()}
+              disabled={uploading || overLimit}
+              className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 bg-ink text-surface rounded-md hover:bg-ink/90 disabled:opacity-50"
+              title={overLimit ? "Over storage limit" : "Upload files"}
+            >
+              {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
+              {uploading ? "Uploading…" : "Upload"}
             </button>
             <button className="size-9 grid place-items-center rounded-md hover:bg-muted" title="Settings">
               <Settings className="size-4" />
@@ -153,73 +218,127 @@ function AppPage() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-auto px-8 py-6">
-          {fl.length > 0 && (
-            <section>
-              <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Folders</h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {fl.map((f) => (
-                  <div key={f.name} className="p-5 bg-card rounded-xl ring-1 ring-black/5 hover:ring-ink/20 transition cursor-default">
-                    <div className="flex items-start justify-between">
-                      <Folder className="size-7 text-ink" strokeWidth={1.5} />
-                      <button className="text-muted-foreground hover:text-ink"><MoreHorizontal className="size-4" /></button>
-                    </div>
-                    <div className="mt-4 text-sm font-semibold">{f.name}</div>
-                    <div className="mt-1 text-xs text-muted-foreground">{f.meta}</div>
-                    <div className="mt-3 text-[11px] text-muted-foreground">{f.size}</div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+        {overLimit && (
+          <div className="bg-destructive/10 border-b border-destructive/20 px-8 py-3 flex items-center gap-3 text-sm">
+            <AlertCircle className="size-4 text-destructive shrink-0" />
+            <span className="text-ink">
+              You're at {formatBytes(used)} of {formatBytes(cap)}. Uploads are blocked until you delete files or upgrade.
+            </span>
+            <Link to="/pricing" className="ml-auto text-xs font-medium underline underline-offset-2">
+              View plans
+            </Link>
+          </div>
+        )}
 
-          {fi.length > 0 && (
-            <section className="mt-10">
-              <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Files</h2>
-              <div className="bg-card rounded-xl ring-1 ring-black/5 overflow-hidden">
-                <div className="grid grid-cols-12 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground border-b border-border bg-muted/40">
-                  <div className="col-span-6">Name</div>
-                  <div className="col-span-3">Modified</div>
-                  <div className="col-span-2">Size</div>
-                  <div className="col-span-1 text-right">Actions</div>
-                </div>
-                {fi.map((f) => {
-                  const meta = iconFor[f.type];
-                  const Icon = meta.Icon;
-                  return (
-                    <div key={f.name} className="grid grid-cols-12 items-center px-5 py-3 border-b border-border last:border-b-0 hover:bg-muted/40">
-                      <div className="col-span-6 flex items-center gap-3 min-w-0">
-                        <div className={`size-9 rounded-md grid place-items-center text-[10px] font-semibold ${meta.cls}`}>
-                          {meta.label}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium truncate flex items-center gap-2">
-                            {f.name}
-                            <Icon className="size-3.5 text-muted-foreground shrink-0 md:hidden" />
-                          </div>
-                          <div className="text-xs text-muted-foreground truncate">{f.meta}</div>
-                        </div>
-                      </div>
-                      <div className="col-span-3 text-sm text-muted-foreground">{f.meta.split("•")[1]?.trim() ?? "—"}</div>
-                      <div className="col-span-2 text-sm text-muted-foreground">{f.size}</div>
-                      <div className="col-span-1 flex justify-end gap-1">
-                        <button className="size-8 grid place-items-center rounded-md hover:bg-card text-muted-foreground hover:text-ink"><Share2 className="size-4" /></button>
-                        <button className="size-8 grid place-items-center rounded-md hover:bg-card text-muted-foreground hover:text-ink"><Download className="size-4" /></button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {all.length === 0 && (
-            <div className="text-center text-sm text-muted-foreground py-24">
-              No files match "{query}".
+        <div
+          className="flex-1 overflow-auto px-8 py-6"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            handleFiles(e.dataTransfer.files);
+          }}
+        >
+          {filesQ.isLoading ? (
+            <div className="text-center py-24 text-sm text-muted-foreground">
+              <Loader2 className="size-5 animate-spin inline mr-2" /> Loading your files…
             </div>
+          ) : !filesQ.data || filesQ.data.length === 0 ? (
+            <EmptyState onClick={() => fileInput.current?.click()} disabled={overLimit} />
+          ) : (
+            <FileList files={filesQ.data} onDelete={(id) => deleteMut.mutate(id)} onDownload={download} />
           )}
         </div>
+
+        <footer className="border-t border-border px-8 py-3 text-xs text-muted-foreground">
+          Per-file limit: {state ? formatBytes(state.maxFileBytes) : "—"}. Plan limit enforced on every upload.
+        </footer>
       </main>
     </div>
   );
+}
+
+function EmptyState({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
+  return (
+    <div className="border-2 border-dashed border-border rounded-2xl py-24 text-center">
+      <Upload className="size-8 text-muted-foreground mx-auto" strokeWidth={1.5} />
+      <h3 className="mt-4 text-base font-semibold">No files yet</h3>
+      <p className="mt-1 text-sm text-muted-foreground">Drag and drop here, or click to upload.</p>
+      <button
+        onClick={onClick}
+        disabled={disabled}
+        className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium px-4 py-2 bg-ink text-surface rounded-md hover:bg-ink/90 disabled:opacity-50"
+      >
+        <Upload className="size-4" /> Upload your first file
+      </button>
+    </div>
+  );
+}
+
+function FileList({
+  files, onDelete, onDownload,
+}: {
+  files: StoredFile[];
+  onDelete: (id: string) => void;
+  onDownload: (id: string) => void;
+}) {
+  return (
+    <div className="bg-card rounded-xl ring-1 ring-black/5 overflow-hidden">
+      <div className="grid grid-cols-12 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground border-b border-border bg-muted/40">
+        <div className="col-span-7">Name</div>
+        <div className="col-span-2">Uploaded</div>
+        <div className="col-span-2">Size</div>
+        <div className="col-span-1 text-right">Actions</div>
+      </div>
+      {files.map((f) => {
+        const m = iconFor(f.mime_type, f.name);
+        return (
+          <div key={f.id} className="grid grid-cols-12 items-center px-5 py-3 border-b border-border last:border-b-0 hover:bg-muted/40">
+            <div className="col-span-7 flex items-center gap-3 min-w-0">
+              <div className={`size-9 rounded-md grid place-items-center ${m.cls}`}>
+                <m.Icon className="size-4" strokeWidth={1.75} />
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-medium truncate">{f.name}</div>
+                <div className="text-xs text-muted-foreground truncate">{f.mime_type ?? "—"}</div>
+              </div>
+            </div>
+            <div className="col-span-2 text-sm text-muted-foreground">
+              {new Date(f.created_at).toLocaleDateString()}
+            </div>
+            <div className="col-span-2 text-sm text-muted-foreground">{formatBytes(f.size_bytes)}</div>
+            <div className="col-span-1 flex justify-end gap-1">
+              <button
+                onClick={() => onDownload(f.id)}
+                className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
+                title="Download"
+              >
+                <Download className="size-4" />
+              </button>
+              <button
+                onClick={() => onDelete(f.id)}
+                className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-destructive"
+                title="Delete"
+              >
+                <Trash2 className="size-4" />
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function iconFor(mime: string | null, name: string) {
+  const m = mime ?? "";
+  if (m.startsWith("image/")) return { Icon: ImageIcon, cls: "bg-blue-50 text-blue-700" };
+  if (m.startsWith("video/")) return { Icon: Film, cls: "bg-amber-50 text-amber-700" };
+  if (m.startsWith("audio/")) return { Icon: Music, cls: "bg-violet-50 text-violet-700" };
+  if (m.includes("pdf")) return { Icon: FileText, cls: "bg-red-50 text-red-700" };
+  if (m.includes("zip") || m.includes("rar") || m.includes("tar") || name.match(/\.(zip|rar|tar|gz|7z)$/i))
+    return { Icon: Archive, cls: "bg-zinc-100 text-zinc-700" };
+  if (m.includes("word") || m.includes("text")) return { Icon: FileText, cls: "bg-blue-50 text-blue-700" };
+  if (m.includes("sheet") || m.includes("excel")) return { Icon: FileText, cls: "bg-emerald-50 text-emerald-700" };
+  void Folder;
+  return { Icon: FileIcon, cls: "bg-muted text-muted-foreground" };
 }
