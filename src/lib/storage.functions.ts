@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { formatBytes } from "./storage-format";
 
 const BUCKET = "user-files";
 const MAX_FILE_BYTES = 26_214_400; // 25 MB — must match DB max_file_bytes()
@@ -213,16 +214,4 @@ export const getDownloadUrl = createServerFn({ method: "POST" })
   });
 
 // ---------- Helpers ----------
-
-export function formatBytes(n: number | null): string {
-  if (n === null) return "Unlimited";
-  if (n < 1024) return `${n} B`;
-  const units = ["KB", "MB", "GB", "TB"];
-  let v = n / 1024;
-  let i = 0;
-  while (v >= 1024 && i < units.length - 1) {
-    v /= 1024;
-    i++;
-  }
-  return `${v.toFixed(v < 10 ? 2 : v < 100 ? 1 : 0)} ${units[i]}`;
-}
+// (formatBytes lives in ./storage-format so it stays client-safe.)
