@@ -5,7 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-mono: var(--font-mono);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -84,5 +86,6 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3 { letter-spacing: -0.02em; }
+  h1, h2, h3 { letter-spacing: -0.03em; font-feature-settings: "ss01"; }
+  code, pre, kbd, samp, .font-mono { font-family: var(--font-mono); }
 }
