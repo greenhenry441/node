@@ -1,0 +1,15 @@
+# Node FMS
+
+> Node File Management Suite (Node FMS), a division of Node — secure file storage and team workspace built for small businesses. Public launch June 1, 2026.
+
+## Pages
+
+- [Home](/): Product overview and pricing summary.
+- [Features](/features): What Node FMS does — storage, sync, sharing, and editing.
+- [Pricing](/pricing): Plans from Free (100 GB) to Node Suite (Unlimited).
+- [Security](/security): How we protect your files and account.
+- [About](/about): Who we are and when the product launches.
+- [Contact](/contact): How to reach us.
+- [Changelog](/changelog): Semantic-versioned release history.
+- [Status](/status): Current service status.
+- [Privacy](/privacy): Privacy policy.
