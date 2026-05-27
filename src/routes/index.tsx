@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { WebGLBackground } from "@/components/webgl-background";
 import {
   FolderTree,
   Lock,
@@ -30,14 +31,15 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="min-h-screen bg-surface text-ink">
+    <div className="min-h-screen bg-surface text-ink relative">
+      <WebGLBackground />
       <SiteHeader />
 
-      <section className="py-20 md:py-32">
+      <section className="py-20 md:py-32 relative">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-ink/10 text-xs font-medium text-muted-foreground mb-6">
-            <span className="size-1.5 rounded-full bg-emerald-500" />
-            Node File Management Suite — a division of Node
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-ink/10 bg-surface/60 backdrop-blur text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground mb-6">
+            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            NODE_FMS // a division of Node
           </div>
           <h1 className="text-4xl md:text-6xl font-semibold leading-tight tracking-tight text-balance max-w-[22ch] mx-auto">
             The single source of truth for your business's files.
