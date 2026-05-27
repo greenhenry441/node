@@ -12,6 +12,19 @@ export const Route = createFileRoute("/changelog")({
       { property: "og:url", content: "https://nodefms.lovable.app/changelog" },
     ],
     links: [{ rel: "canonical", href: "https://nodefms.lovable.app/changelog" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Node FMS Changelog",
+          description: "Semantic-versioned release history for Node FMS.",
+          url: "https://nodefms.lovable.app/changelog",
+          isPartOf: { "@type": "WebSite", name: "Node FMS", url: "https://nodefms.lovable.app" },
+        }),
+      },
+    ],
   }),
   component: ChangelogPage,
 });

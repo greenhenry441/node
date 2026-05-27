@@ -13,6 +13,25 @@ export const Route = createFileRoute("/pricing")({
       { property: "og:url", content: "https://nodefms.lovable.app/pricing" },
     ],
     links: [{ rel: "canonical", href: "https://nodefms.lovable.app/pricing" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: "Node FMS",
+          description:
+            "Secure file storage and team workspace from Node File Management Suite.",
+          brand: { "@type": "Brand", name: "Node" },
+          offers: [
+            { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "100 GB storage" },
+            { "@type": "Offer", name: "Starter", price: "25.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "500 GB storage" },
+            { "@type": "Offer", name: "Steady", price: "50.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "1 TB storage" },
+            { "@type": "Offer", name: "Node Suite", price: "75.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "Unlimited storage" },
+          ],
+        }),
+      },
+    ],
   }),
   component: PricingPage,
 });

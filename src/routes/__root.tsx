@@ -93,6 +93,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" },
       { rel: "stylesheet", href: appCss },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Node FMS",
+          alternateName: "Node File Management Suite",
+          url: "https://nodefms.lovable.app",
+          parentOrganization: { "@type": "Organization", name: "Node" },
+          description:
+            "Node File Management Suite (Node FMS), a division of Node — secure file storage and team workspace built for small businesses.",
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
