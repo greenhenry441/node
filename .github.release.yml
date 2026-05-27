@@ -1,0 +1,11 @@
+changelog:
+  categories:
+    - title: "Major"
+      labels:
+        - "major"
+    - title: "Minor"
+      labels:
+        - "Minor"
+    - title: "PATCH"
+      labels:
+        - "Patch"
