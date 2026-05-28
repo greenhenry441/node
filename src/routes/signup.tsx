@@ -43,6 +43,7 @@ function SignupPage() {
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
   const [checkInbox, setCheckInbox] = useState(false);
 
   const score = useMemo(() => pwStrength(form.password), [form.password]);
