@@ -155,15 +155,26 @@ function SignupPage() {
         </>
       }
     >
-      <button
-        type="button"
-        onClick={signUpWithGoogle}
-        disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
-      >
-        {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
-        Continue with Google
-      </button>
+      <div className="space-y-2">
+        <button
+          type="button"
+          onClick={signUpWithGoogle}
+          disabled={googleLoading || appleLoading}
+          className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
+        >
+          {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
+          Continue with Google
+        </button>
+        <button
+          type="button"
+          onClick={signUpWithApple}
+          disabled={googleLoading || appleLoading}
+          className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
+        >
+          {appleLoading ? <Loader2 className="size-4 animate-spin" /> : <AppleIcon />}
+          Continue with Apple
+        </button>
+      </div>
       <Divider>or sign up with email</Divider>
 
       <form onSubmit={submit} noValidate className="space-y-4">
