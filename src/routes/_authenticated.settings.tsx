@@ -238,6 +238,46 @@ function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
         </div>
       </div>
 
+      {/* Prominent join code — share to invite anyone instantly */}
+      <div className="px-6 py-5 border-b border-border bg-muted/30">
+        <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2">
+          <KeyRound className="size-3.5" /> Workspace access code
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <code className="px-4 py-2.5 rounded-md bg-ink text-surface font-mono text-lg tracking-widest select-all">
+            {workspace.join_code}
+          </code>
+          <button
+            onClick={() => copyText(workspace.join_code, `code-${workspace.id}`, "Code")}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md border border-border text-sm font-medium hover:bg-card"
+          >
+            {copied === `code-${workspace.id}` ? <Check className="size-4" /> : <Copy className="size-4" />} Copy code
+          </button>
+          <button
+            onClick={() => copyText(`${window.location.origin}/invite/${workspace.join_code}`, `link-${workspace.id}`, "Join link")}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md border border-border text-sm font-medium hover:bg-card"
+          >
+            {copied === `link-${workspace.id}` ? <Check className="size-4" /> : <Copy className="size-4" />} Copy link
+          </button>
+          {canManage && (
+            <button
+              onClick={() => { if (confirm("Regenerate code? The old code stops working.")) regenMut.mutate(); }}
+              disabled={regenMut.isPending}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-ink hover:bg-card disabled:opacity-50"
+            >
+              <RefreshCw className={`size-4 ${regenMut.isPending ? "animate-spin" : ""}`} /> Regenerate
+            </button>
+          )}
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Anyone with this code can join as a member. Share it directly — no email required.
+        </p>
+      </div>
+
+      {/* Live team chat */}
+      <div className="border-b border-border h-[420px]">
+        <WorkspaceChat workspaceId={workspace.id} />
+      </div>
       {canManage && (
         <div className="px-6 py-5 border-b border-border">
           <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Invite by email</div>
