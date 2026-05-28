@@ -92,7 +92,6 @@ export const createWorkspace = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ...ws, role: "owner" as WorkspaceRole };
   });
-  });
 
 // ---------- Get workspace detail ----------
 
