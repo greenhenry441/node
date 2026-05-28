@@ -286,6 +286,31 @@ const tagMeaning: Record<ReleaseTag, string> = {
   RTAO: "Release to Application Only — desktop app required",
 };
 
+const latestLts = releases.find((r) => r.tags.includes("LTS"));
+
+function EolBanner({ latestVersion }: { latestVersion: string }) {
+  return (
+    <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-start gap-3">
+      <AlertTriangle className="shrink-0 size-5 text-amber-700 mt-0.5" />
+      <div>
+        <p className="text-sm font-semibold text-amber-900">
+          This release has reached end-of-life (EOL)
+        </p>
+        <p className="text-sm text-amber-800 mt-0.5">
+          No more fixes or support. Please upgrade to{" "}
+          <a
+            href={`#v${latestVersion}`}
+            className="underline underline-offset-2 font-medium hover:text-amber-950"
+          >
+            the latest LTS version
+          </a>
+          .
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function ChangelogPage() {
   return (
     <div className="min-h-screen bg-surface">
