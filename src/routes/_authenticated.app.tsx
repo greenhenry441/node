@@ -89,7 +89,7 @@ function AppPage() {
       if (fileInput.current) fileInput.current.value = "";
     }
   };
-  };
+
 
   const download = async (id: string) => {
     try {
