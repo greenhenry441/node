@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FilePlus2, FolderOpen, Save, Download, Monitor, Globe, FileText } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 
-export const Route = createFileRoute("/editor")({
+export const Route = createFileRoute("/_authenticated/editor")({
   head: () => ({
     meta: [
       { title: "Editor — Node FMS Desktop" },
