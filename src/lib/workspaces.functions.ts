@@ -86,11 +86,12 @@ export const createWorkspace = createServerFn({ method: "POST" })
     }
     const { data: ws, error } = await supabaseAdmin
       .from("workspaces")
-      .insert({ name: data.name, slug, owner_id: userId })
-      .select("id, name, slug, owner_id, created_at")
+      .insert({ name: data.name, slug, owner_id: userId, join_code: newJoinCode() })
+      .select("id, name, slug, owner_id, join_code, created_at")
       .single();
     if (error) throw new Error(error.message);
     return { ...ws, role: "owner" as WorkspaceRole };
+  });
   });
 
 // ---------- Get workspace detail ----------
