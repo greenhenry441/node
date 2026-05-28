@@ -4,14 +4,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
-  ArrowLeft, Loader2, Plus, Copy, Check, Trash2, UserMinus, Users, Building2, Mail, Shield,
+  ArrowLeft, Loader2, Plus, Copy, Check, Trash2, UserMinus, Users, Building2, Mail, Shield, KeyRound, RefreshCw, LogIn,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   listMyWorkspaces, createWorkspace, getWorkspaceDetail, createInvite, revokeInvite, removeMember,
+  regenerateJoinCode, joinWorkspaceByCode,
   type WorkspaceRole,
 } from "@/lib/workspaces.functions";
+import { WorkspaceChat } from "@/components/workspace-chat";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings — Node FMS" }] }),
@@ -29,6 +31,8 @@ function SettingsPage() {
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
+  const [joinCodeInput, setJoinCodeInput] = useState("");
+  const joinFn = useServerFn(joinWorkspaceByCode);
 
   const createMut = useMutation({
     mutationFn: (name: string) => createWsFn({ data: { name } }),
@@ -36,6 +40,17 @@ function SettingsPage() {
       toast.success(`Workspace "${ws.name}" created`);
       setNewName("");
       setActiveId(ws.id);
+      qc.invalidateQueries({ queryKey: ["my-workspaces"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const joinMut = useMutation({
+    mutationFn: (code: string) => joinFn({ data: { code: code.trim().toLowerCase() } }),
+    onSuccess: (r) => {
+      toast.success(`Joined "${r.name}"`);
+      setJoinCodeInput("");
+      setActiveId(r.workspace_id);
       qc.invalidateQueries({ queryKey: ["my-workspaces"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -106,23 +121,45 @@ function SettingsPage() {
             ))}
           </div>
 
-          <form
-            onSubmit={(e) => { e.preventDefault(); if (newName.trim()) createMut.mutate(newName.trim()); }}
-            className="mt-4 flex gap-2 max-w-md"
-          >
-            <input
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              placeholder="New workspace name"
-              className="flex-1 px-3 py-2 rounded-md border border-border bg-card text-sm"
-            />
-            <button
-              disabled={createMut.isPending || !newName.trim()}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-ink text-surface text-sm font-medium hover:bg-ink/90 disabled:opacity-50"
+          <div className="mt-4 grid sm:grid-cols-2 gap-3 max-w-2xl">
+            <form
+              onSubmit={(e) => { e.preventDefault(); if (newName.trim()) createMut.mutate(newName.trim()); }}
+              className="flex gap-2"
             >
-              <Plus className="size-4" /> Create
-            </button>
-          </form>
+              <input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="New workspace name"
+                className="flex-1 px-3 py-2 rounded-md border border-border bg-card text-sm"
+              />
+              <button
+                disabled={createMut.isPending || !newName.trim()}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-ink text-surface text-sm font-medium hover:bg-ink/90 disabled:opacity-50"
+              >
+                <Plus className="size-4" /> Create
+              </button>
+            </form>
+            <form
+              onSubmit={(e) => { e.preventDefault(); if (joinCodeInput.trim()) joinMut.mutate(joinCodeInput); }}
+              className="flex gap-2"
+            >
+              <input
+                value={joinCodeInput}
+                onChange={(e) => setJoinCodeInput(e.target.value)}
+                placeholder="Join with workspace code"
+                className="flex-1 px-3 py-2 rounded-md border border-border bg-card text-sm font-mono"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+              />
+              <button
+                disabled={joinMut.isPending || !joinCodeInput.trim()}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md border border-border text-sm font-medium hover:bg-muted disabled:opacity-50"
+              >
+                <LogIn className="size-4" /> Join
+              </button>
+            </form>
+          </div>
 
           {active && <WorkspaceDetail key={active} workspaceId={active} />}
         </section>
@@ -137,6 +174,7 @@ function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
   const inviteFn = useServerFn(createInvite);
   const revokeFn = useServerFn(revokeInvite);
   const removeFn = useServerFn(removeMember);
+  const regenFn = useServerFn(regenerateJoinCode);
 
   const dq = useQuery({
     queryKey: ["workspace", workspaceId],
@@ -166,6 +204,15 @@ function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId] }),
     onError: (e: Error) => toast.error(e.message),
   });
+  const regenMut = useMutation({
+    mutationFn: () => regenFn({ data: { workspace_id: workspaceId } }),
+    onSuccess: () => {
+      toast.success("Join code regenerated");
+      qc.invalidateQueries({ queryKey: ["workspace", workspaceId] });
+      qc.invalidateQueries({ queryKey: ["my-workspaces"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   if (dq.isLoading) return <div className="mt-8 text-sm text-muted-foreground"><Loader2 className="inline size-4 animate-spin mr-2" />Loading workspace…</div>;
   if (dq.error) return <div className="mt-8 text-sm text-destructive">{(dq.error as Error).message}</div>;
@@ -174,13 +221,13 @@ function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
   const { workspace, members, invites, myRole } = dq.data;
   const canManage = myRole === "owner" || myRole === "admin";
 
-  const copyInvite = async (code: string) => {
-    const url = `${window.location.origin}/invite/${code}`;
-    await navigator.clipboard.writeText(url);
-    setCopied(code);
-    toast.success("Invite link copied");
+  const copyText = async (text: string, key: string, label: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(key);
+    toast.success(`${label} copied`);
     setTimeout(() => setCopied(null), 1500);
   };
+  const copyInvite = (code: string) => copyText(`${window.location.origin}/invite/${code}`, code, "Invite link");
 
   return (
     <div className="mt-8 rounded-2xl border border-border bg-card overflow-hidden">
@@ -191,6 +238,46 @@ function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
         </div>
       </div>
 
+      {/* Prominent join code — share to invite anyone instantly */}
+      <div className="px-6 py-5 border-b border-border bg-muted/30">
+        <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2">
+          <KeyRound className="size-3.5" /> Workspace access code
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <code className="px-4 py-2.5 rounded-md bg-ink text-surface font-mono text-lg tracking-widest select-all">
+            {workspace.join_code}
+          </code>
+          <button
+            onClick={() => copyText(workspace.join_code, `code-${workspace.id}`, "Code")}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md border border-border text-sm font-medium hover:bg-card"
+          >
+            {copied === `code-${workspace.id}` ? <Check className="size-4" /> : <Copy className="size-4" />} Copy code
+          </button>
+          <button
+            onClick={() => copyText(`${window.location.origin}/invite/${workspace.join_code}`, `link-${workspace.id}`, "Join link")}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md border border-border text-sm font-medium hover:bg-card"
+          >
+            {copied === `link-${workspace.id}` ? <Check className="size-4" /> : <Copy className="size-4" />} Copy link
+          </button>
+          {canManage && (
+            <button
+              onClick={() => { if (confirm("Regenerate code? The old code stops working.")) regenMut.mutate(); }}
+              disabled={regenMut.isPending}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-ink hover:bg-card disabled:opacity-50"
+            >
+              <RefreshCw className={`size-4 ${regenMut.isPending ? "animate-spin" : ""}`} /> Regenerate
+            </button>
+          )}
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Anyone with this code can join as a member. Share it directly — no email required.
+        </p>
+      </div>
+
+      {/* Live team chat */}
+      <div className="border-b border-border h-[420px]">
+        <WorkspaceChat workspaceId={workspace.id} />
+      </div>
       {canManage && (
         <div className="px-6 py-5 border-b border-border">
           <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Invite by email</div>

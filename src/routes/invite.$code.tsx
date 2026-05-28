@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getInviteByCode, acceptInvite } from "@/lib/workspaces.functions";
+import { getInviteByCode, acceptInvite, joinWorkspaceByCode } from "@/lib/workspaces.functions";
 
 export const Route = createFileRoute("/invite/$code")({
   head: () => ({ meta: [{ title: "Join workspace — Node FMS" }] }),
@@ -27,6 +27,7 @@ function InvitePage() {
 
   const lookupFn = useServerFn(getInviteByCode);
   const acceptFn = useServerFn(acceptInvite);
+  const joinFn = useServerFn(joinWorkspaceByCode);
 
   const q = useQuery({
     queryKey: ["invite", code],
@@ -35,10 +36,12 @@ function InvitePage() {
 
   const acceptMut = useMutation({
     mutationFn: () => acceptFn({ data: { code } }),
-    onSuccess: () => {
-      toast.success("You're in!");
-      navigate({ to: "/settings" });
-    },
+    onSuccess: () => { toast.success("You're in!"); navigate({ to: "/settings" }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const joinMut = useMutation({
+    mutationFn: () => joinFn({ data: { code } }),
+    onSuccess: () => { toast.success("Joined workspace"); navigate({ to: "/settings" }); },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -54,13 +57,44 @@ function InvitePage() {
           </div>
         )}
 
-        {q.data && !q.data.invite && (
+        {q.data && q.data.kind === "none" && (
           <div className="mt-6 text-sm flex items-start gap-2 text-destructive">
-            <AlertCircle className="size-4 mt-0.5" /> This invite link is invalid or has been revoked.
+            <AlertCircle className="size-4 mt-0.5" /> This code is invalid or has been revoked.
           </div>
         )}
 
-        {q.data?.invite && (
+        {q.data?.kind === "join_code" && q.data.invite && (
+          <>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Join <span className="font-semibold text-ink">{q.data.invite.workspace?.name ?? "the workspace"}</span> as a member.
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Open access code — anyone with this code can join.</p>
+            <div className="mt-6">
+              {sessionEmail === undefined ? (
+                <div className="text-sm text-muted-foreground"><Loader2 className="inline size-4 animate-spin mr-1" /> Loading…</div>
+              ) : sessionEmail === null ? (
+                <Link
+                  to="/login"
+                  search={{ next: `/invite/${code}` } as never}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-surface text-sm font-medium hover:bg-ink/90"
+                >
+                  Sign in to join <ArrowRight className="size-4" />
+                </Link>
+              ) : (
+                <button
+                  onClick={() => joinMut.mutate()}
+                  disabled={joinMut.isPending}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ink text-surface text-sm font-medium hover:bg-ink/90 disabled:opacity-50"
+                >
+                  {joinMut.isPending && <Loader2 className="size-4 animate-spin" />}
+                  Join workspace <ArrowRight className="size-4" />
+                </button>
+              )}
+            </div>
+          </>
+        )}
+
+        {q.data?.kind === "email" && q.data.invite && (
           <>
             <p className="mt-3 text-sm text-muted-foreground">
               Join <span className="font-semibold text-ink">{q.data.invite.workspace?.name ?? "the workspace"}</span> as a{" "}
@@ -84,7 +118,7 @@ function InvitePage() {
                   >
                     Sign in to accept <ArrowRight className="size-4" />
                   </Link>
-                ) : sessionEmail.toLowerCase() !== q.data.invite.email.toLowerCase() ? (
+                ) : q.data.invite.email && sessionEmail.toLowerCase() !== q.data.invite.email.toLowerCase() ? (
                   <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
                     You're signed in as <strong>{sessionEmail}</strong>. Sign in as {q.data.invite.email} to accept.
                   </div>

@@ -11,6 +11,7 @@ export type Workspace = {
   slug: string;
   owner_id: string;
   role: WorkspaceRole;
+  join_code: string;
   created_at: string;
 };
 
@@ -35,11 +36,12 @@ export type WorkspaceInvite = {
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
 
-function randomCode() {
-  return Array.from(crypto.getRandomValues(new Uint8Array(18)))
+function randomCode(len = 18) {
+  return Array.from(crypto.getRandomValues(new Uint8Array(len)))
     .map((b) => "abcdefghijkmnopqrstuvwxyz23456789"[b % 33])
     .join("");
 }
+const newJoinCode = () => randomCode(10);
 
 // ---------- List my workspaces ----------
 
@@ -49,11 +51,11 @@ export const listMyWorkspaces = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("workspace_members")
-      .select("role, workspaces:workspace_id (id, name, slug, owner_id, created_at)")
+      .select("role, workspaces:workspace_id (id, name, slug, owner_id, join_code, created_at)")
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
     return (data ?? [])
-      .map((row: { role: WorkspaceRole; workspaces: { id: string; name: string; slug: string; owner_id: string; created_at: string } | null }) =>
+      .map((row: { role: WorkspaceRole; workspaces: { id: string; name: string; slug: string; owner_id: string; join_code: string; created_at: string } | null }) =>
         row.workspaces
           ? {
               ...row.workspaces,
@@ -84,8 +86,8 @@ export const createWorkspace = createServerFn({ method: "POST" })
     }
     const { data: ws, error } = await supabaseAdmin
       .from("workspaces")
-      .insert({ name: data.name, slug, owner_id: userId })
-      .select("id, name, slug, owner_id, created_at")
+      .insert({ name: data.name, slug, owner_id: userId, join_code: newJoinCode() })
+      .select("id, name, slug, owner_id, join_code, created_at")
       .single();
     if (error) throw new Error(error.message);
     return { ...ws, role: "owner" as WorkspaceRole };
@@ -109,7 +111,7 @@ export const getWorkspaceDetail = createServerFn({ method: "POST" })
     if (!membership) throw new Error("Not a member of this workspace");
 
     const [{ data: ws }, { data: rawMembers }, invitesRes] = await Promise.all([
-      supabase.from("workspaces").select("id, name, slug, owner_id, created_at").eq("id", data.id).single(),
+      supabase.from("workspaces").select("id, name, slug, owner_id, join_code, created_at").eq("id", data.id).single(),
       supabase.from("workspace_members").select("id, user_id, role, created_at").eq("workspace_id", data.id),
       membership.role === "owner" || membership.role === "admin"
         ? supabase
@@ -219,7 +221,7 @@ export const removeMember = createServerFn({ method: "POST" })
 
 export const getInviteByCode = createServerFn({ method: "POST" })
   .inputValidator((input) =>
-    z.object({ code: z.string().min(8).max(64).regex(/^[a-z0-9]+$/) }).parse(input),
+    z.object({ code: z.string().min(6).max(64).regex(/^[a-z0-9]+$/) }).parse(input),
   )
   .handler(async ({ data }) => {
     const { data: inv } = await supabaseAdmin
@@ -227,17 +229,32 @@ export const getInviteByCode = createServerFn({ method: "POST" })
       .select("id, email, role, code, expires_at, accepted_at, workspace_id, workspaces:workspace_id(name, slug)")
       .eq("code", data.code)
       .maybeSingle();
-    if (!inv) return { invite: null as null };
-    return {
-      invite: {
-        id: inv.id,
-        email: inv.email,
-        role: inv.role as WorkspaceRole,
-        expires_at: inv.expires_at,
-        accepted_at: inv.accepted_at,
-        workspace: inv.workspaces as { name: string; slug: string } | null,
-      },
-    };
+    if (inv) {
+      return {
+        kind: "email" as const,
+        invite: {
+          id: inv.id,
+          email: inv.email,
+          role: inv.role as WorkspaceRole,
+          expires_at: inv.expires_at,
+          accepted_at: inv.accepted_at,
+          workspace: inv.workspaces as { name: string; slug: string } | null,
+        },
+      };
+    }
+    // Fallback: try workspace-wide join code
+    const { data: ws } = await supabaseAdmin
+      .from("workspaces")
+      .select("id, name, slug")
+      .eq("join_code", data.code)
+      .maybeSingle();
+    if (ws) {
+      return {
+        kind: "join_code" as const,
+        invite: { workspace: { name: ws.name, slug: ws.slug } },
+      };
+    }
+    return { kind: "none" as const, invite: null };
   });
 
 // ---------- Accept invite ----------
@@ -278,4 +295,107 @@ export const acceptInvite = createServerFn({ method: "POST" })
       .eq("id", inv.id);
 
     return { workspace_id: inv.workspace_id };
+  });
+
+// ---------- Regenerate workspace join code ----------
+
+export const regenerateJoinCode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ workspace_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const { data: m } = await supabaseAdmin
+      .from("workspace_members").select("role")
+      .eq("workspace_id", data.workspace_id).eq("user_id", userId).maybeSingle();
+    if (!m || (m.role !== "owner" && m.role !== "admin")) {
+      throw new Error("Only owners and admins can regenerate the join code");
+    }
+    const code = newJoinCode();
+    const { error } = await supabaseAdmin
+      .from("workspaces").update({ join_code: code }).eq("id", data.workspace_id);
+    if (error) throw new Error(error.message);
+    return { join_code: code };
+  });
+
+// ---------- Join workspace by code (no email required) ----------
+
+export const joinWorkspaceByCode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ code: z.string().trim().toLowerCase().min(6).max(40).regex(/^[a-z0-9]+$/) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const { data: ws } = await supabaseAdmin
+      .from("workspaces").select("id, name").eq("join_code", data.code).maybeSingle();
+    if (!ws) throw new Error("Invalid workspace code");
+
+    const { error } = await supabaseAdmin
+      .from("workspace_members")
+      .insert({ workspace_id: ws.id, user_id: userId, role: "member" });
+    if (error && !error.message.includes("duplicate")) throw new Error(error.message);
+    return { workspace_id: ws.id, name: ws.name };
+  });
+
+// ---------- Workspace messages (chat / comments) ----------
+
+export type WorkspaceMessage = {
+  id: string;
+  user_id: string;
+  email: string | null;
+  body: string;
+  created_at: string;
+};
+
+export const listWorkspaceMessages = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ workspace_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }): Promise<WorkspaceMessage[]> => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("workspace_messages")
+      .select("id, user_id, body, created_at")
+      .eq("workspace_id", data.workspace_id)
+      .order("created_at", { ascending: true })
+      .limit(500);
+    if (error) throw new Error(error.message);
+
+    const ids = Array.from(new Set((rows ?? []).map((r) => r.user_id)));
+    const emails = new Map<string, string | null>();
+    if (ids.length) {
+      const { data: usersData } = await supabaseAdmin.auth.admin.listUsers({ perPage: 200 });
+      for (const u of usersData?.users ?? []) {
+        if (ids.includes(u.id)) emails.set(u.id, u.email ?? null);
+      }
+    }
+    return (rows ?? []).map((r) => ({ ...r, email: emails.get(r.user_id) ?? null }));
+  });
+
+export const postWorkspaceMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({
+      workspace_id: z.string().uuid(),
+      body: z.string().trim().min(1).max(4000),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: row, error } = await supabase
+      .from("workspace_messages")
+      .insert({ workspace_id: data.workspace_id, user_id: userId, body: data.body })
+      .select("id, user_id, body, created_at")
+      .single();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const deleteWorkspaceMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase.from("workspace_messages").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });

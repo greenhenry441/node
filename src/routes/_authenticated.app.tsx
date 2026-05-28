@@ -8,8 +8,10 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   Folder, FileText, Image as ImageIcon, Film, Music, Archive, Upload, Trash2,
   Settings, ChevronRight, Download, LogOut, Loader2, AlertCircle, Crown, FileIcon,
-  Search, Star, X, Pencil, Save as SaveIcon,
+  Search, Star, X, Pencil, Save as SaveIcon, MessageSquare,
 } from "lucide-react";
+import { listMyWorkspaces } from "@/lib/workspaces.functions";
+import { WorkspaceChat } from "@/components/workspace-chat";
 import {
   getStorageState, listFiles, deleteFile, setPlan, getDownloadUrl,
   getFileText, updateFileText,
@@ -52,6 +54,10 @@ function AppPage() {
   const fileInput = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const getStateFn = useServerFn(getStorageState);
+  const listWsFn = useServerFn(listMyWorkspaces);
+  const wsQ = useQuery({ queryKey: ["my-workspaces"], queryFn: () => listWsFn() });
+  const [chatOpen, setChatOpen] = useState(false);
+  const activeWs = wsQ.data?.[0];
 
   const listFn = useServerFn(listFiles);
   const deleteFn = useServerFn(deleteFile);
@@ -342,6 +348,15 @@ function AppPage() {
               {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
               {uploading ? "Uploading…" : "Upload"}
             </button>
+            {activeWs && (
+              <button
+                onClick={() => setChatOpen(true)}
+                className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-md border border-border hover:bg-muted"
+                title={`Team chat — ${activeWs.name}`}
+              >
+                <MessageSquare className="size-4" /> Chat
+              </button>
+            )}
             <Link to="/settings" className="size-9 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink" title="Settings">
               <Settings className="size-4" />
             </Link>
@@ -476,6 +491,25 @@ function AppPage() {
           Per-file limit: {state ? formatBytes(state.maxFileBytes) : "—"}. Plan limit enforced on every upload.
         </footer>
       </main>
+
+      {chatOpen && activeWs && (
+        <div className="fixed inset-0 z-40 bg-ink/30 backdrop-blur-sm" onClick={() => setChatOpen(false)}>
+          <aside
+            className="absolute right-0 top-0 h-full w-full max-w-md bg-card border-l border-border shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+              <div className="text-sm font-semibold">{activeWs.name}</div>
+              <button onClick={() => setChatOpen(false)} className="size-8 grid place-items-center rounded-md hover:bg-muted">
+                <X className="size-4" />
+              </button>
+            </div>
+            <div className="flex-1 min-h-0">
+              <WorkspaceChat workspaceId={activeWs.id} />
+            </div>
+          </aside>
+        </div>
+      )}
 
       {editor && (
         <EditorModal

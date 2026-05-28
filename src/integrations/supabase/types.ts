@@ -219,10 +219,43 @@ export type Database = {
           },
         ]
       }
+      workspace_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_messages_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workspaces: {
         Row: {
           created_at: string
           id: string
+          join_code: string
           name: string
           owner_id: string
           slug: string
@@ -231,6 +264,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          join_code: string
           name: string
           owner_id: string
           slug: string
@@ -239,6 +273,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          join_code?: string
           name?: string
           owner_id?: string
           slug?: string
