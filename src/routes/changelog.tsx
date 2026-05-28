@@ -65,6 +65,43 @@ type Release = {
 // release labels declared in `ReleaseTag` above.
 const releases: Release[] = [
   {
+    version: "1.2.0",
+    date: "May 28, 2026",
+    tags: ["Major"],
+    title: "Node becomes Node — three apps under one roof",
+    highlights: [
+      "Rebranded the platform to Node, with NodeFMS, Node Tasks, and Node Calendar as divisions",
+      "Home page reframed around the three apps with a new 'divisions' section",
+      "/features rebuilt as three sections (NodeFMS, Node Tasks, Node Calendar) with anchored navigation",
+      "/pricing updated — Node Suite tier now explicitly bundles all three apps",
+      "Personalized copy across docs, status, and changelog in Henry's voice",
+      "About page now has my real photo and bio — 11, HVS District, Milford MI, Gifted & Talented project",
+    ],
+  },
+  {
+    version: "1.1.0",
+    date: "May 28, 2026",
+    tags: ["Minor"],
+    title: "Node Tasks — ClickUp-style task management",
+    highlights: [
+      "New /tasks app with List, Board (Kanban), and Calendar views",
+      "Lists, tasks, statuses, priorities, assignees, and due dates",
+      "Workspace-scoped with full row-level security",
+      "Task editor with quick-edit and inline list management",
+    ],
+  },
+  {
+    version: "1.0.2",
+    date: "May 28, 2026",
+    tags: ["Patch"],
+    title: "Calendar connector + white-dot logo restored",
+    highlights: [
+      "New /integrations page for connecting Google Calendar and Outlook to Node Calendar",
+      "Reverted the favicon and inline logo back to the original white dot across every surface",
+    ],
+  },
+  {
+
     version: "1.0.1",
     date: "May 28, 2026",
     tags: ["LTS Patch"],
