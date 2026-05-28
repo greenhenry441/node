@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Lightweight WebGL background: animated tech grid + plasma glow.
- * Renders into a fixed full-viewport canvas behind page content.
+ * Technological WebGL background: layered perspective grid, plasma plume,
+ * scrolling data streams, dot matrix overlay and chromatic scanlines.
+ * Renders into an absolute canvas. Parent must be positioned.
  */
 export function WebGLBackground({ className = "" }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -10,7 +11,7 @@ export function WebGLBackground({ className = "" }: { className?: string }) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const gl = canvas.getContext("webgl", { antialias: true, alpha: true });
+    const gl = canvas.getContext("webgl", { antialias: true, alpha: true, premultipliedAlpha: false });
     if (!gl) return;
 
     const vert = `
@@ -23,8 +24,8 @@ export function WebGLBackground({ className = "" }: { className?: string }) {
       uniform float uTime;
       uniform vec2 uMouse;
 
-      // Hash + noise
       float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+      float hash11(float n){ return fract(sin(n)*43758.5453); }
       float noise(vec2 p){
         vec2 i = floor(p); vec2 f = fract(p);
         float a = hash(i);
@@ -34,36 +35,85 @@ export function WebGLBackground({ className = "" }: { className?: string }) {
         vec2 u = f*f*(3.0-2.0*f);
         return mix(a,b,u.x) + (c-a)*u.y*(1.0-u.x) + (d-b)*u.x*u.y;
       }
+      float fbm(vec2 p){
+        float v = 0.0; float a = 0.5;
+        for (int i = 0; i < 5; i++){ v += a*noise(p); p *= 2.02; a *= 0.5; }
+        return v;
+      }
+
+      // Distant perspective grid (floor-style)
+      float perspectiveGrid(vec2 uv, float t){
+        // project — pull lines toward horizon
+        vec2 g = uv;
+        g.y = 1.0 / (abs(g.y) + 0.04);
+        g.x *= g.y;
+        g += vec2(0.0, t * 1.4);
+        vec2 q = fract(g * 1.2) - 0.5;
+        float line = smoothstep(0.5, 0.46, max(abs(q.x), abs(q.y)));
+        // fade behind horizon
+        float horizonFade = smoothstep(0.0, 0.4, -uv.y) * smoothstep(-0.95, -0.3, uv.y);
+        return line * horizonFade;
+      }
+
+      // Vertical streaming "data" columns
+      float dataStreams(vec2 uv, float t){
+        vec2 g = uv * vec2(40.0, 18.0);
+        float col = floor(g.x);
+        float speed = 0.6 + hash11(col) * 1.6;
+        float y = fract(g.y * 0.12 + t * speed + hash11(col * 1.7));
+        float head = smoothstep(0.0, 0.02, y) * smoothstep(0.5, 0.0, y);
+        float trail = pow(1.0 - y, 4.0);
+        float intensity = head * 0.9 + trail * 0.18;
+        // randomly turn off some columns
+        float alive = step(0.35, hash11(col * 0.31));
+        return intensity * alive;
+      }
 
       void main(){
         vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
         float t = uTime * 0.08;
 
-        // Perspective grid
-        vec2 g = uv * vec2(8.0, 8.0);
-        g.y += t * 2.0;
-        vec2 gridUV = fract(g) - 0.5;
-        float line = smoothstep(0.49, 0.5, max(abs(gridUV.x), abs(gridUV.y)));
-        float grid = 1.0 - line;
+        // Top-half: dot matrix
+        vec2 dotG = uv * 80.0;
+        vec2 dq = fract(dotG) - 0.5;
+        float dot = smoothstep(0.18, 0.0, length(dq));
+        float dotMask = smoothstep(0.2, -0.4, uv.y);
+        float matrix = dot * dotMask * 0.35;
 
-        // Fade grid by distance from center
-        float vignette = smoothstep(1.2, 0.1, length(uv));
+        // Floor grid
+        float grid = perspectiveGrid(uv * 1.3, t);
 
-        // Plasma blob
-        float n = noise(uv * 2.0 + t * 3.0) + 0.5 * noise(uv * 4.0 - t * 2.0);
-        float blob = smoothstep(0.9, 0.2, length(uv - uMouse * 0.6) - n * 0.15);
+        // Streams
+        float streams = dataStreams(uv + vec2(0.0, t * 0.0), uTime * 0.4);
 
-        vec3 base = vec3(0.04, 0.05, 0.08);
-        vec3 cyan = vec3(0.30, 0.85, 1.00);
-        vec3 violet = vec3(0.55, 0.40, 1.00);
+        // Vignette
+        float vignette = smoothstep(1.3, 0.1, length(uv));
 
-        vec3 col = base;
-        col += cyan * grid * 0.18 * vignette;
-        col += mix(cyan, violet, n) * blob * 0.35;
-        col += violet * pow(blob, 3.0) * 0.5;
+        // Plasma plume following mouse
+        vec2 m = uMouse * vec2(1.2, 0.7);
+        float n = fbm(uv * 1.8 + uTime * 0.07);
+        float blob = smoothstep(0.95, 0.15, length(uv - m) - n * 0.18);
 
-        // Scanlines
-        col *= 0.96 + 0.04 * sin(gl_FragCoord.y * 1.5);
+        vec3 bg = vec3(0.025, 0.03, 0.055);
+        vec3 cyan = vec3(0.32, 0.92, 1.00);
+        vec3 violet = vec3(0.58, 0.42, 1.00);
+        vec3 hot = vec3(1.00, 0.45, 0.85);
+
+        vec3 col = bg;
+        col += cyan   * grid    * 0.55;
+        col += cyan   * matrix  * 0.6;
+        col += mix(cyan, violet, n) * blob * 0.45;
+        col += hot    * pow(blob, 4.0) * 0.6;
+        col += vec3(0.65, 0.95, 1.0) * streams * 0.55;
+
+        col *= 0.7 + 0.6 * vignette;
+
+        // Subtle chromatic scanlines
+        float scan = 0.96 + 0.04 * sin(gl_FragCoord.y * 1.6 + uTime * 2.0);
+        col *= scan;
+
+        // Gamma
+        col = pow(col, vec3(0.9));
 
         gl_FragColor = vec4(col, 1.0);
       }
@@ -73,6 +123,9 @@ export function WebGLBackground({ className = "" }: { className?: string }) {
       const s = gl.createShader(type)!;
       gl.shaderSource(s, src);
       gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.warn("[webgl] shader error", gl.getShaderInfoLog(s));
+      }
       return s;
     };
     const prog = gl.createProgram()!;
@@ -92,22 +145,24 @@ export function WebGLBackground({ className = "" }: { className?: string }) {
     const uTime = gl.getUniformLocation(prog, "uTime");
     const uMouse = gl.getUniformLocation(prog, "uMouse");
 
-    const mouse = { x: 0, y: 0 };
+    const mouse = { x: 0, y: 0.2 };
     const onMove = (e: MouseEvent) => {
-      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -((e.clientY / window.innerHeight) * 2 - 1);
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
     };
     window.addEventListener("mousemove", onMove);
 
     const resize = () => {
+      const rect = canvas.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      canvas.style.width = window.innerWidth + "px";
-      canvas.style.height = window.innerHeight + "px";
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
     resize();
+    const ro = new ResizeObserver(resize);
+    if (canvas.parentElement) ro.observe(canvas.parentElement);
     window.addEventListener("resize", resize);
 
     const start = performance.now();
@@ -124,6 +179,7 @@ export function WebGLBackground({ className = "" }: { className?: string }) {
 
     return () => {
       cancelAnimationFrame(raf);
+      ro.disconnect();
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMove);
     };
@@ -137,4 +193,3 @@ export function WebGLBackground({ className = "" }: { className?: string }) {
     />
   );
 }
-
