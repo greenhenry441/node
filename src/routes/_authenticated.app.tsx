@@ -619,3 +619,74 @@ function iconFor(mime: string | null, name: string) {
   void Folder;
   return { Icon: FileIcon, cls: "bg-muted text-muted-foreground" };
 }
+
+function EditorModal({
+  editor, onChange, onSave, onClose,
+}: {
+  editor: { id: string; name: string; original: string; content: string; loading: boolean; saving: boolean };
+  onChange: (content: string) => void;
+  onSave: () => void;
+  onClose: () => void;
+}) {
+  const dirty = editor.content !== editor.original;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.key.toLowerCase() === "s") { e.preventDefault(); onSave(); }
+      else if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onSave, onClose]);
+
+  return (
+    <div className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8" onClick={onClose}>
+      <div
+        className="bg-card rounded-2xl ring-1 ring-black/10 shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="px-5 py-3 border-b border-border flex items-center gap-3">
+          <FileText className="size-4 text-muted-foreground" />
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-semibold truncate">{editor.name}{dirty ? " •" : ""}</div>
+            <div className="text-[11px] text-muted-foreground">
+              {editor.loading ? "Loading…" : dirty ? "Unsaved changes" : "Saved"}
+            </div>
+          </div>
+          <button
+            onClick={onSave}
+            disabled={editor.loading || editor.saving || !dirty}
+            className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md bg-ink text-surface hover:bg-ink/90 disabled:opacity-40"
+            title="Save (⌘S)"
+          >
+            {editor.saving ? <Loader2 className="size-3.5 animate-spin" /> : <SaveIcon className="size-3.5" />}
+            Save
+          </button>
+          <button
+            onClick={onClose}
+            className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
+            title="Close (Esc)"
+          >
+            <X className="size-4" />
+          </button>
+        </header>
+        <div className="flex-1 min-h-0 bg-surface">
+          {editor.loading ? (
+            <div className="h-full grid place-items-center text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-2"><Loader2 className="size-4 animate-spin" /> Loading file…</span>
+            </div>
+          ) : (
+            <textarea
+              autoFocus
+              value={editor.content}
+              onChange={(e) => onChange(e.target.value)}
+              spellCheck={false}
+              className="w-full h-full resize-none bg-transparent p-5 font-mono text-sm leading-relaxed outline-none"
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
