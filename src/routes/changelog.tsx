@@ -62,6 +62,22 @@ type Release = {
 // release labels declared in `ReleaseTag` above.
 const releases: Release[] = [
   {
+    version: "0.7.1",
+    date: "May 28, 2026",
+    tags: ["Patch"],
+    title: "WebGL fix, workspace invites, and settings",
+    highlights: [
+      "Fixed WebGL hero contrast so all text is readable against the dark background",
+      "Upgraded WebGL shader with perspective grid, data streams, and mouse-tracked plasma",
+      "Workspace collaboration system: create workspaces, invite by email, accept via invite code",
+      "High-speed uploads via direct-to-storage signed URLs (parallel, up to 15 GB per file)",
+      "New /settings page for profile, workspace management, and member invites",
+      "New /invite/:code route for accepting workspace invitations",
+      "/download page now marks Mac and Windows apps as Available now",
+      "Added release-label legend to the changelog so every tag is explained",
+    ],
+  },
+  {
     version: "0.7.0",
     date: "May 28, 2026",
     tags: ["Minor", "Pre-Release"],
