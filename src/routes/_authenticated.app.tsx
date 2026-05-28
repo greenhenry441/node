@@ -41,7 +41,16 @@ function loadStars(): Set<string> {
 export const Route = createFileRoute("/_authenticated/app")({
   head: () => ({ meta: [{ title: "Workspace — Node FMS" }] }),
   component: AppPage,
+});
+
+function AppPage() {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const { user } = useAuth();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
   const getStateFn = useServerFn(getStorageState);
+
   const listFn = useServerFn(listFiles);
   const deleteFn = useServerFn(deleteFile);
   const setPlanFn = useServerFn(setPlan);
