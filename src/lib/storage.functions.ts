@@ -211,7 +211,8 @@ export const getDownloadUrl = createServerFn({ method: "POST" })
       .createSignedUrl(row.storage_path, 60, { download: row.name });
     if (signErr) throw new Error(signErr.message);
     return { url: signed.signedUrl };
-    return { url: signed.signedUrl };
+    return { url: signed!.signedUrl };
+
   });
 
 // ---------- Open & edit text files in place ----------
