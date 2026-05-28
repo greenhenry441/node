@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getInviteByCode, acceptInvite } from "@/lib/workspaces.functions";
+import { getInviteByCode, acceptInvite, joinWorkspaceByCode } from "@/lib/workspaces.functions";
 
 export const Route = createFileRoute("/invite/$code")({
   head: () => ({ meta: [{ title: "Join workspace — Node FMS" }] }),
