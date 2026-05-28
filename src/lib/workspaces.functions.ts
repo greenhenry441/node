@@ -221,7 +221,7 @@ export const removeMember = createServerFn({ method: "POST" })
 
 export const getInviteByCode = createServerFn({ method: "POST" })
   .inputValidator((input) =>
-    z.object({ code: z.string().min(8).max(64).regex(/^[a-z0-9]+$/) }).parse(input),
+    z.object({ code: z.string().min(6).max(64).regex(/^[a-z0-9]+$/) }).parse(input),
   )
   .handler(async ({ data }) => {
     const { data: inv } = await supabaseAdmin
@@ -229,17 +229,32 @@ export const getInviteByCode = createServerFn({ method: "POST" })
       .select("id, email, role, code, expires_at, accepted_at, workspace_id, workspaces:workspace_id(name, slug)")
       .eq("code", data.code)
       .maybeSingle();
-    if (!inv) return { invite: null as null };
-    return {
-      invite: {
-        id: inv.id,
-        email: inv.email,
-        role: inv.role as WorkspaceRole,
-        expires_at: inv.expires_at,
-        accepted_at: inv.accepted_at,
-        workspace: inv.workspaces as { name: string; slug: string } | null,
-      },
-    };
+    if (inv) {
+      return {
+        kind: "email" as const,
+        invite: {
+          id: inv.id,
+          email: inv.email,
+          role: inv.role as WorkspaceRole,
+          expires_at: inv.expires_at,
+          accepted_at: inv.accepted_at,
+          workspace: inv.workspaces as { name: string; slug: string } | null,
+        },
+      };
+    }
+    // Fallback: try workspace-wide join code
+    const { data: ws } = await supabaseAdmin
+      .from("workspaces")
+      .select("id, name, slug")
+      .eq("join_code", data.code)
+      .maybeSingle();
+    if (ws) {
+      return {
+        kind: "join_code" as const,
+        invite: { workspace: { name: ws.name, slug: ws.slug } },
+      };
+    }
+    return { kind: "none" as const, invite: null };
   });
 
 // ---------- Accept invite ----------
