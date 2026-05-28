@@ -89,7 +89,9 @@ function PricingPage() {
   return (
     <div className="min-h-screen bg-surface">
       <SiteHeader />
+      <section className="py-20 md:py-24">
         <div className="max-w-7xl mx-auto px-6 text-center">
+
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Node pricing
           </span>
