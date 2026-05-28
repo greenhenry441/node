@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Github } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Github, AlertTriangle } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Reveal } from "@/components/reveal";
@@ -286,6 +286,31 @@ const tagMeaning: Record<ReleaseTag, string> = {
   RTAO: "Release to Application Only — desktop app required",
 };
 
+const latestLts = releases.find((r) => r.tags.includes("LTS"));
+
+function EolBanner({ latestVersion }: { latestVersion: string }) {
+  return (
+    <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-start gap-3">
+      <AlertTriangle className="shrink-0 size-5 text-amber-700 mt-0.5" />
+      <div>
+        <p className="text-sm font-semibold text-amber-900">
+          This release has reached end-of-life (EOL)
+        </p>
+        <p className="text-sm text-amber-800 mt-0.5">
+          No more fixes or support. Please upgrade to{" "}
+          <a
+            href={`#v${latestVersion}`}
+            className="underline underline-offset-2 font-medium hover:text-amber-950"
+          >
+            the latest LTS version
+          </a>
+          .
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function ChangelogPage() {
   return (
     <div className="min-h-screen bg-surface">
@@ -337,7 +362,7 @@ function ChangelogPage() {
           <div className="mt-12 space-y-10">
             {releases.map((r, i) => (
               <Reveal key={r.version} delay={i * 50} as="article">
-                <div className="border-l-2 border-border pl-6 relative">
+                <div id={`v${r.version}`} className="border-l-2 border-border pl-6 relative">
                   <div className="absolute -left-[5px] top-1.5 size-2 rounded-full bg-ink" />
                   <div className="flex flex-wrap items-baseline gap-3">
                     <h2 className="text-2xl font-semibold tracking-tight">v{r.version}</h2>
@@ -350,6 +375,9 @@ function ChangelogPage() {
                   </div>
                   {r.title && (
                     <p className="mt-2 text-sm font-medium text-ink/70">{r.title}</p>
+                  )}
+                  {r.tags.includes("EOL") && latestLts && (
+                    <EolBanner latestVersion={latestLts.version} />
                   )}
                   <ul className="mt-4 space-y-2 text-sm text-ink/80">
                     {r.highlights.map((h) => (
