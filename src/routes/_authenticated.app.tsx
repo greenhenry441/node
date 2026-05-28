@@ -27,10 +27,8 @@ function AppPage() {
   const { user } = useAuth();
   const fileInput = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-
   const getStateFn = useServerFn(getStorageState);
   const listFn = useServerFn(listFiles);
-  const uploadFn = useServerFn(uploadFile);
   const deleteFn = useServerFn(deleteFile);
   const setPlanFn = useServerFn(setPlan);
   const downloadFn = useServerFn(getDownloadUrl);
