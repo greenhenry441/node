@@ -41,14 +41,6 @@ function loadStars(): Set<string> {
 export const Route = createFileRoute("/_authenticated/app")({
   head: () => ({ meta: [{ title: "Workspace — Node FMS" }] }),
   component: AppPage,
-});
-
-function AppPage() {
-  const navigate = useNavigate();
-  const qc = useQueryClient();
-  const { user } = useAuth();
-  const fileInput = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
   const getStateFn = useServerFn(getStorageState);
   const listFn = useServerFn(listFiles);
   const deleteFn = useServerFn(deleteFile);
@@ -58,23 +50,44 @@ function AppPage() {
   const stateQ = useQuery({ queryKey: ["storage-state"], queryFn: () => getStateFn() });
   const filesQ = useQuery({ queryKey: ["files"], queryFn: () => listFn() });
 
-  const planMut = useMutation({
-    mutationFn: (plan: "free" | "starter" | "steady" | "suite") =>
-      setPlanFn({ data: { plan } }),
-    onSuccess: (r) => {
-      toast.success(`Plan changed to ${PLAN_LABEL[r.plan]}`);
-      qc.invalidateQueries({ queryKey: ["storage-state"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  // Search / filter / star / multi-select
+  const [query, setQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
+  const [starredOnly, setStarredOnly] = useState(false);
+  const [stars, setStars] = useState<Set<string>>(() => loadStars());
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
 
-  const deleteMut = useMutation({
-    mutationFn: (id: string) => deleteFn({ data: { id } }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["files"] });
-      qc.invalidateQueries({ queryKey: ["storage-state"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
+  useEffect(() => {
+    localStorage.setItem(STAR_KEY, JSON.stringify(Array.from(stars)));
+  }, [stars]);
+
+  const toggleStar = (id: string) =>
+    setStars((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleSelect = (id: string) =>
+    setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+  const visibleFiles = useMemo(() => {
+    const all = filesQ.data ?? [];
+    const q = query.trim().toLowerCase();
+    return all.filter((f) => {
+      if (q && !f.name.toLowerCase().includes(q)) return false;
+      if (typeFilter !== "all" && classify(f.mime_type, f.name) !== typeFilter) return false;
+      if (starredOnly && !stars.has(f.id)) return false;
+      return true;
+    });
+  }, [filesQ.data, query, typeFilter, starredOnly, stars]);
+
+  const allVisibleSelected = visibleFiles.length > 0 && visibleFiles.every((f) => selected.has(f.id));
+  const toggleSelectAll = () =>
+    setSelected((s) => {
+      const n = new Set(s);
+      if (allVisibleSelected) visibleFiles.forEach((f) => n.delete(f.id));
+      else visibleFiles.forEach((f) => n.add(f.id));
+      return n;
+    });
+  const clearSelection = () => setSelected(new Set());
+
   });
 
   const signOut = async () => {
