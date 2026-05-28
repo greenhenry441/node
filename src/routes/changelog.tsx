@@ -22,10 +22,11 @@ export const Route = createFileRoute("/changelog")({
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          name: "Node FMS Changelog",
-          description: "Semantic-versioned release history for Node FMS.",
+          name: "Node Changelog",
+          description: "Semantic-versioned release history for Node (NodeFMS, Node Tasks, Node Calendar).",
           url: "https://nodefms.lovable.app/changelog",
+          isPartOf: { "@type": "WebSite", name: "Node", url: "https://nodefms.lovable.app" },
+
           isPartOf: { "@type": "WebSite", name: "Node FMS", url: "https://nodefms.lovable.app" },
         }),
       },
