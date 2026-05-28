@@ -166,8 +166,3 @@ function PricingPage() {
     </div>
   );
 }
-
-      <SiteFooter />
-    </div>
-  );
-}
