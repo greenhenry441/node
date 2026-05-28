@@ -158,6 +158,24 @@ const tagStyles: Record<ReleaseTag, string> = {
   RTAO: "bg-rose-100 text-rose-900",
 };
 
+const tagMeaning: Record<ReleaseTag, string> = {
+  Revamp: "Full visual or architectural rewrite of an area",
+  Major: "Breaking changes — review before upgrading",
+  Minor: "New features, fully backwards compatible",
+  Patch: "Bug fixes and small polish, no new features",
+  "Emergency Update": "Hot-shipped fix for a critical or security issue",
+  "Pre-Release": "Shipped before general availability — expect rough edges",
+  "Pre-Alpha": "Earliest internal builds, things will break",
+  Alpha: "Feature-incomplete preview for early testers",
+  "Open-Beta": "Public beta, anyone can opt in",
+  "Closed-Beta": "Beta limited to invited testers and design partners",
+  "Release Candidate": "Final candidate — shipping unless we find regressions",
+  Stable: "Generally available, recommended for everyone",
+  LTS: "Long-term support — extended maintenance window",
+  EOL: "End of life — no longer supported, please upgrade",
+  RTAO: "Release to Application Only — desktop app required",
+};
+
 function ChangelogPage() {
   return (
     <div className="min-h-screen bg-surface">
