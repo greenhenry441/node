@@ -36,8 +36,12 @@ function Index() {
       {/* Dark, WebGL-backed hero */}
       <section className="relative overflow-hidden bg-[#06070d] text-white">
         <WebGLBackground />
+        {/* Contrast scrim: keeps WebGL visible while guaranteeing legible text */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#06070d]/70 via-[#06070d]/40 to-[#06070d]/85 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(6,7,13,0.55)_70%)] pointer-events-none" />
         <div className="relative z-10">
-          <SiteHeader />
+          <SiteHeader theme="dark" />
+
           <div className="py-20 md:py-32">
             <div className="max-w-7xl mx-auto px-6 text-center">
               <Reveal>
