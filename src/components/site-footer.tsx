@@ -7,7 +7,7 @@ export function SiteFooter() {
     <footer className="py-12 border-t border-border/60 mt-24 relative z-10">
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
         <Link to="/" className="flex items-center gap-2">
-          <img src="/logo-icon.png" alt="Node" className="size-4" />
+          <img src="/node-dot-logo.png" alt="Node" className="size-4" />
           <span className="text-sm font-semibold tracking-tight">Node</span>
         </Link>
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-medium text-muted-foreground">

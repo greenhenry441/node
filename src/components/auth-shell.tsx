@@ -17,7 +17,7 @@ export function AuthShell({
     <div className="min-h-screen grid lg:grid-cols-2 bg-surface text-ink">
       <div className="flex flex-col px-6 py-8 lg:px-16">
         <Link to="/" className="flex items-center gap-2">
-          <img src="/logo-icon.png" alt="Node" className="size-5" />
+          <img src="/node-dot-logo.png" alt="Node" className="size-5" />
           <span className="text-sm font-semibold tracking-tight">Node</span>
         </Link>
         <div className="flex-1 flex items-center">
