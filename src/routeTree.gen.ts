@@ -30,6 +30,7 @@ import { Route as ForumIdRouteImport } from './routes/forum.$id'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated.onboarding'
+import { Route as AuthenticatedIntegrationsRouteImport } from './routes/_authenticated.integrations'
 import { Route as AuthenticatedEditorRouteImport } from './routes/_authenticated.editor'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated.app'
 
@@ -137,6 +138,12 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedIntegrationsRoute =
+  AuthenticatedIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedEditorRoute = AuthenticatedEditorRouteImport.update({
   id: '/editor',
   path: '/editor',
@@ -166,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/status': typeof StatusRoute
   '/app': typeof AuthenticatedAppRoute
   '/editor': typeof AuthenticatedEditorRoute
+  '/integrations': typeof AuthenticatedIntegrationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -190,6 +198,7 @@ export interface FileRoutesByTo {
   '/status': typeof StatusRoute
   '/app': typeof AuthenticatedAppRoute
   '/editor': typeof AuthenticatedEditorRoute
+  '/integrations': typeof AuthenticatedIntegrationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -216,6 +225,7 @@ export interface FileRoutesById {
   '/status': typeof StatusRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/editor': typeof AuthenticatedEditorRoute
+  '/_authenticated/integrations': typeof AuthenticatedIntegrationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -242,6 +252,7 @@ export interface FileRouteTypes {
     | '/status'
     | '/app'
     | '/editor'
+    | '/integrations'
     | '/onboarding'
     | '/settings'
     | '/auth/callback'
@@ -266,6 +277,7 @@ export interface FileRouteTypes {
     | '/status'
     | '/app'
     | '/editor'
+    | '/integrations'
     | '/onboarding'
     | '/settings'
     | '/auth/callback'
@@ -291,6 +303,7 @@ export interface FileRouteTypes {
     | '/status'
     | '/_authenticated/app'
     | '/_authenticated/editor'
+    | '/_authenticated/integrations'
     | '/_authenticated/onboarding'
     | '/_authenticated/settings'
     | '/auth/callback'
@@ -468,6 +481,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/integrations': {
+      id: '/_authenticated/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof AuthenticatedIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/editor': {
       id: '/_authenticated/editor'
       path: '/editor'
@@ -488,6 +508,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedEditorRoute: typeof AuthenticatedEditorRoute
+  AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
 }
@@ -495,6 +516,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedEditorRoute: AuthenticatedEditorRoute,
+  AuthenticatedIntegrationsRoute: AuthenticatedIntegrationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
 }
