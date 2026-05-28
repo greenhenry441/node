@@ -63,32 +63,32 @@ function AppPage() {
       navigate({ to: "/" });
     }
   };
-
   const handleFiles = async (selected: FileList | null) => {
     if (!selected || selected.length === 0) return;
+    const state = stateQ.data;
+    const files: File[] = [];
+    for (const f of Array.from(selected)) {
+      if (state && f.size > state.maxFileBytes) {
+        toast.error(`${f.name}: exceeds ${formatBytes(state.maxFileBytes)} per-file limit.`);
+      } else {
+        files.push(f);
+      }
+    }
+    if (files.length === 0) return;
     setUploading(true);
     try {
-      for (const file of Array.from(selected)) {
-        const state = stateQ.data;
-        if (state && file.size > state.maxFileBytes) {
-          toast.error(`${file.name}: exceeds ${formatBytes(state.maxFileBytes)} per-file limit.`);
-          continue;
-        }
-        const fd = new FormData();
-        fd.append("file", file);
-        try {
-          await uploadFn({ data: fd });
-          toast.success(`Uploaded ${file.name}`);
-        } catch (e) {
-          toast.error(`${file.name}: ${(e as Error).message}`);
-        }
-      }
+      // Direct-to-storage parallel uploads — bytes never round-trip the server fn.
+      await uploadAll(files, 4, (f, ok, err) => {
+        if (ok) toast.success(`Uploaded ${f.name}`);
+        else toast.error(`${f.name}: ${err ?? "upload failed"}`);
+      });
       qc.invalidateQueries({ queryKey: ["files"] });
       qc.invalidateQueries({ queryKey: ["storage-state"] });
     } finally {
       setUploading(false);
       if (fileInput.current) fileInput.current.value = "";
     }
+  };
   };
 
   const download = async (id: string) => {
