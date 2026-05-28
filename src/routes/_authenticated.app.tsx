@@ -97,6 +97,60 @@ function AppPage() {
     });
   const clearSelection = () => setSelected(new Set());
 
+  const planMut = useMutation({
+    mutationFn: (plan: "free" | "starter" | "steady" | "suite") =>
+      setPlanFn({ data: { plan } }),
+    onSuccess: (r) => {
+      toast.success(`Plan changed to ${PLAN_LABEL[r.plan]}`);
+      qc.invalidateQueries({ queryKey: ["storage-state"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: (id: string) => deleteFn({ data: { id } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["files"] });
+      qc.invalidateQueries({ queryKey: ["storage-state"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const bulkDelete = async () => {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    if (!confirm(`Delete ${ids.length} file${ids.length === 1 ? "" : "s"}? This cannot be undone.`)) return;
+    setBulkBusy(true);
+    let ok = 0, fail = 0;
+    for (const id of ids) {
+      try { await deleteFn({ data: { id } }); ok++; } catch { fail++; }
+    }
+    setBulkBusy(false);
+    clearSelection();
+    qc.invalidateQueries({ queryKey: ["files"] });
+    qc.invalidateQueries({ queryKey: ["storage-state"] });
+    if (fail === 0) toast.success(`Deleted ${ok} file${ok === 1 ? "" : "s"}`);
+    else toast.error(`Deleted ${ok}, failed ${fail}`);
+  };
+
+  const bulkDownload = async () => {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    for (const id of ids) {
+      try {
+        const { url } = await downloadFn({ data: { id } });
+        const a = document.createElement("a");
+        a.href = url; a.rel = "noopener"; a.target = "_blank";
+        document.body.appendChild(a); a.click(); a.remove();
+        await new Promise((r) => setTimeout(r, 250));
+      } catch (e) {
+        toast.error((e as Error).message);
+      }
+    }
+    setBulkBusy(false);
+  };
+
 
 
 
