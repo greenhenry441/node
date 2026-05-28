@@ -31,6 +31,7 @@ function LoginPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -66,6 +67,20 @@ function LoginPage() {
     navigate({ to: "/app" });
   };
 
+  const signInWithApple = async () => {
+    setAppleLoading(true);
+    const result = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: window.location.origin + "/app",
+    });
+    if (result.error) {
+      setAppleLoading(false);
+      toast.error("Apple sign-in failed. Please try again.");
+      return;
+    }
+    if (result.redirected) return;
+    navigate({ to: "/app" });
+  };
+
   return (
     <AuthShell
       title="Sign in to Node"
@@ -79,15 +94,26 @@ function LoginPage() {
         </>
       }
     >
-      <button
-        type="button"
-        onClick={signInWithGoogle}
-        disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
-      >
-        {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
-        Continue with Google
-      </button>
+      <div className="space-y-2">
+        <button
+          type="button"
+          onClick={signInWithGoogle}
+          disabled={googleLoading || appleLoading}
+          className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
+        >
+          {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
+          Continue with Google
+        </button>
+        <button
+          type="button"
+          onClick={signInWithApple}
+          disabled={googleLoading || appleLoading}
+          className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
+        >
+          {appleLoading ? <Loader2 className="size-4 animate-spin" /> : <AppleIcon />}
+          Continue with Apple
+        </button>
+      </div>
       <Divider>or continue with email</Divider>
 
       <form onSubmit={submit} noValidate className="space-y-4">
@@ -183,6 +209,14 @@ export function GoogleIcon() {
       <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.26 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/>
       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18a11 11 0 0 0 0 9.86l3.66-2.84z"/>
       <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/>
+    </svg>
+  );
+}
+
+export function AppleIcon() {
+  return (
+    <svg className="size-4" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+      <path d="M17.05 12.86c-.03-2.86 2.34-4.24 2.45-4.31-1.34-1.96-3.43-2.23-4.17-2.26-1.78-.18-3.47 1.05-4.37 1.05-.92 0-2.3-1.03-3.78-1-1.95.03-3.74 1.13-4.74 2.87-2.02 3.5-.52 8.69 1.45 11.54.96 1.4 2.11 2.97 3.61 2.91 1.46-.06 2.01-.94 3.77-.94 1.75 0 2.25.94 3.78.91 1.56-.03 2.55-1.42 3.5-2.83 1.1-1.62 1.56-3.2 1.58-3.28-.04-.02-3.03-1.16-3.07-4.6zM14.18 4.7c.8-.97 1.34-2.32 1.19-3.66-1.15.05-2.55.77-3.38 1.74-.74.86-1.39 2.24-1.21 3.55 1.28.1 2.6-.65 3.4-1.63z"/>
     </svg>
   );
 }

@@ -3,7 +3,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { AuthShell } from "@/components/auth-shell";
-import { Field, Divider, GoogleIcon } from "./login";
+import { Field, Divider, GoogleIcon, AppleIcon } from "./login";
 import { Check, Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -43,6 +43,7 @@ function SignupPage() {
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
   const [checkInbox, setCheckInbox] = useState(false);
 
   const score = useMemo(() => pwStrength(form.password), [form.password]);
@@ -103,6 +104,20 @@ function SignupPage() {
     navigate({ to: "/onboarding" });
   };
 
+  const signUpWithApple = async () => {
+    setAppleLoading(true);
+    const result = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: window.location.origin + "/onboarding",
+    });
+    if (result.error) {
+      setAppleLoading(false);
+      toast.error("Apple sign-up failed. Please try again.");
+      return;
+    }
+    if (result.redirected) return;
+    navigate({ to: "/onboarding" });
+  };
+
   if (checkInbox) {
     return (
       <AuthShell
@@ -140,15 +155,26 @@ function SignupPage() {
         </>
       }
     >
-      <button
-        type="button"
-        onClick={signUpWithGoogle}
-        disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
-      >
-        {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
-        Continue with Google
-      </button>
+      <div className="space-y-2">
+        <button
+          type="button"
+          onClick={signUpWithGoogle}
+          disabled={googleLoading || appleLoading}
+          className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
+        >
+          {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
+          Continue with Google
+        </button>
+        <button
+          type="button"
+          onClick={signUpWithApple}
+          disabled={googleLoading || appleLoading}
+          className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
+        >
+          {appleLoading ? <Loader2 className="size-4 animate-spin" /> : <AppleIcon />}
+          Continue with Apple
+        </button>
+      </div>
       <Divider>or sign up with email</Divider>
 
       <form onSubmit={submit} noValidate className="space-y-4">
