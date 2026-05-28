@@ -158,6 +158,24 @@ const tagStyles: Record<ReleaseTag, string> = {
   RTAO: "bg-rose-100 text-rose-900",
 };
 
+const tagMeaning: Record<ReleaseTag, string> = {
+  Revamp: "Full visual or architectural rewrite of an area",
+  Major: "Breaking changes — review before upgrading",
+  Minor: "New features, fully backwards compatible",
+  Patch: "Bug fixes and small polish, no new features",
+  "Emergency Update": "Hot-shipped fix for a critical or security issue",
+  "Pre-Release": "Shipped before general availability — expect rough edges",
+  "Pre-Alpha": "Earliest internal builds, things will break",
+  Alpha: "Feature-incomplete preview for early testers",
+  "Open-Beta": "Public beta, anyone can opt in",
+  "Closed-Beta": "Beta limited to invited testers and design partners",
+  "Release Candidate": "Final candidate — shipping unless we find regressions",
+  Stable: "Generally available, recommended for everyone",
+  LTS: "Long-term support — extended maintenance window",
+  EOL: "End of life — no longer supported, please upgrade",
+  RTAO: "Release to Application Only — desktop app required",
+};
+
 function ChangelogPage() {
   return (
     <div className="min-h-screen bg-surface">
@@ -188,14 +206,23 @@ function ChangelogPage() {
               </a>
               . Every publish ships here with the features, fixes, and changes it includes.
             </p>
-            <div className="mt-6 flex flex-wrap gap-1.5">
-              {(Object.keys(tagStyles) as ReleaseTag[]).map((t) => (
-                <span key={t} className={`text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full ${tagStyles[t]}`}>
-                  {t}
-                </span>
-              ))}
+            <div className="mt-8 rounded-2xl border border-border bg-card p-5">
+              <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                What each label means
+              </div>
+              <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2.5">
+                {(Object.keys(tagStyles) as ReleaseTag[]).map((t) => (
+                  <li key={t} className="flex items-start gap-2.5 text-sm">
+                    <span className={`shrink-0 mt-0.5 text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full ${tagStyles[t]}`}>
+                      {t}
+                    </span>
+                    <span className="text-muted-foreground">{tagMeaning[t]}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </Reveal>
+
 
           <div className="mt-12 space-y-10">
             {releases.map((r, i) => (
