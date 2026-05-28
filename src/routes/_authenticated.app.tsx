@@ -492,6 +492,25 @@ function AppPage() {
         </footer>
       </main>
 
+      {chatOpen && activeWs && (
+        <div className="fixed inset-0 z-40 bg-ink/30 backdrop-blur-sm" onClick={() => setChatOpen(false)}>
+          <aside
+            className="absolute right-0 top-0 h-full w-full max-w-md bg-card border-l border-border shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+              <div className="text-sm font-semibold">{activeWs.name}</div>
+              <button onClick={() => setChatOpen(false)} className="size-8 grid place-items-center rounded-md hover:bg-muted">
+                <X className="size-4" />
+              </button>
+            </div>
+            <div className="flex-1 min-h-0">
+              <WorkspaceChat workspaceId={activeWs.id} />
+            </div>
+          </aside>
+        </div>
+      )}
+
       {editor && (
         <EditorModal
           editor={editor}
