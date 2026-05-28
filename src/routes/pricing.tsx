@@ -74,11 +74,12 @@ const tiers = [
     per: "per month",
     useCase: "Small and medium businesses.",
     features: [
-      "Unlimited storage",
-      "All Node File Management",
-      "Node Task Management",
-      "Later: Node Intelligence features",
+      "Unlimited storage in NodeFMS",
+      "Full NodeFMS features",
+      "Full Node Tasks (List, Board, Calendar views)",
+      "Node Calendar with Google + Outlook sync",
     ],
+
     disabled: true,
   },
 ];
