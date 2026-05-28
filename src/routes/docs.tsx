@@ -4,7 +4,9 @@ import { SiteFooter } from "@/components/site-footer";
 
 export const Route = createFileRoute("/docs")({
   head: () => ({
+    meta: [
       { title: "Docs — Node" },
+
       {
         name: "description",
         content:
