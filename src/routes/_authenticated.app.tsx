@@ -452,30 +452,60 @@ function EmptyState({ onClick, disabled }: { onClick: () => void; disabled: bool
 }
 
 function FileList({
-  files, onDelete, onDownload,
+  files, stars, selected, allSelected,
+  onToggleAll, onToggleStar, onToggleSelect, onDelete, onDownload,
 }: {
   files: StoredFile[];
+  stars: Set<string>;
+  selected: Set<string>;
+  allSelected: boolean;
+  onToggleAll: () => void;
+  onToggleStar: (id: string) => void;
+  onToggleSelect: (id: string) => void;
   onDelete: (id: string) => void;
   onDownload: (id: string) => void;
 }) {
   return (
     <div className="bg-card rounded-xl ring-1 ring-black/5 overflow-hidden">
-      <div className="grid grid-cols-12 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground border-b border-border bg-muted/40">
-        <div className="col-span-7">Name</div>
+      <div className="grid grid-cols-12 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground border-b border-border bg-muted/40 items-center">
+        <div className="col-span-1">
+          <input
+            type="checkbox"
+            checked={allSelected}
+            onChange={onToggleAll}
+            className="size-3.5 accent-ink cursor-pointer"
+            aria-label="Select all"
+          />
+        </div>
+        <div className="col-span-6">Name</div>
         <div className="col-span-2">Uploaded</div>
         <div className="col-span-2">Size</div>
         <div className="col-span-1 text-right">Actions</div>
       </div>
       {files.map((f) => {
         const m = iconFor(f.mime_type, f.name);
+        const isSel = selected.has(f.id);
+        const isStar = stars.has(f.id);
         return (
-          <div key={f.id} className="grid grid-cols-12 items-center px-5 py-3 border-b border-border last:border-b-0 hover:bg-muted/40">
-            <div className="col-span-7 flex items-center gap-3 min-w-0">
+          <div key={f.id} className={`grid grid-cols-12 items-center px-5 py-3 border-b border-border last:border-b-0 ${isSel ? "bg-ink/[0.04]" : "hover:bg-muted/40"}`}>
+            <div className="col-span-1">
+              <input
+                type="checkbox"
+                checked={isSel}
+                onChange={() => onToggleSelect(f.id)}
+                className="size-3.5 accent-ink cursor-pointer"
+                aria-label={`Select ${f.name}`}
+              />
+            </div>
+            <div className="col-span-6 flex items-center gap-3 min-w-0">
               <div className={`size-9 rounded-md grid place-items-center ${m.cls}`}>
                 <m.Icon className="size-4" strokeWidth={1.75} />
               </div>
               <div className="min-w-0">
-                <div className="text-sm font-medium truncate">{f.name}</div>
+                <div className="text-sm font-medium truncate flex items-center gap-1.5">
+                  {f.name}
+                  {isStar && <Star className="size-3 fill-amber-500 text-amber-500 shrink-0" />}
+                </div>
                 <div className="text-xs text-muted-foreground truncate">{f.mime_type ?? "—"}</div>
               </div>
             </div>
@@ -484,6 +514,13 @@ function FileList({
             </div>
             <div className="col-span-2 text-sm text-muted-foreground">{formatBytes(f.size_bytes)}</div>
             <div className="col-span-1 flex justify-end gap-1">
+              <button
+                onClick={() => onToggleStar(f.id)}
+                className={`size-8 grid place-items-center rounded-md hover:bg-muted ${isStar ? "text-amber-500" : "text-muted-foreground hover:text-amber-500"}`}
+                title={isStar ? "Unstar" : "Star"}
+              >
+                <Star className={`size-4 ${isStar ? "fill-amber-500" : ""}`} />
+              </button>
               <button
                 onClick={() => onDownload(f.id)}
                 className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
@@ -505,6 +542,7 @@ function FileList({
     </div>
   );
 }
+
 
 function iconFor(mime: string | null, name: string) {
   const m = mime ?? "";
