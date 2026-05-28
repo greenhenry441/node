@@ -111,7 +111,7 @@ export const getWorkspaceDetail = createServerFn({ method: "POST" })
     if (!membership) throw new Error("Not a member of this workspace");
 
     const [{ data: ws }, { data: rawMembers }, invitesRes] = await Promise.all([
-      supabase.from("workspaces").select("id, name, slug, owner_id, created_at").eq("id", data.id).single(),
+      supabase.from("workspaces").select("id, name, slug, owner_id, join_code, created_at").eq("id", data.id).single(),
       supabase.from("workspace_members").select("id, user_id, role, created_at").eq("workspace_id", data.id),
       membership.role === "owner" || membership.role === "admin"
         ? supabase
