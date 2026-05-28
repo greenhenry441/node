@@ -41,8 +41,14 @@ const tiers = [
     name: "Free",
     price: "$0",
     per: "forever",
-    useCase: "Personal projects and temporary businesses.",
-    features: ["500 GB storage", "File syncing", "File editing", "15 GB per file upload"],
+    useCase: "Everyone — unlimited storage while we're in launch week.",
+    features: [
+      "Unlimited storage (launch promo)",
+      "File syncing",
+      "File editing",
+      "15 GB per file upload",
+    ],
+    disabled: false,
   },
   {
     name: "Starter",
@@ -50,6 +56,7 @@ const tiers = [
     per: "per month",
     useCase: "Very small businesses.",
     features: ["1 TB storage", "File syncing", "File editing", "More file types supported"],
+    disabled: true,
   },
   {
     name: "Steady",
@@ -58,6 +65,7 @@ const tiers = [
     useCase: "Small businesses.",
     features: ["5 TB storage", "Advanced file syncing and editing", "More file types supported"],
     featured: true,
+    disabled: true,
   },
   {
     name: "Node Suite",
@@ -70,8 +78,10 @@ const tiers = [
       "Node Task Management",
       "Later: Node Intelligence features",
     ],
+    disabled: true,
   },
 ];
+
 
 function PricingPage() {
   return (
