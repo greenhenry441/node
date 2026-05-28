@@ -8,12 +8,14 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   Folder, FileText, Image as ImageIcon, Film, Music, Archive, Upload, Trash2,
   Settings, ChevronRight, Download, LogOut, Loader2, AlertCircle, Crown, FileIcon,
-  Search, Star, X,
+  Search, Star, X, Pencil, Save as SaveIcon,
 } from "lucide-react";
 import {
   getStorageState, listFiles, deleteFile, setPlan, getDownloadUrl,
+  getFileText, updateFileText,
   type StoredFile,
 } from "@/lib/storage.functions";
+
 import { uploadAll } from "@/lib/upload-client";
 import { formatBytes, PLAN_LABEL } from "@/lib/storage-format";
 
@@ -55,6 +57,45 @@ function AppPage() {
   const deleteFn = useServerFn(deleteFile);
   const setPlanFn = useServerFn(setPlan);
   const downloadFn = useServerFn(getDownloadUrl);
+  const getTextFn = useServerFn(getFileText);
+  const updateTextFn = useServerFn(updateFileText);
+
+  // Inline cloud editor
+  const [editor, setEditor] = useState<{
+    id: string; name: string; original: string; content: string; loading: boolean; saving: boolean;
+  } | null>(null);
+
+  const openEdit = async (f: StoredFile) => {
+    setEditor({ id: f.id, name: f.name, original: "", content: "", loading: true, saving: false });
+    try {
+      const r = await getTextFn({ data: { id: f.id } });
+      setEditor({ id: r.id, name: r.name, original: r.content, content: r.content, loading: false, saving: false });
+    } catch (e) {
+      toast.error((e as Error).message);
+      setEditor(null);
+    }
+  };
+
+  const saveEdit = async () => {
+    if (!editor || editor.saving) return;
+    setEditor({ ...editor, saving: true });
+    try {
+      await updateTextFn({ data: { id: editor.id, content: editor.content } });
+      toast.success(`Saved ${editor.name}`);
+      qc.invalidateQueries({ queryKey: ["files"] });
+      qc.invalidateQueries({ queryKey: ["storage-state"] });
+      setEditor({ ...editor, original: editor.content, saving: false });
+    } catch (e) {
+      toast.error((e as Error).message);
+      setEditor((s) => (s ? { ...s, saving: false } : s));
+    }
+  };
+
+  const closeEdit = () => {
+    if (editor && editor.content !== editor.original && !confirm("Discard unsaved changes?")) return;
+    setEditor(null);
+  };
+
 
   const stateQ = useQuery({ queryKey: ["storage-state"], queryFn: () => getStateFn() });
   const filesQ = useQuery({ queryKey: ["files"], queryFn: () => listFn() });
@@ -421,6 +462,7 @@ function AppPage() {
               onToggleSelect={toggleSelect}
               onDelete={(id) => deleteMut.mutate(id)}
               onDownload={download}
+              onOpen={openEdit}
             />
           )}
         </div>
@@ -430,9 +472,19 @@ function AppPage() {
           Per-file limit: {state ? formatBytes(state.maxFileBytes) : "—"}. Plan limit enforced on every upload.
         </footer>
       </main>
+
+      {editor && (
+        <EditorModal
+          editor={editor}
+          onChange={(content) => setEditor((s) => (s ? { ...s, content } : s))}
+          onSave={saveEdit}
+          onClose={closeEdit}
+        />
+      )}
     </div>
   );
 }
+
 
 function EmptyState({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
   return (
@@ -453,7 +505,7 @@ function EmptyState({ onClick, disabled }: { onClick: () => void; disabled: bool
 
 function FileList({
   files, stars, selected, allSelected,
-  onToggleAll, onToggleStar, onToggleSelect, onDelete, onDownload,
+  onToggleAll, onToggleStar, onToggleSelect, onDelete, onDownload, onOpen,
 }: {
   files: StoredFile[];
   stars: Set<string>;
@@ -464,7 +516,9 @@ function FileList({
   onToggleSelect: (id: string) => void;
   onDelete: (id: string) => void;
   onDownload: (id: string) => void;
+  onOpen: (f: StoredFile) => void;
 }) {
+
   return (
     <div className="bg-card rounded-xl ring-1 ring-black/5 overflow-hidden">
       <div className="grid grid-cols-12 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground border-b border-border bg-muted/40 items-center">
@@ -519,13 +573,21 @@ function FileList({
                 className={`size-8 grid place-items-center rounded-md hover:bg-muted ${isStar ? "text-amber-500" : "text-muted-foreground hover:text-amber-500"}`}
                 title={isStar ? "Unstar" : "Star"}
               >
-                <Star className={`size-4 ${isStar ? "fill-amber-500" : ""}`} />
+              <button
+                onClick={() => onOpen(f)}
+                className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
+                title="Open & edit"
+              >
+                <Pencil className="size-4" />
               </button>
               <button
                 onClick={() => onDownload(f.id)}
                 className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
                 title="Download"
               >
+                <Download className="size-4" />
+              </button>
+
                 <Download className="size-4" />
               </button>
               <button
@@ -557,3 +619,74 @@ function iconFor(mime: string | null, name: string) {
   void Folder;
   return { Icon: FileIcon, cls: "bg-muted text-muted-foreground" };
 }
+
+function EditorModal({
+  editor, onChange, onSave, onClose,
+}: {
+  editor: { id: string; name: string; original: string; content: string; loading: boolean; saving: boolean };
+  onChange: (content: string) => void;
+  onSave: () => void;
+  onClose: () => void;
+}) {
+  const dirty = editor.content !== editor.original;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.key.toLowerCase() === "s") { e.preventDefault(); onSave(); }
+      else if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onSave, onClose]);
+
+  return (
+    <div className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8" onClick={onClose}>
+      <div
+        className="bg-card rounded-2xl ring-1 ring-black/10 shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="px-5 py-3 border-b border-border flex items-center gap-3">
+          <FileText className="size-4 text-muted-foreground" />
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-semibold truncate">{editor.name}{dirty ? " •" : ""}</div>
+            <div className="text-[11px] text-muted-foreground">
+              {editor.loading ? "Loading…" : dirty ? "Unsaved changes" : "Saved"}
+            </div>
+          </div>
+          <button
+            onClick={onSave}
+            disabled={editor.loading || editor.saving || !dirty}
+            className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md bg-ink text-surface hover:bg-ink/90 disabled:opacity-40"
+            title="Save (⌘S)"
+          >
+            {editor.saving ? <Loader2 className="size-3.5 animate-spin" /> : <SaveIcon className="size-3.5" />}
+            Save
+          </button>
+          <button
+            onClick={onClose}
+            className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
+            title="Close (Esc)"
+          >
+            <X className="size-4" />
+          </button>
+        </header>
+        <div className="flex-1 min-h-0 bg-surface">
+          {editor.loading ? (
+            <div className="h-full grid place-items-center text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-2"><Loader2 className="size-4 animate-spin" /> Loading file…</span>
+            </div>
+          ) : (
+            <textarea
+              autoFocus
+              value={editor.content}
+              onChange={(e) => onChange(e.target.value)}
+              spellCheck={false}
+              className="w-full h-full resize-none bg-transparent p-5 font-mono text-sm leading-relaxed outline-none"
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
