@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Github } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Github, AlertTriangle } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Reveal } from "@/components/reveal";
