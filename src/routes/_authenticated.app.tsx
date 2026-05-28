@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   Folder, FileText, Image as ImageIcon, Film, Music, Archive, Upload, Trash2,
   Settings, ChevronRight, Download, LogOut, Loader2, AlertCircle, Crown, FileIcon,
+  Search, Star, X,
 } from "lucide-react";
 import {
   getStorageState, listFiles, deleteFile, setPlan, getDownloadUrl,
@@ -15,6 +16,27 @@ import {
 } from "@/lib/storage.functions";
 import { uploadAll } from "@/lib/upload-client";
 import { formatBytes, PLAN_LABEL } from "@/lib/storage-format";
+
+type TypeFilter = "all" | "image" | "video" | "audio" | "doc" | "archive" | "other";
+const TYPE_LABELS: Record<TypeFilter, string> = {
+  all: "All", image: "Images", video: "Video", audio: "Audio",
+  doc: "Documents", archive: "Archives", other: "Other",
+};
+function classify(mime: string | null, name: string): TypeFilter {
+  const m = mime ?? "";
+  if (m.startsWith("image/")) return "image";
+  if (m.startsWith("video/")) return "video";
+  if (m.startsWith("audio/")) return "audio";
+  if (m.includes("pdf") || m.includes("word") || m.includes("text") || m.includes("sheet") || m.includes("excel")) return "doc";
+  if (m.includes("zip") || m.includes("rar") || m.includes("tar") || /\.(zip|rar|tar|gz|7z)$/i.test(name)) return "archive";
+  return "other";
+}
+const STAR_KEY = "nodefms.starred.v1";
+function loadStars(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try { return new Set(JSON.parse(localStorage.getItem(STAR_KEY) ?? "[]")); } catch { return new Set(); }
+}
+
 
 export const Route = createFileRoute("/_authenticated/app")({
   head: () => ({ meta: [{ title: "Workspace — Node FMS" }] }),
