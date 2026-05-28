@@ -4,14 +4,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
-  ArrowLeft, Loader2, Plus, Copy, Check, Trash2, UserMinus, Users, Building2, Mail, Shield,
+  ArrowLeft, Loader2, Plus, Copy, Check, Trash2, UserMinus, Users, Building2, Mail, Shield, KeyRound, RefreshCw, LogIn,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   listMyWorkspaces, createWorkspace, getWorkspaceDetail, createInvite, revokeInvite, removeMember,
+  regenerateJoinCode, joinWorkspaceByCode,
   type WorkspaceRole,
 } from "@/lib/workspaces.functions";
+import { WorkspaceChat } from "@/components/workspace-chat";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings — Node FMS" }] }),
