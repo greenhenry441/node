@@ -8,8 +8,10 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   Folder, FileText, Image as ImageIcon, Film, Music, Archive, Upload, Trash2,
   Settings, ChevronRight, Download, LogOut, Loader2, AlertCircle, Crown, FileIcon,
-  Search, Star, X, Pencil, Save as SaveIcon,
+  Search, Star, X, Pencil, Save as SaveIcon, MessageSquare,
 } from "lucide-react";
+import { listMyWorkspaces } from "@/lib/workspaces.functions";
+import { WorkspaceChat } from "@/components/workspace-chat";
 import {
   getStorageState, listFiles, deleteFile, setPlan, getDownloadUrl,
   getFileText, updateFileText,
