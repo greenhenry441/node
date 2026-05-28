@@ -4,22 +4,22 @@ import { SiteFooter } from "@/components/site-footer";
 
 export const Route = createFileRoute("/docs")({
   head: () => ({
-    meta: [
-      { title: "Docs — Node FMS" },
+      { title: "Docs — Node" },
       {
         name: "description",
         content:
-          "Long-form documentation for Node File Management Suite: setup, file storage, workspaces, sharing, editor, security, plans, and troubleshooting.",
+          "The Node handbook: how NodeFMS, Node Tasks, and Node Calendar fit together. Setup, workspaces, sharing, the editor, security, plans, and troubleshooting.",
       },
-      { property: "og:title", content: "Docs — Node FMS" },
+      { property: "og:title", content: "Docs — Node" },
       {
         property: "og:description",
         content:
-          "Long-form documentation for Node File Management Suite: setup, file storage, workspaces, sharing, editor, security, plans, and troubleshooting.",
+          "The Node handbook: how NodeFMS, Node Tasks, and Node Calendar fit together.",
       },
       { property: "og:url", content: "https://nodefms.lovable.app/docs" },
     ],
     links: [{ rel: "canonical", href: "https://nodefms.lovable.app/docs" }],
+
   }),
   component: DocsPage,
 });
