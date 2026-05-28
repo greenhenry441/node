@@ -5,13 +5,13 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { formatBytes } from "./storage-format";
 
 const BUCKET = "user-files";
-const MAX_FILE_BYTES = 26_214_400; // 25 MB — must match DB max_file_bytes()
+const MAX_FILE_BYTES = 16_106_127_360; // 15 GB — must match DB max_file_bytes()
 
 const PLAN_CAPS = {
-  free: 107_374_182_400,
-  starter: 536_870_912_000,
-  steady: 1_099_511_627_776,
-  suite: null,
+  free: 536_870_912_000,        // 500 GB
+  starter: 1_099_511_627_776,   // 1 TB
+  steady: 5_497_558_138_880,    // 5 TB
+  suite: null,                  // unlimited
 } as const;
 
 type Plan = keyof typeof PLAN_CAPS;
