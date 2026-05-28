@@ -281,3 +281,106 @@ export const acceptInvite = createServerFn({ method: "POST" })
 
     return { workspace_id: inv.workspace_id };
   });
+
+// ---------- Regenerate workspace join code ----------
+
+export const regenerateJoinCode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ workspace_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const { data: m } = await supabaseAdmin
+      .from("workspace_members").select("role")
+      .eq("workspace_id", data.workspace_id).eq("user_id", userId).maybeSingle();
+    if (!m || (m.role !== "owner" && m.role !== "admin")) {
+      throw new Error("Only owners and admins can regenerate the join code");
+    }
+    const code = newJoinCode();
+    const { error } = await supabaseAdmin
+      .from("workspaces").update({ join_code: code }).eq("id", data.workspace_id);
+    if (error) throw new Error(error.message);
+    return { join_code: code };
+  });
+
+// ---------- Join workspace by code (no email required) ----------
+
+export const joinWorkspaceByCode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ code: z.string().trim().toLowerCase().min(6).max(40).regex(/^[a-z0-9]+$/) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const { data: ws } = await supabaseAdmin
+      .from("workspaces").select("id, name").eq("join_code", data.code).maybeSingle();
+    if (!ws) throw new Error("Invalid workspace code");
+
+    const { error } = await supabaseAdmin
+      .from("workspace_members")
+      .insert({ workspace_id: ws.id, user_id: userId, role: "member" });
+    if (error && !error.message.includes("duplicate")) throw new Error(error.message);
+    return { workspace_id: ws.id, name: ws.name };
+  });
+
+// ---------- Workspace messages (chat / comments) ----------
+
+export type WorkspaceMessage = {
+  id: string;
+  user_id: string;
+  email: string | null;
+  body: string;
+  created_at: string;
+};
+
+export const listWorkspaceMessages = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ workspace_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }): Promise<WorkspaceMessage[]> => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("workspace_messages")
+      .select("id, user_id, body, created_at")
+      .eq("workspace_id", data.workspace_id)
+      .order("created_at", { ascending: true })
+      .limit(500);
+    if (error) throw new Error(error.message);
+
+    const ids = Array.from(new Set((rows ?? []).map((r) => r.user_id)));
+    const emails = new Map<string, string | null>();
+    if (ids.length) {
+      const { data: usersData } = await supabaseAdmin.auth.admin.listUsers({ perPage: 200 });
+      for (const u of usersData?.users ?? []) {
+        if (ids.includes(u.id)) emails.set(u.id, u.email ?? null);
+      }
+    }
+    return (rows ?? []).map((r) => ({ ...r, email: emails.get(r.user_id) ?? null }));
+  });
+
+export const postWorkspaceMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({
+      workspace_id: z.string().uuid(),
+      body: z.string().trim().min(1).max(4000),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: row, error } = await supabase
+      .from("workspace_messages")
+      .insert({ workspace_id: data.workspace_id, user_id: userId, body: data.body })
+      .select("id, user_id, body, created_at")
+      .single();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const deleteWorkspaceMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase.from("workspace_messages").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
