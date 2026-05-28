@@ -348,6 +348,15 @@ function AppPage() {
               {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
               {uploading ? "Uploading…" : "Upload"}
             </button>
+            {activeWs && (
+              <button
+                onClick={() => setChatOpen(true)}
+                className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-md border border-border hover:bg-muted"
+                title={`Team chat — ${activeWs.name}`}
+              >
+                <MessageSquare className="size-4" /> Chat
+              </button>
+            )}
             <Link to="/settings" className="size-9 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink" title="Settings">
               <Settings className="size-4" />
             </Link>
