@@ -211,7 +211,98 @@ export const getDownloadUrl = createServerFn({ method: "POST" })
       .createSignedUrl(row.storage_path, 60, { download: row.name });
     if (signErr) throw new Error(signErr.message);
     return { url: signed.signedUrl };
+    return { url: signed.signedUrl };
   });
 
-// ---------- Helpers ----------
-// (formatBytes lives in ./storage-format so it stays client-safe.)
+// ---------- Open & edit text files in place ----------
+
+const MAX_EDITABLE_BYTES = 2 * 1024 * 1024; // 2 MB cap for in-app editor
+
+function isLikelyText(mime: string | null, name: string): boolean {
+  const m = (mime ?? "").toLowerCase();
+  if (m.startsWith("text/")) return true;
+  if (/(json|xml|yaml|javascript|typescript|csv|html|sql|toml|markdown|x-sh)/.test(m)) return true;
+  if (/\.(txt|md|markdown|json|yaml|yml|xml|html|htm|css|scss|sass|less|js|jsx|ts|tsx|mjs|cjs|csv|tsv|log|sh|bash|zsh|sql|toml|ini|env|conf|gitignore|py|rb|go|rs|java|kt|c|h|cpp|hpp|php|svelte|vue|astro)$/i.test(name)) return true;
+  return false;
+}
+
+export const getFileText = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const { data: row, error } = await supabaseAdmin
+      .from("user_files")
+      .select("id, name, mime_type, size_bytes, storage_path, user_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row || row.user_id !== userId) throw new Error("Not found");
+    if (Number(row.size_bytes) > MAX_EDITABLE_BYTES) {
+      throw new Error(`Files larger than ${Math.round(MAX_EDITABLE_BYTES / 1024 / 1024)} MB can't be opened in the editor.`);
+    }
+    if (!isLikelyText(row.mime_type, row.name)) {
+      throw new Error("This file type can't be opened as text. Download it instead.");
+    }
+    const { data: blob, error: dlErr } = await supabaseAdmin.storage.from(BUCKET).download(row.storage_path);
+    if (dlErr || !blob) throw new Error(dlErr?.message ?? "Download failed");
+    const text = await blob.text();
+    return { id: row.id, name: row.name, mime: row.mime_type, content: text };
+  });
+
+export const updateFileText = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ id: z.string().uuid(), content: z.string().max(MAX_EDITABLE_BYTES) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const { data: row, error } = await supabaseAdmin
+      .from("user_files")
+      .select("id, storage_path, size_bytes, mime_type, name, user_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row || row.user_id !== userId) throw new Error("Not found");
+    if (!isLikelyText(row.mime_type, row.name)) {
+      throw new Error("This file type can't be edited as text.");
+    }
+
+    const bytes = new TextEncoder().encode(data.content);
+    const newSize = bytes.byteLength;
+    if (newSize > MAX_EDITABLE_BYTES) {
+      throw new Error(`Editor limit is ${Math.round(MAX_EDITABLE_BYTES / 1024 / 1024)} MB.`);
+    }
+
+    // Quota check (delta-based)
+    const delta = newSize - Number(row.size_bytes);
+    if (delta > 0) {
+      const [{ data: sub }, { data: usageRows }] = await Promise.all([
+        supabaseAdmin.from("user_subscriptions").select("plan").eq("user_id", userId).maybeSingle(),
+        supabaseAdmin.from("user_files").select("size_bytes").eq("user_id", userId),
+      ]);
+      const plan = (sub?.plan as Plan | undefined) ?? "free";
+      const cap = PLAN_CAPS[plan];
+      const used = (usageRows ?? []).reduce((s, r) => s + Number(r.size_bytes ?? 0), 0);
+      if (cap !== null && used + delta > cap) {
+        throw new Error(`Save would exceed your ${formatBytes(cap)} plan limit.`);
+      }
+    }
+
+    const { error: upErr } = await supabaseAdmin.storage
+      .from(BUCKET)
+      .upload(row.storage_path, bytes, {
+        contentType: row.mime_type ?? "text/plain",
+        upsert: true,
+      });
+    if (upErr) throw new Error(upErr.message);
+
+    const { error: updErr } = await supabaseAdmin
+      .from("user_files")
+      .update({ size_bytes: newSize })
+      .eq("id", row.id);
+    if (updErr) throw new Error(updErr.message);
+
+    return { ok: true, size_bytes: newSize };
+  });
+
