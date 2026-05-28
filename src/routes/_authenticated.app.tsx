@@ -336,16 +336,95 @@ function AppPage() {
             handleFiles(e.dataTransfer.files);
           }}
         >
+          {filesQ.data && filesQ.data.length > 0 && (
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <div className="relative flex-1 min-w-[220px] max-w-md">
+                <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search files…"
+                  className="w-full pl-9 pr-9 py-2 text-sm bg-card rounded-md ring-1 ring-black/5 focus:ring-2 focus:ring-ink/20 outline-none"
+                />
+                {query && (
+                  <button onClick={() => setQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-ink">
+                    <X className="size-3.5" />
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {(Object.keys(TYPE_LABELS) as TypeFilter[]).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTypeFilter(t)}
+                    className={`px-2.5 py-1.5 rounded-md text-xs font-medium ${
+                      typeFilter === t ? "bg-ink text-surface" : "text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {TYPE_LABELS[t]}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setStarredOnly((v) => !v)}
+                className={`px-2.5 py-1.5 rounded-md text-xs font-medium inline-flex items-center gap-1 ${
+                  starredOnly ? "bg-amber-100 text-amber-800" : "text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                <Star className={`size-3.5 ${starredOnly ? "fill-amber-500 text-amber-500" : ""}`} />
+                Starred
+              </button>
+            </div>
+          )}
+
+          {selected.size > 0 && (
+            <div className="mb-4 flex items-center gap-3 px-4 py-2.5 bg-ink text-surface rounded-lg text-sm">
+              <span className="font-medium">{selected.size} selected</span>
+              <button
+                onClick={bulkDownload}
+                disabled={bulkBusy}
+                className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface/10 hover:bg-surface/20 disabled:opacity-50"
+              >
+                <Download className="size-3.5" /> Download
+              </button>
+              <button
+                onClick={bulkDelete}
+                disabled={bulkBusy}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-destructive hover:bg-destructive/90 disabled:opacity-50"
+              >
+                {bulkBusy ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />} Delete
+              </button>
+              <button onClick={clearSelection} className="px-2 py-1 rounded hover:bg-surface/10" title="Clear">
+                <X className="size-3.5" />
+              </button>
+            </div>
+          )}
+
           {filesQ.isLoading ? (
             <div className="text-center py-24 text-sm text-muted-foreground">
               <Loader2 className="size-5 animate-spin inline mr-2" /> Loading your files…
             </div>
           ) : !filesQ.data || filesQ.data.length === 0 ? (
             <EmptyState onClick={() => fileInput.current?.click()} disabled={overLimit} />
+          ) : visibleFiles.length === 0 ? (
+            <div className="text-center py-24 text-sm text-muted-foreground">
+              No files match your filters.
+            </div>
           ) : (
-            <FileList files={filesQ.data} onDelete={(id) => deleteMut.mutate(id)} onDownload={download} />
+            <FileList
+              files={visibleFiles}
+              stars={stars}
+              selected={selected}
+              allSelected={allVisibleSelected}
+              onToggleAll={toggleSelectAll}
+              onToggleStar={toggleStar}
+              onToggleSelect={toggleSelect}
+              onDelete={(id) => deleteMut.mutate(id)}
+              onDownload={download}
+            />
           )}
         </div>
+
 
         <footer className="border-t border-border px-8 py-3 text-xs text-muted-foreground">
           Per-file limit: {state ? formatBytes(state.maxFileBytes) : "—"}. Plan limit enforced on every upload.
