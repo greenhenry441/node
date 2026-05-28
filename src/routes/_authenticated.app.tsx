@@ -8,12 +8,14 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   Folder, FileText, Image as ImageIcon, Film, Music, Archive, Upload, Trash2,
   Settings, ChevronRight, Download, LogOut, Loader2, AlertCircle, Crown, FileIcon,
-  Search, Star, X,
+  Search, Star, X, Pencil, Save as SaveIcon,
 } from "lucide-react";
 import {
   getStorageState, listFiles, deleteFile, setPlan, getDownloadUrl,
+  getFileText, updateFileText,
   type StoredFile,
 } from "@/lib/storage.functions";
+
 import { uploadAll } from "@/lib/upload-client";
 import { formatBytes, PLAN_LABEL } from "@/lib/storage-format";
 
