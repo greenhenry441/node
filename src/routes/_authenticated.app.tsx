@@ -259,31 +259,35 @@ function AppPage() {
           Plan
         </div>
         <div className="px-4 space-y-1">
-          {(["free", "starter", "steady", "suite"] as const).map((p) => (
-            <button
-              key={p}
-              onClick={() => planMut.mutate(p)}
-              disabled={planMut.isPending || state?.plan === p}
-              className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between ${
-                state?.plan === p
-                  ? "bg-ink text-surface"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                {p === "suite" && <Crown className="size-3.5" />}
-                {PLAN_LABEL[p]}
-              </span>
-              <span className="text-[10px] opacity-70">
-                {formatBytes(
-                  p === "free" ? 536_870_912_000 :
-                  p === "starter" ? 1_099_511_627_776 :
-                  p === "steady" ? 5_497_558_138_880 : null
-                )}
-              </span>
-            </button>
-          ))}
+          {(["free", "starter", "steady", "suite"] as const).map((p) => {
+            const isCurrent = state?.plan === p;
+            const isPaid = p !== "free";
+            return (
+              <button
+                key={p}
+                onClick={() => !isPaid && planMut.mutate(p)}
+                disabled={planMut.isPending || isCurrent || isPaid}
+                title={isPaid ? "Paid plans are temporarily unavailable during launch week" : undefined}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between ${
+                  isCurrent
+                    ? "bg-ink text-surface"
+                    : isPaid
+                    ? "text-muted-foreground/60 cursor-not-allowed"
+                    : "text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  {p === "suite" && <Crown className="size-3.5" />}
+                  {PLAN_LABEL[p]}
+                </span>
+                <span className="text-[10px] opacity-70">
+                  {isPaid ? "Soon" : "Unlimited"}
+                </span>
+              </button>
+            );
+          })}
         </div>
+
 
         <div className="mt-auto p-4 m-3 rounded-xl bg-muted">
           <div className="text-xs text-muted-foreground flex items-center justify-between">
