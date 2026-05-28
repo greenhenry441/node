@@ -5,11 +5,10 @@ import { Check } from "lucide-react";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
-    meta: [
-      { title: "Pricing — Node FMS" },
-      { name: "description", content: "Simple, flat pricing for Node FMS. Start free, upgrade or cancel anytime." },
-      { property: "og:title", content: "Pricing — Node FMS" },
-      { property: "og:description", content: "Simple, flat pricing for Node FMS. Start free, upgrade or cancel anytime." },
+      { title: "Pricing — Node" },
+      { name: "description", content: "Honest, flat pricing for Node. Start free. The Node Suite tier bundles NodeFMS, Node Tasks, and Node Calendar." },
+      { property: "og:title", content: "Pricing — Node" },
+      { property: "og:description", content: "Free forever for basics. Node Suite bundles all three apps for one price." },
       { property: "og:url", content: "https://nodefms.lovable.app/pricing" },
     ],
     links: [{ rel: "canonical", href: "https://nodefms.lovable.app/pricing" }],
@@ -19,20 +18,23 @@ export const Route = createFileRoute("/pricing")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Product",
-          name: "Node FMS",
+          name: "Node",
           description:
-            "Secure file storage and team workspace from Node File Management Suite.",
+            "Node — three small apps for small businesses: NodeFMS for files, Node Tasks for work, Node Calendar for time.",
           brand: { "@type": "Brand", name: "Node" },
           offers: [
-            { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "500 GB storage" },
-            { "@type": "Offer", name: "Starter", price: "25.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "1 TB storage" },
-            { "@type": "Offer", name: "Steady", price: "50.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "5 TB storage" },
-            { "@type": "Offer", name: "Node Suite", price: "75.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "Unlimited storage" },
+            { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "NodeFMS basics, unlimited during launch week" },
+            { "@type": "Offer", name: "Starter", price: "25.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "NodeFMS for very small businesses" },
+            { "@type": "Offer", name: "Steady", price: "50.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "NodeFMS for small businesses" },
+            { "@type": "Offer", name: "Node Suite", price: "75.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "NodeFMS + Node Tasks + Node Calendar" },
           ],
         }),
       },
     ],
   }),
+  component: PricingPage,
+});
+
   component: PricingPage,
 });
 
