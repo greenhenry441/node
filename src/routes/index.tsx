@@ -11,10 +11,11 @@ import {
   Zap,
   CheckCircle2,
   ArrowRight,
-  FileText,
-  Image as ImageIcon,
-  Film,
+  ListChecks,
+  CalendarDays,
+  HardDrive,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
