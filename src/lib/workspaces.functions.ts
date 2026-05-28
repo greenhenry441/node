@@ -36,11 +36,12 @@ export type WorkspaceInvite = {
 const slugify = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
 
-function randomCode() {
-  return Array.from(crypto.getRandomValues(new Uint8Array(18)))
+function randomCode(len = 18) {
+  return Array.from(crypto.getRandomValues(new Uint8Array(len)))
     .map((b) => "abcdefghijkmnopqrstuvwxyz23456789"[b % 33])
     .join("");
 }
+const newJoinCode = () => randomCode(10);
 
 // ---------- List my workspaces ----------
 
