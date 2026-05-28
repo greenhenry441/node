@@ -5,14 +5,15 @@ import { CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/status")({
   head: () => ({
-    meta: [
-      { title: "Status — Node FMS" },
-      { name: "description", content: "Live operational status for Node File Management Suite services." },
-      { property: "og:title", content: "Status — Node FMS" },
-      { property: "og:description", content: "Live operational status for Node File Management Suite services." },
+      { title: "Status — Node" },
+      { name: "description", content: "Live status for Node — NodeFMS, Node Tasks, and Node Calendar." },
+      { property: "og:title", content: "Status — Node" },
+      { property: "og:description", content: "Live status for Node — NodeFMS, Node Tasks, and Node Calendar." },
       { property: "og:url", content: "https://nodefms.lovable.app/status" },
     ],
     links: [{ rel: "canonical", href: "https://nodefms.lovable.app/status" }],
+  }),
+
   }),
   component: StatusPage,
 });
