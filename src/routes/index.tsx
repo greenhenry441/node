@@ -51,15 +51,16 @@ function Index() {
               <Reveal>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/[0.04] backdrop-blur text-[11px] font-mono uppercase tracking-[0.18em] text-white/70 mb-6">
                   <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  NODE_FMS // a division of Node
+                  NODE // built by an 11-year-old in Milford, MI
                 </div>
-                <h1 className="text-4xl md:text-6xl font-semibold leading-tight tracking-tight text-balance max-w-[22ch] mx-auto">
-                  The single source of truth for your business's files.
+                <h1 className="text-4xl md:text-6xl font-semibold leading-tight tracking-tight text-balance max-w-[24ch] mx-auto">
+                  One little toolkit for the way your business actually works.
                 </h1>
-                <p className="mt-8 text-lg md:text-xl text-white/70 text-pretty max-w-[56ch] mx-auto">
-                  Node FMS is secure cloud storage purpose-built for small businesses.
-                  Keep client deliverables, contracts, and brand libraries in one
-                  protected, organized space.
+                <p className="mt-8 text-lg md:text-xl text-white/70 text-pretty max-w-[58ch] mx-auto">
+                  Node is three small apps that play nicely together: <span className="text-white">NodeFMS</span> for files,
+                  {" "}<span className="text-white">Node Tasks</span> for the work, and
+                  {" "}<span className="text-white">Node Calendar</span> for the time. I'm Henry — I built it for my
+                  Gifted &amp; Talented project, and for small businesses who shouldn't need ten tabs open to get through the day.
                 </p>
               </Reveal>
               <Reveal delay={150}>
@@ -68,14 +69,15 @@ function Index() {
                     to="/app"
                     className="group bg-white text-[#06070d] px-5 py-2.5 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-white/90 transition-colors"
                   >
-                    Start free 14-day trial
+                    Try Node — it's free
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                   </Link>
-                  <a href="#features" className="px-5 py-2.5 text-sm font-medium text-white/60 hover:text-white transition-colors">
-                    See how it works
+                  <a href="#divisions" className="px-5 py-2.5 text-sm font-medium text-white/60 hover:text-white transition-colors">
+                    Meet the three apps
                   </a>
                 </div>
               </Reveal>
+
             </div>
           </div>
         </div>
