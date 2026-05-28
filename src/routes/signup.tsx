@@ -104,6 +104,20 @@ function SignupPage() {
     navigate({ to: "/onboarding" });
   };
 
+  const signUpWithApple = async () => {
+    setAppleLoading(true);
+    const result = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: window.location.origin + "/onboarding",
+    });
+    if (result.error) {
+      setAppleLoading(false);
+      toast.error("Apple sign-up failed. Please try again.");
+      return;
+    }
+    if (result.redirected) return;
+    navigate({ to: "/onboarding" });
+  };
+
   if (checkInbox) {
     return (
       <AuthShell
