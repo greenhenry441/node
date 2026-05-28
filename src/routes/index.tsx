@@ -19,6 +19,9 @@ import {
   HardDrive,
 } from "lucide-react";
 
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
       { title: "Node — Tools small businesses actually want to use" },
       { name: "description", content: "Node is a small toolkit built by an 11-year-old in Milford, MI. Three pieces that work together: NodeFMS for files, Node Tasks for work, Node Calendar for time." },
       { property: "og:title", content: "Node — Tools small businesses actually want to use" },
@@ -30,11 +33,6 @@ import {
   component: Index,
 });
 
-    ],
-    links: [{ rel: "canonical", href: "https://nodefms.lovable.app/" }],
-  }),
-  component: Index,
-});
 
 function Index() {
   return (
