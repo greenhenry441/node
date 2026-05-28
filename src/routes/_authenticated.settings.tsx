@@ -163,7 +163,6 @@ function SettingsPage() {
 
           {active && <WorkspaceDetail key={active} workspaceId={active} />}
         </section>
-        </section>
       </main>
     </div>
   );
