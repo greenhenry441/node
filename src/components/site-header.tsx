@@ -30,7 +30,6 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
             <div className={`text-[10px] -mt-0.5 ${subCls}`}>A division of Node</div>
           </div>
         </Link>
-        </Link>
         <nav className={`hidden md:flex items-center gap-7 text-sm font-medium ${navIdle}`}>
           <Link to="/features" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Features</Link>
           <Link to="/pricing" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Pricing</Link>

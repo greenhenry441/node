@@ -20,7 +20,6 @@ export function AuthShell({
           <img src="/logo-icon.png" alt="Node" className="size-5" />
           <span className="text-sm font-semibold tracking-tight">Node</span>
         </Link>
-        </Link>
         <div className="flex-1 flex items-center">
           <div className="w-full max-w-sm mx-auto">
             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-balance">{title}</h1>

@@ -10,7 +10,6 @@ export function SiteFooter() {
           <img src="/logo-icon.png" alt="Node FMS" className="size-4" />
           <span className="text-sm font-semibold tracking-tight">Node File Management Suite</span>
         </Link>
-        </Link>
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-medium text-muted-foreground">
           <Link to="/features" className="hover:text-ink">Features</Link>
           <Link to="/pricing" className="hover:text-ink">Pricing</Link>
