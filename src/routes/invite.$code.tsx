@@ -27,6 +27,7 @@ function InvitePage() {
 
   const lookupFn = useServerFn(getInviteByCode);
   const acceptFn = useServerFn(acceptInvite);
+  const joinFn = useServerFn(joinWorkspaceByCode);
 
   const q = useQuery({
     queryKey: ["invite", code],
@@ -35,10 +36,12 @@ function InvitePage() {
 
   const acceptMut = useMutation({
     mutationFn: () => acceptFn({ data: { code } }),
-    onSuccess: () => {
-      toast.success("You're in!");
-      navigate({ to: "/settings" });
-    },
+    onSuccess: () => { toast.success("You're in!"); navigate({ to: "/settings" }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const joinMut = useMutation({
+    mutationFn: () => joinFn({ data: { code } }),
+    onSuccess: () => { toast.success("Joined workspace"); navigate({ to: "/settings" }); },
     onError: (e: Error) => toast.error(e.message),
   });
 
