@@ -62,9 +62,34 @@ type Release = {
 // release labels declared in `ReleaseTag` above.
 const releases: Release[] = [
   {
+    version: "1.0.0",
+    date: "May 28, 2026",
+    tags: ["Major", "Stable", "LTS"],
+    title: "Node FMS 1.0 — Generally Available, LTS",
+    highlights: [
+      "Node FMS is officially launched — no more waiting for the 1st",
+      "First Long-Term Support release: extended maintenance and security patches",
+      "Stable API surface — safe to build on in production",
+      "All Alpha and Beta feature flags graduated to GA",
+      "Hardened workspace permissions, quotas, and storage pipeline",
+    ],
+  },
+  {
+    version: "0.9.0",
+    date: "May 28, 2026",
+    tags: ["Minor", "Stable"],
+    title: "Pre-1.0 stabilization",
+    highlights: [
+      "Final polish pass across marketing, app, and settings",
+      "Performance improvements to file list rendering and uploads",
+      "Tightened RLS policies and workspace role checks",
+      "Bug sweep across invites, billing, and onboarding flows",
+    ],
+  },
+  {
     version: "0.8.0",
     date: "May 28, 2026",
-    tags: ["Major", "RTAO"],
+    tags: ["Major", "Stable", "RTAO"],
     title: "Real desktop apps — Mac, Windows, and Linux",
     highlights: [
       "Shipped real, runnable native desktop clients for macOS (Apple Silicon and Intel), Windows x64, and Linux x64",
@@ -77,7 +102,6 @@ const releases: Release[] = [
     ],
   },
   {
-
     version: "0.7.1",
     date: "May 28, 2026",
     tags: ["Patch"],
@@ -96,7 +120,7 @@ const releases: Release[] = [
   {
     version: "0.7.0",
     date: "May 28, 2026",
-    tags: ["Minor", "Pre-Release"],
+    tags: ["Minor", "Open-Beta"],
     title: "Storage limits, technological refresh, downloads page",
     highlights: [
       "Per-file upload limit raised from 25 MB to 15 GB",
@@ -111,8 +135,8 @@ const releases: Release[] = [
   {
     version: "0.6.0",
     date: "May 26, 2026",
-    tags: ["Minor", "Pre-Release"],
-    title: "Full Release",
+    tags: ["Minor", "Open-Beta"],
+    title: "Open Beta begins",
     highlights: [
       "Launch countdown banner across the marketing site",
       "Email verification callback now correctly signs you in",
@@ -124,7 +148,7 @@ const releases: Release[] = [
   {
     version: "0.5.0",
     date: "May 25, 2026",
-    tags: ["Minor"],
+    tags: ["Minor", "Alpha"],
     highlights: [
       "AI-powered onboarding chat for new sign-ups",
       "Business profile auto-fills as you describe your company",
@@ -134,7 +158,7 @@ const releases: Release[] = [
   {
     version: "0.4.0",
     date: "May 24, 2026",
-    tags: ["Minor"],
+    tags: ["Minor", "Alpha"],
     highlights: [
       "About, Contact, Privacy, and Status pages",
       "Full sitemap.xml with all public routes",
@@ -144,7 +168,7 @@ const releases: Release[] = [
   {
     version: "0.3.0",
     date: "May 23, 2026",
-    tags: ["Minor"],
+    tags: ["Minor", "Alpha"],
     highlights: [
       "Rebrand to Node File Management Suite (Node FMS)",
       "Homepage pricing section with all four tiers",
@@ -153,7 +177,7 @@ const releases: Release[] = [
   {
     version: "0.2.0",
     date: "May 22, 2026",
-    tags: ["Minor"],
+    tags: ["Minor", "Alpha"],
     highlights: [
       "Real authentication: sign up, sign in, Google OAuth",
       "Protected /app route behind sign-in",
@@ -171,6 +195,7 @@ const releases: Release[] = [
     ],
   },
 ];
+
 
 const tagStyles: Record<ReleaseTag, string> = {
   Revamp: "bg-fuchsia-100 text-fuchsia-900",
