@@ -64,6 +64,7 @@ function LoginPage() {
       return;
     }
     if (result.redirected) return;
+    navigate({ to: "/app" });
   };
 
   const signInWithApple = async () => {
