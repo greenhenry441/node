@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Github } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { Reveal } from "@/components/reveal";
+import { GITHUB_URL } from "@/lib/links";
 
 export const Route = createFileRoute("/changelog")({
   head: () => ({
@@ -29,20 +32,55 @@ export const Route = createFileRoute("/changelog")({
   component: ChangelogPage,
 });
 
+type ReleaseTag =
+  | "Revamp"
+  | "Major"
+  | "Minor"
+  | "Patch"
+  | "Emergency Update"
+  | "Pre-Release"
+  | "Pre-Alpha"
+  | "Alpha"
+  | "Open-Beta"
+  | "Closed-Beta"
+  | "Release Candidate"
+  | "Stable"
+  | "LTS"
+  | "EOL"
+  | "RTAO";
+
 type Release = {
   version: string;
   date: string;
-  tag: "Pre-release" | "Minor" | "Major" | "Patch";
+  tags: ReleaseTag[];
+  title?: string;
   highlights: string[];
 };
 
 // Append a new entry at the top each time we publish.
-// Follow semver: MAJOR.MINOR.PATCH.
+// Follow semver: MAJOR.MINOR.PATCH. Tag with one or more of the
+// release labels declared in `ReleaseTag` above.
 const releases: Release[] = [
+  {
+    version: "0.7.0",
+    date: "May 28, 2026",
+    tags: ["Minor", "Pre-Release"],
+    title: "Storage limits, technological refresh, downloads page",
+    highlights: [
+      "Per-file upload limit raised from 25 MB to 15 GB",
+      "Storage plans restructured: Free 500 GB, Starter 1 TB, Steady 5 TB, Node Suite unlimited",
+      "WebGL hero background now actually renders (was hidden behind the page surface)",
+      "Scroll-triggered reveal animations across the marketing site",
+      "New /download page for the upcoming Mac and Windows native apps (shipping 2027)",
+      "GitHub button added to the site header, footer, and changelog",
+      "Expanded release-label vocabulary: Pre-Alpha, Alpha, Open-Beta, Closed-Beta, RC, Stable, LTS, EOL, RTAO, Emergency Update, Revamp",
+    ],
+  },
   {
     version: "0.6.0",
     date: "May 26, 2026",
-    tag: "Pre-release",
+    tags: ["Minor", "Pre-Release"],
+    title: "Full Release",
     highlights: [
       "Launch countdown banner across the marketing site",
       "Email verification callback now correctly signs you in",
@@ -54,7 +92,7 @@ const releases: Release[] = [
   {
     version: "0.5.0",
     date: "May 25, 2026",
-    tag: "Minor",
+    tags: ["Minor"],
     highlights: [
       "AI-powered onboarding chat for new sign-ups",
       "Business profile auto-fills as you describe your company",
@@ -64,7 +102,7 @@ const releases: Release[] = [
   {
     version: "0.4.0",
     date: "May 24, 2026",
-    tag: "Minor",
+    tags: ["Minor"],
     highlights: [
       "About, Contact, Privacy, and Status pages",
       "Full sitemap.xml with all public routes",
@@ -74,7 +112,7 @@ const releases: Release[] = [
   {
     version: "0.3.0",
     date: "May 23, 2026",
-    tag: "Minor",
+    tags: ["Minor"],
     highlights: [
       "Rebrand to Node File Management Suite (Node FMS)",
       "Homepage pricing section with all four tiers",
@@ -83,7 +121,7 @@ const releases: Release[] = [
   {
     version: "0.2.0",
     date: "May 22, 2026",
-    tag: "Minor",
+    tags: ["Minor"],
     highlights: [
       "Real authentication: sign up, sign in, Google OAuth",
       "Protected /app route behind sign-in",
@@ -93,7 +131,7 @@ const releases: Release[] = [
   {
     version: "0.1.0",
     date: "May 21, 2026",
-    tag: "Pre-release",
+    tags: ["Pre-Release", "Pre-Alpha"],
     highlights: [
       "Initial marketing site: Features, Pricing, Security",
       "Login, signup, and forgot-password pages",
@@ -102,11 +140,22 @@ const releases: Release[] = [
   },
 ];
 
-const tagStyles: Record<Release["tag"], string> = {
-  "Pre-release": "bg-amber-100 text-amber-900",
-  Minor: "bg-blue-100 text-blue-900",
+const tagStyles: Record<ReleaseTag, string> = {
+  Revamp: "bg-fuchsia-100 text-fuchsia-900",
   Major: "bg-emerald-100 text-emerald-900",
+  Minor: "bg-blue-100 text-blue-900",
   Patch: "bg-zinc-100 text-zinc-700",
+  "Emergency Update": "bg-red-100 text-red-900",
+  "Pre-Release": "bg-amber-100 text-amber-900",
+  "Pre-Alpha": "bg-orange-100 text-orange-900",
+  Alpha: "bg-yellow-100 text-yellow-900",
+  "Open-Beta": "bg-sky-100 text-sky-900",
+  "Closed-Beta": "bg-indigo-100 text-indigo-900",
+  "Release Candidate": "bg-teal-100 text-teal-900",
+  Stable: "bg-emerald-100 text-emerald-900",
+  LTS: "bg-violet-100 text-violet-900",
+  EOL: "bg-zinc-800 text-zinc-100",
+  RTAO: "bg-rose-100 text-rose-900",
 };
 
 function ChangelogPage() {
@@ -115,38 +164,66 @@ function ChangelogPage() {
       <SiteHeader />
       <section className="py-20 md:py-24">
         <div className="max-w-3xl mx-auto px-6">
-          <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Changelog</span>
-          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-balance">
-            What's new in Node FMS
-          </h1>
-          <p className="mt-6 text-lg text-muted-foreground text-pretty">
-            We use{" "}
-            <a href="https://semver.org" target="_blank" rel="noreferrer" className="underline underline-offset-4">
-              semantic versioning
-            </a>
-            . Every publish ships here with the features, fixes, and changes it includes.
-          </p>
+          <Reveal>
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Changelog</span>
+                <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-balance">
+                  What's new in Node FMS
+                </h1>
+              </div>
+              <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-ink/10 text-sm font-medium hover:bg-ink/5 transition-colors"
+              >
+                <Github className="size-4" /> View on GitHub
+              </a>
+            </div>
+            <p className="mt-6 text-lg text-muted-foreground text-pretty">
+              We use{" "}
+              <a href="https://semver.org" target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                semantic versioning
+              </a>
+              . Every publish ships here with the features, fixes, and changes it includes.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-1.5">
+              {(Object.keys(tagStyles) as ReleaseTag[]).map((t) => (
+                <span key={t} className={`text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full ${tagStyles[t]}`}>
+                  {t}
+                </span>
+              ))}
+            </div>
+          </Reveal>
 
           <div className="mt-12 space-y-10">
-            {releases.map((r) => (
-              <article key={r.version} className="border-l-2 border-border pl-6 relative">
-                <div className="absolute -left-[5px] top-1.5 size-2 rounded-full bg-ink" />
-                <div className="flex flex-wrap items-baseline gap-3">
-                  <h2 className="text-2xl font-semibold tracking-tight">v{r.version}</h2>
-                  <span className={`text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full ${tagStyles[r.tag]}`}>
-                    {r.tag}
-                  </span>
-                  <span className="text-xs text-muted-foreground">{r.date}</span>
+            {releases.map((r, i) => (
+              <Reveal key={r.version} delay={i * 50} as="article">
+                <div className="border-l-2 border-border pl-6 relative">
+                  <div className="absolute -left-[5px] top-1.5 size-2 rounded-full bg-ink" />
+                  <div className="flex flex-wrap items-baseline gap-3">
+                    <h2 className="text-2xl font-semibold tracking-tight">v{r.version}</h2>
+                    {r.tags.map((t) => (
+                      <span key={t} className={`text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full ${tagStyles[t]}`}>
+                        {t}
+                      </span>
+                    ))}
+                    <span className="text-xs text-muted-foreground">{r.date}</span>
+                  </div>
+                  {r.title && (
+                    <p className="mt-2 text-sm font-medium text-ink/70">{r.title}</p>
+                  )}
+                  <ul className="mt-4 space-y-2 text-sm text-ink/80">
+                    {r.highlights.map((h) => (
+                      <li key={h} className="flex gap-2">
+                        <span className="text-muted-foreground">—</span>
+                        <span>{h}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="mt-4 space-y-2 text-sm text-ink/80">
-                  {r.highlights.map((h) => (
-                    <li key={h} className="flex gap-2">
-                      <span className="text-muted-foreground">—</span>
-                      <span>{h}</span>
-                    </li>
-                  ))}
-                </ul>
-              </article>
+              </Reveal>
             ))}
           </div>
         </div>
