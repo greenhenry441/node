@@ -97,7 +97,8 @@ function AppPage() {
     });
   const clearSelection = () => setSelected(new Set());
 
-  });
+
+
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
