@@ -64,6 +64,19 @@ function LoginPage() {
       return;
     }
     if (result.redirected) return;
+  };
+
+  const signInWithApple = async () => {
+    setAppleLoading(true);
+    const result = await lovable.auth.signInWithOAuth("apple", {
+      redirect_uri: window.location.origin + "/app",
+    });
+    if (result.error) {
+      setAppleLoading(false);
+      toast.error("Apple sign-in failed. Please try again.");
+      return;
+    }
+    if (result.redirected) return;
     navigate({ to: "/app" });
   };
 
@@ -80,14 +93,26 @@ function LoginPage() {
         </>
       }
     >
-      <button
-        type="button"
-        onClick={signInWithGoogle}
-        disabled={googleLoading}
-        className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
-      >
-        {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
-        Continue with Google
+      <div className="space-y-2">
+        <button
+          type="button"
+          onClick={signInWithGoogle}
+          disabled={googleLoading || appleLoading}
+          className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
+        >
+          {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
+          Continue with Google
+        </button>
+        <button
+          type="button"
+          onClick={signInWithApple}
+          disabled={googleLoading || appleLoading}
+          className="w-full flex items-center justify-center gap-2.5 py-2.5 text-sm font-medium rounded-md border border-border bg-card hover:bg-muted transition disabled:opacity-60"
+        >
+          {appleLoading ? <Loader2 className="size-4 animate-spin" /> : <AppleIcon />}
+          Continue with Apple
+        </button>
+      </div>
       </button>
       <Divider>or continue with email</Divider>
 
