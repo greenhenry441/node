@@ -15,7 +15,6 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
   const ctaCls = isDark
     ? "bg-white text-[#06070d] hover:bg-white/90"
     : "bg-ink text-surface hover:bg-ink/90";
-  const logoDot = isDark ? "bg-white" : "bg-ink";
   const titleCls = isDark ? "text-white" : "";
   const subCls = isDark ? "text-white/50" : "text-muted-foreground";
   return (
@@ -24,17 +23,16 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
     <header className="w-full py-6 relative z-10">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src="/logo-icon.png" alt="Node FMS" className="size-5" />
+          <img src="/logo-icon.png" alt="Node" className="size-5" />
           <div className="leading-tight">
-            <div className={`text-sm font-semibold tracking-tight ${titleCls}`}>Node FMS</div>
-            <div className={`text-[10px] -mt-0.5 ${subCls}`}>A division of Node</div>
+            <div className={`text-sm font-semibold tracking-tight ${titleCls}`}>Node</div>
+            <div className={`text-[10px] -mt-0.5 ${subCls}`}>Files · Tasks · Calendar</div>
           </div>
         </Link>
         <nav className={`hidden md:flex items-center gap-7 text-sm font-medium ${navIdle}`}>
-          <Link to="/features" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Features</Link>
+          <Link to="/features" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Products</Link>
           <Link to="/pricing" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Pricing</Link>
           <Link to="/download" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Download</Link>
-          <Link to="/editor" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Editor</Link>
           <Link to="/docs" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Docs</Link>
           <Link to="/forum" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Forum</Link>
           <Link to="/about" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>About</Link>
@@ -45,7 +43,7 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
             href={GITHUB_URL}
             target="_blank"
             rel="noreferrer"
-            aria-label="Node FMS on GitHub"
+            aria-label="Node on GitHub"
             className={`hidden sm:inline-flex size-9 items-center justify-center rounded-full border transition-colors ${iconBorder} ${isDark ? "text-white" : ""}`}
           >
             <Github className="size-4" strokeWidth={1.75} />
@@ -62,4 +60,3 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
     </>
   );
 }
-

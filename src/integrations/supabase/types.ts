@@ -163,6 +163,95 @@ export type Database = {
         }
         Relationships: []
       }
+      task_lists: {
+        Row: {
+          color: string
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          position: number
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          position?: number
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          position?: number
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          assignee_id: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          due_at: string | null
+          id: string
+          list_id: string
+          position: number
+          priority: Database["public"]["Enums"]["task_priority"]
+          status: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          assignee_id?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          list_id: string
+          position?: number
+          priority?: Database["public"]["Enums"]["task_priority"]
+          status?: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          assignee_id?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          list_id?: string
+          position?: number
+          priority?: Database["public"]["Enums"]["task_priority"]
+          status?: Database["public"]["Enums"]["task_status"]
+          title?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "task_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_files: {
         Row: {
           created_at: string
@@ -376,6 +465,8 @@ export type Database = {
     }
     Enums: {
       subscription_plan: "free" | "starter" | "steady" | "suite"
+      task_priority: "low" | "normal" | "high" | "urgent"
+      task_status: "todo" | "in_progress" | "review" | "done"
       workspace_role: "owner" | "admin" | "member"
     }
     CompositeTypes: {
@@ -505,6 +596,8 @@ export const Constants = {
   public: {
     Enums: {
       subscription_plan: ["free", "starter", "steady", "suite"],
+      task_priority: ["low", "normal", "high", "urgent"],
+      task_status: ["todo", "in_progress", "review", "done"],
       workspace_role: ["owner", "admin", "member"],
     },
   },

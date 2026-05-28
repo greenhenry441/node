@@ -28,6 +28,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as ForumIdRouteImport } from './routes/forum.$id'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated.tasks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated.onboarding'
 import { Route as AuthenticatedIntegrationsRouteImport } from './routes/_authenticated.integrations'
@@ -128,6 +129,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -176,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/integrations': typeof AuthenticatedIntegrationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/tasks': typeof AuthenticatedTasksRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/forum/$id': typeof ForumIdRoute
   '/invite/$code': typeof InviteCodeRoute
@@ -201,6 +208,7 @@ export interface FileRoutesByTo {
   '/integrations': typeof AuthenticatedIntegrationsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/tasks': typeof AuthenticatedTasksRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/forum/$id': typeof ForumIdRoute
   '/invite/$code': typeof InviteCodeRoute
@@ -228,6 +236,7 @@ export interface FileRoutesById {
   '/_authenticated/integrations': typeof AuthenticatedIntegrationsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/tasks': typeof AuthenticatedTasksRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/forum/$id': typeof ForumIdRoute
   '/invite/$code': typeof InviteCodeRoute
@@ -255,6 +264,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/onboarding'
     | '/settings'
+    | '/tasks'
     | '/auth/callback'
     | '/forum/$id'
     | '/invite/$code'
@@ -280,6 +290,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/onboarding'
     | '/settings'
+    | '/tasks'
     | '/auth/callback'
     | '/forum/$id'
     | '/invite/$code'
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/_authenticated/integrations'
     | '/_authenticated/onboarding'
     | '/_authenticated/settings'
+    | '/_authenticated/tasks'
     | '/auth/callback'
     | '/forum/$id'
     | '/invite/$code'
@@ -467,6 +479,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tasks': {
+      id: '/_authenticated/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof AuthenticatedTasksRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -511,6 +530,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -519,6 +539,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIntegrationsRoute: AuthenticatedIntegrationsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedTasksRoute: AuthenticatedTasksRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
