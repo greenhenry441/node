@@ -5,6 +5,7 @@ import { CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/status")({
   head: () => ({
+    meta: [
       { title: "Status — Node" },
       { name: "description", content: "Live status for Node — NodeFMS, Node Tasks, and Node Calendar." },
       { property: "og:title", content: "Status — Node" },
@@ -13,10 +14,9 @@ export const Route = createFileRoute("/status")({
     ],
     links: [{ rel: "canonical", href: "https://nodefms.lovable.app/status" }],
   }),
-
-  }),
   component: StatusPage,
 });
+
 
 const systems = [
   { name: "File storage & sync", uptime: "99.99%" },
