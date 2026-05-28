@@ -228,7 +228,7 @@ const releases: Release[] = [
   {
     version: "0.2.0",
     date: "May 22, 2026",
-    tags: ["Minor", "Alpha"],
+    tags: ["Minor", "Alpha", "EOL"],
     highlights: [
       "Real authentication: sign up, sign in, Google OAuth",
       "Protected /app route behind sign-in",
