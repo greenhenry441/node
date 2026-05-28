@@ -24,7 +24,7 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
     <header className="w-full py-6 relative z-10">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className={`size-5 ${logoDot} rounded-sm`} />
+          <img src="/logo-icon.png" alt="Node FMS" className="size-5" />
           <div className="leading-tight">
             <div className={`text-sm font-semibold tracking-tight ${titleCls}`}>Node FMS</div>
             <div className={`text-[10px] -mt-0.5 ${subCls}`}>A division of Node</div>
