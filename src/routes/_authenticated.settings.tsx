@@ -204,6 +204,15 @@ function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["workspace", workspaceId] }),
     onError: (e: Error) => toast.error(e.message),
   });
+  const regenMut = useMutation({
+    mutationFn: () => regenFn({ data: { workspace_id: workspaceId } }),
+    onSuccess: () => {
+      toast.success("Join code regenerated");
+      qc.invalidateQueries({ queryKey: ["workspace", workspaceId] });
+      qc.invalidateQueries({ queryKey: ["my-workspaces"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   if (dq.isLoading) return <div className="mt-8 text-sm text-muted-foreground"><Loader2 className="inline size-4 animate-spin mr-2" />Loading workspace…</div>;
   if (dq.error) return <div className="mt-8 text-sm text-destructive">{(dq.error as Error).message}</div>;
@@ -212,13 +221,13 @@ function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
   const { workspace, members, invites, myRole } = dq.data;
   const canManage = myRole === "owner" || myRole === "admin";
 
-  const copyInvite = async (code: string) => {
-    const url = `${window.location.origin}/invite/${code}`;
-    await navigator.clipboard.writeText(url);
-    setCopied(code);
-    toast.success("Invite link copied");
+  const copyText = async (text: string, key: string, label: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(key);
+    toast.success(`${label} copied`);
     setTimeout(() => setCopied(null), 1500);
   };
+  const copyInvite = (code: string) => copyText(`${window.location.origin}/invite/${code}`, code, "Invite link");
 
   return (
     <div className="mt-8 rounded-2xl border border-border bg-card overflow-hidden">
