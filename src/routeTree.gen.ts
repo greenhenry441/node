@@ -19,6 +19,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as DownloadRouteImport } from './routes/download'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as AboutRouteImport } from './routes/about'
@@ -78,6 +79,11 @@ const FeaturesRoute = FeaturesRouteImport.update({
   path: '/features',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DownloadRoute = DownloadRouteImport.update({
+  id: '/download',
+  path: '/download',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
+  '/download': typeof DownloadRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
+  '/download': typeof DownloadRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
+  '/download': typeof DownloadRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/changelog'
     | '/contact'
+    | '/download'
     | '/features'
     | '/forgot-password'
     | '/login'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/changelog'
     | '/contact'
+    | '/download'
     | '/features'
     | '/forgot-password'
     | '/login'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/changelog'
     | '/contact'
+    | '/download'
     | '/features'
     | '/forgot-password'
     | '/login'
@@ -244,6 +256,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ChangelogRoute: typeof ChangelogRoute
   ContactRoute: typeof ContactRoute
+  DownloadRoute: typeof DownloadRoute
   FeaturesRoute: typeof FeaturesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
@@ -329,6 +342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeaturesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/download': {
+      id: '/download'
+      path: '/download'
+      fullPath: '/download'
+      preLoaderRoute: typeof DownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -408,6 +428,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ChangelogRoute: ChangelogRoute,
   ContactRoute: ContactRoute,
+  DownloadRoute: DownloadRoute,
   FeaturesRoute: FeaturesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
