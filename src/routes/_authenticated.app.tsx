@@ -54,6 +54,10 @@ function AppPage() {
   const fileInput = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const getStateFn = useServerFn(getStorageState);
+  const listWsFn = useServerFn(listMyWorkspaces);
+  const wsQ = useQuery({ queryKey: ["my-workspaces"], queryFn: () => listWsFn() });
+  const [chatOpen, setChatOpen] = useState(false);
+  const activeWs = wsQ.data?.[0];
 
   const listFn = useServerFn(listFiles);
   const deleteFn = useServerFn(deleteFile);
