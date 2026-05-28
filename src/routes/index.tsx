@@ -163,16 +163,76 @@ function Index() {
         </div>
       </section>
 
+      <section id="divisions" className="py-24 border-t border-border/60">
+        <div className="max-w-7xl mx-auto px-6">
+          <Reveal>
+            <div className="max-w-[46ch]">
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">The three apps</span>
+              <h2 className="mt-3 text-3xl md:text-4xl font-semibold leading-tight text-balance">
+                One login. Three tools. Built to actually talk to each other.
+              </h2>
+              <p className="mt-4 text-muted-foreground text-pretty">
+                Each app is good on its own. Together they're the whole workspace — files attach to tasks, tasks land on the calendar,
+                and nothing lives in a fourth tool you have to pay extra for.
+              </p>
+            </div>
+          </Reveal>
+          <div className="mt-14 grid md:grid-cols-3 gap-6">
+            {[
+              {
+                tag: "NodeFMS",
+                title: "Files, finally organized",
+                body: "Secure cloud storage for client work, contracts, and brand libraries. Team folders, client portals, version history.",
+                href: "/app",
+                cta: "Open NodeFMS",
+                icon: HardDrive,
+              },
+              {
+                tag: "Node Tasks",
+                title: "Work, the way you actually plan it",
+                body: "Lists, statuses, priorities, assignees. Switch between List, Board, and Calendar views. Inspired by ClickUp, sized for a small team.",
+                href: "/tasks",
+                cta: "Open Node Tasks",
+                icon: ListChecks,
+              },
+              {
+                tag: "Node Calendar",
+                title: "Time that connects to everything",
+                body: "Plug into Google or Outlook. Your due dates and meetings live in one calendar so nothing slips through the cracks.",
+                href: "/integrations",
+                cta: "Connect Node Calendar",
+                icon: CalendarDays,
+              },
+            ].map((d, i) => (
+              <Reveal key={d.tag} delay={i * 80}>
+                <Link to={d.href} className="block p-6 bg-card rounded-2xl ring-1 ring-black/5 h-full hover:ring-ink/20 transition-all group">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">{d.tag}</span>
+                    <d.icon className="size-5 text-ink" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="mt-6 text-xl font-semibold tracking-tight">{d.title}</h3>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{d.body}</p>
+                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink group-hover:gap-2.5 transition-all">
+                    {d.cta} <ArrowRight className="size-4" />
+                  </span>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="features" className="py-24 border-t border-border/60">
         <div className="max-w-7xl mx-auto px-6">
           <Reveal>
-            <div className="max-w-[40ch]">
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Built for SMBs</span>
+            <div className="max-w-[44ch]">
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Inside NodeFMS</span>
               <h2 className="mt-3 text-3xl md:text-4xl font-semibold leading-tight text-balance">
-                Everything your team needs. Nothing it doesn't.
+                The file side of Node, in detail.
               </h2>
             </div>
           </Reveal>
+
           <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { icon: FolderTree, title: "Team folders", body: "Organize by client, project, or department. Permissions inherit cleanly so onboarding takes seconds." },
