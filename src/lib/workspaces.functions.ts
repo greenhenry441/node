@@ -51,11 +51,11 @@ export const listMyWorkspaces = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("workspace_members")
-      .select("role, workspaces:workspace_id (id, name, slug, owner_id, created_at)")
+      .select("role, workspaces:workspace_id (id, name, slug, owner_id, join_code, created_at)")
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
     return (data ?? [])
-      .map((row: { role: WorkspaceRole; workspaces: { id: string; name: string; slug: string; owner_id: string; created_at: string } | null }) =>
+      .map((row: { role: WorkspaceRole; workspaces: { id: string; name: string; slug: string; owner_id: string; join_code: string; created_at: string } | null }) =>
         row.workspaces
           ? {
               ...row.workspaces,
