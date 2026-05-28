@@ -41,8 +41,14 @@ const tiers = [
     name: "Free",
     price: "$0",
     per: "forever",
-    useCase: "Personal projects and temporary businesses.",
-    features: ["500 GB storage", "File syncing", "File editing", "15 GB per file upload"],
+    useCase: "Everyone — unlimited storage while we're in launch week.",
+    features: [
+      "Unlimited storage (launch promo)",
+      "File syncing",
+      "File editing",
+      "15 GB per file upload",
+    ],
+    disabled: false,
   },
   {
     name: "Starter",
@@ -50,6 +56,7 @@ const tiers = [
     per: "per month",
     useCase: "Very small businesses.",
     features: ["1 TB storage", "File syncing", "File editing", "More file types supported"],
+    disabled: true,
   },
   {
     name: "Steady",
@@ -58,6 +65,7 @@ const tiers = [
     useCase: "Small businesses.",
     features: ["5 TB storage", "Advanced file syncing and editing", "More file types supported"],
     featured: true,
+    disabled: true,
   },
   {
     name: "Node Suite",
@@ -70,8 +78,10 @@ const tiers = [
       "Node Task Management",
       "Later: Node Intelligence features",
     ],
+    disabled: true,
   },
 ];
+
 
 function PricingPage() {
   return (
@@ -82,61 +92,73 @@ function PricingPage() {
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Node File Management
           </span>
-          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-balance max-w-[22ch] mx-auto">
-            Price list.
-          </h1>
-          <p className="mt-6 text-lg text-muted-foreground max-w-[52ch] mx-auto">
-            Upgrade or cancel anytime. Every plan scales with your team.
+          <p className="mt-6 text-sm font-medium text-ink/80 max-w-[60ch] mx-auto bg-amber-100 border border-amber-200 rounded-full px-5 py-2">
+            Launch week: all paid plans are temporarily unavailable. Everyone gets unlimited storage on Free.
           </p>
 
-          <div className="mt-16 grid md:grid-cols-2 xl:grid-cols-4 gap-6 text-left">
+          <div className="mt-12 grid md:grid-cols-2 xl:grid-cols-4 gap-6 text-left">
             {tiers.map((t) => (
               <div
                 key={t.name}
-                className={`p-8 rounded-2xl flex flex-col ${
+                className={`p-8 rounded-2xl flex flex-col relative ${
+                  t.disabled ? "bg-card/60 ring-1 ring-black/5 opacity-70" :
                   t.featured ? "bg-ink text-surface ring-1 ring-ink shadow-elegant" : "bg-card ring-1 ring-black/5"
                 }`}
               >
+                {t.disabled && (
+                  <span className="absolute top-4 right-4 text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-zinc-200 text-zinc-700">
+                    Coming soon
+                  </span>
+                )}
                 <span
                   className={`text-xs font-semibold uppercase tracking-wider ${
-                    t.featured ? "opacity-60" : "text-muted-foreground"
+                    t.featured && !t.disabled ? "opacity-60" : "text-muted-foreground"
                   }`}
                 >
                   {t.name}
                 </span>
                 <div className="mt-4 flex items-baseline gap-1.5">
                   <span className="text-4xl font-semibold tracking-tight">{t.price}</span>
-                  <span className={`text-sm ${t.featured ? "opacity-60" : "text-muted-foreground"}`}>
+                  <span className={`text-sm ${t.featured && !t.disabled ? "opacity-60" : "text-muted-foreground"}`}>
                     {t.per}
                   </span>
                 </div>
-                <p className={`mt-3 text-sm ${t.featured ? "opacity-80" : "text-muted-foreground"}`}>
+                <p className={`mt-3 text-sm ${t.featured && !t.disabled ? "opacity-80" : "text-muted-foreground"}`}>
                   <span className="font-semibold">Use case:</span> {t.useCase}
                 </p>
                 <ul className="mt-6 space-y-3 flex-1">
                   {t.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm">
-                      <Check className={`size-4 mt-0.5 shrink-0 ${t.featured ? "" : "text-ink"}`} />
-                      <span className={t.featured ? "" : "text-ink/85"}>{f}</span>
+                      <Check className={`size-4 mt-0.5 shrink-0 ${t.featured && !t.disabled ? "" : "text-ink"}`} />
+                      <span className={t.featured && !t.disabled ? "" : "text-ink/85"}>{f}</span>
                     </li>
                   ))}
                 </ul>
-                <Link
-                  to="/signup"
-                  className={`mt-8 w-full py-2.5 px-4 rounded-full text-sm font-medium text-center transition-colors ${
-                    t.featured
-                      ? "bg-surface text-ink hover:bg-zinc-100"
-                      : "border border-ink/10 hover:bg-ink hover:text-surface"
-                  }`}
-                >
-                  {t.name === "Free" ? "Get started" : "Start free trial"}
-                </Link>
+                {t.disabled ? (
+                  <button
+                    disabled
+                    className="mt-8 w-full py-2.5 px-4 rounded-full text-sm font-medium text-center bg-zinc-200 text-zinc-500 cursor-not-allowed"
+                  >
+                    Temporarily unavailable
+                  </button>
+                ) : (
+                  <Link
+                    to="/signup"
+                    className={`mt-8 w-full py-2.5 px-4 rounded-full text-sm font-medium text-center transition-colors ${
+                      t.featured
+                        ? "bg-surface text-ink hover:bg-zinc-100"
+                        : "border border-ink/10 hover:bg-ink hover:text-surface"
+                    }`}
+                  >
+                    Get started — free
+                  </Link>
+                )}
               </div>
             ))}
           </div>
 
           <p className="mt-10 text-xs uppercase tracking-widest text-muted-foreground">
-            Upgrade or cancel anytime
+            Paid plans return after launch week
           </p>
         </div>
       </section>
