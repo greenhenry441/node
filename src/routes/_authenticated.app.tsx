@@ -136,9 +136,9 @@ function AppPage() {
               </span>
               <span className="text-[10px] opacity-70">
                 {formatBytes(
-                  p === "free" ? 107_374_182_400 :
-                  p === "starter" ? 536_870_912_000 :
-                  p === "steady" ? 1_099_511_627_776 : null
+                  p === "free" ? 536_870_912_000 :
+                  p === "starter" ? 1_099_511_627_776 :
+                  p === "steady" ? 5_497_558_138_880 : null
                 )}
               </span>
             </button>
