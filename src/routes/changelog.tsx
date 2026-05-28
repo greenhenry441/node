@@ -238,7 +238,7 @@ const releases: Release[] = [
   {
     version: "0.1.0",
     date: "May 21, 2026",
-    tags: ["Pre-Release", "Pre-Alpha"],
+    tags: ["Pre-Release", "Pre-Alpha", "EOL"],
     highlights: [
       "Initial marketing site: Features, Pricing, Security",
       "Login, signup, and forgot-password pages",
