@@ -63,6 +63,17 @@ type Release = {
 // release labels declared in `ReleaseTag` above.
 const releases: Release[] = [
   {
+    version: "1.0.1",
+    date: "May 28, 2026",
+    tags: ["LTS Patch"],
+    title: "Launch week hotfix",
+    highlights: [
+      "Paid plans temporarily disabled in-app — free tier is unlimited during launch week",
+      "Announcement banner swapped to highlight the new desktop downloads",
+      "Final typecheck, security scan, and SEO pass before GA",
+    ],
+  },
+  {
     version: "1.0.0",
     date: "May 28, 2026",
     tags: ["Major", "Stable", "LTS"],
