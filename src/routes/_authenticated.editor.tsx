@@ -6,8 +6,8 @@ import { SiteHeader } from "@/components/site-header";
 export const Route = createFileRoute("/_authenticated/editor")({
   head: () => ({
     meta: [
-      { title: "Editor — Node FMS Desktop" },
-      { name: "description", content: "Open and edit local files inside the Node FMS desktop app." },
+      { title: "Editor — Node FMS" },
+      { name: "description", content: "Edit code files (run & compile) and files uploaded to your Node FMS box." },
     ],
   }),
   component: EditorPage,
