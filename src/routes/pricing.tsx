@@ -5,6 +5,7 @@ import { Check } from "lucide-react";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
+    meta: [
       { title: "Pricing — Node" },
       { name: "description", content: "Honest, flat pricing for Node. Start free. The Node Suite tier bundles NodeFMS, Node Tasks, and Node Calendar." },
       { property: "og:title", content: "Pricing — Node" },
@@ -35,8 +36,6 @@ export const Route = createFileRoute("/pricing")({
   component: PricingPage,
 });
 
-  component: PricingPage,
-});
 
 const tiers = [
   {
