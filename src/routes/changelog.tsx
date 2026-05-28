@@ -212,6 +212,7 @@ const tagStyles: Record<ReleaseTag, string> = {
   "Release Candidate": "bg-teal-100 text-teal-900",
   Stable: "bg-emerald-100 text-emerald-900",
   LTS: "bg-violet-100 text-violet-900",
+  "LTS Maintenance/Security Release": "bg-violet-50 text-violet-900",
   EOL: "bg-zinc-800 text-zinc-100",
   RTAO: "bg-rose-100 text-rose-900",
 };
