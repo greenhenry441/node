@@ -7,7 +7,9 @@ import { GITHUB_URL } from "@/lib/links";
 
 export const Route = createFileRoute("/changelog")({
   head: () => ({
+    meta: [
       { title: "Changelog — Node" },
+
       { name: "description", content: "Every Node release across NodeFMS, Node Tasks, and Node Calendar. Tracked with semantic versioning by Henry." },
       { property: "og:title", content: "Changelog — Node" },
       { property: "og:description", content: "Every Node release, tracked with semantic versioning." },
