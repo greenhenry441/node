@@ -112,7 +112,7 @@ function TasksPage() {
   });
 
   const updateTaskMut = useMutation({
-    mutationFn: (patch: Parameters<typeof updateTaskFn>[0]["data"]) =>
+    mutationFn: (patch: { id: string; status?: TaskStatus; priority?: TaskPriority; title?: string; description?: string | null; list_id?: string; due_at?: string | null }) =>
       updateTaskFn({ data: patch }),
     onSuccess: () => invalidateAll(),
     onError: (e: Error) => toast.error(e.message),
