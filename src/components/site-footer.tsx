@@ -15,6 +15,8 @@ export function SiteFooter() {
           <Link to="/pricing" className="hover:text-ink">Pricing</Link>
           <Link to="/download" className="hover:text-ink">Download</Link>
           <Link to="/editor" className="hover:text-ink">Editor</Link>
+          <Link to="/docs" className="hover:text-ink">Docs</Link>
+          <Link to="/forum" className="hover:text-ink">Forum</Link>
           <Link to="/about" className="hover:text-ink">About</Link>
           <Link to="/contact" className="hover:text-ink">Contact</Link>
           <Link to="/status" className="hover:text-ink">Status</Link>

@@ -35,6 +35,8 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
           <Link to="/pricing" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Pricing</Link>
           <Link to="/download" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Download</Link>
           <Link to="/editor" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Editor</Link>
+          <Link to="/docs" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Docs</Link>
+          <Link to="/forum" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Forum</Link>
           <Link to="/about" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>About</Link>
           <Link to="/contact" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Contact</Link>
         </nav>
