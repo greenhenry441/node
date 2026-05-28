@@ -114,7 +114,6 @@ function LoginPage() {
           Continue with Apple
         </button>
       </div>
-      </button>
       <Divider>or continue with email</Divider>
 
       <form onSubmit={submit} noValidate className="space-y-4">
