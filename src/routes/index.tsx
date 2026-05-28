@@ -201,14 +201,19 @@ function Index() {
               </p>
             </div>
           </Reveal>
-          <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="mt-8 max-w-[60ch] mx-auto">
+            <p className="text-sm font-medium text-ink/80 bg-amber-100 border border-amber-200 rounded-full px-5 py-2 text-center">
+              Launch week: paid plans paused. Free gets unlimited storage.
+            </p>
+          </div>
+          <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <Reveal delay={0}>
               <PricingCard
                 tier="Free"
                 price="$0"
                 cadence="forever"
-                useCase="Personal projects and temporary businesses"
-                features={["500 GB storage", "File syncing", "File editing"]}
+                useCase="Everyone — unlimited storage during launch week"
+                features={["Unlimited storage (launch promo)", "File syncing", "File editing"]}
                 cta="Get started"
               />
             </Reveal>
@@ -219,7 +224,8 @@ function Index() {
                 cadence="/month"
                 useCase="Very small businesses"
                 features={["1 TB storage", "File syncing", "File editing", "More file types supported"]}
-                cta="Start trial"
+                cta="Coming soon"
+                disabled
               />
             </Reveal>
             <Reveal delay={160}>
@@ -229,8 +235,9 @@ function Index() {
                 cadence="/month"
                 useCase="Small businesses"
                 features={["5 TB storage", "Advanced file syncing & editing", "More file types supported"]}
-                cta="Start trial"
+                cta="Coming soon"
                 featured
+                disabled
               />
             </Reveal>
             <Reveal delay={240}>
@@ -240,7 +247,8 @@ function Index() {
                 cadence="/month"
                 useCase="Small and medium businesses"
                 features={["Unlimited storage", "All Node File Management", "Node Task Management", "Later: Node Intelligence features"]}
-                cta="Start trial"
+                cta="Coming soon"
+                disabled
               />
             </Reveal>
           </div>
@@ -248,8 +256,9 @@ function Index() {
             <Link to="/pricing" className="inline-flex items-center gap-2 text-sm font-medium text-ink hover:gap-3 transition-all">
               Compare all plans <ArrowRight className="size-4" />
             </Link>
-            <p className="mt-4 text-xs uppercase tracking-widest text-muted-foreground">Upgrade or cancel anytime</p>
+            <p className="mt-4 text-xs uppercase tracking-widest text-muted-foreground">Paid plans return after launch week</p>
           </div>
+
         </div>
       </section>
 
