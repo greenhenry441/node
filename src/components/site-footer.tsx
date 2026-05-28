@@ -7,14 +7,13 @@ export function SiteFooter() {
     <footer className="py-12 border-t border-border/60 mt-24 relative z-10">
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
         <Link to="/" className="flex items-center gap-2">
-          <img src="/logo-icon.png" alt="Node FMS" className="size-4" />
-          <span className="text-sm font-semibold tracking-tight">Node File Management Suite</span>
+          <img src="/logo-icon.png" alt="Node" className="size-4" />
+          <span className="text-sm font-semibold tracking-tight">Node</span>
         </Link>
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-medium text-muted-foreground">
-          <Link to="/features" className="hover:text-ink">Features</Link>
+          <Link to="/features" className="hover:text-ink">Products</Link>
           <Link to="/pricing" className="hover:text-ink">Pricing</Link>
           <Link to="/download" className="hover:text-ink">Download</Link>
-          <Link to="/editor" className="hover:text-ink">Editor</Link>
           <Link to="/docs" className="hover:text-ink">Docs</Link>
           <Link to="/forum" className="hover:text-ink">Forum</Link>
           <Link to="/about" className="hover:text-ink">About</Link>
@@ -25,7 +24,11 @@ export function SiteFooter() {
             <Github className="size-3" /> GitHub
           </a>
         </div>
-        <span className="text-xs text-muted-foreground">© 2026 Node FMS — a division of Node, Inc.</span>
+        <span className="text-xs text-muted-foreground text-center md:text-right">
+          © 2026 Node · Built by Henry Green<br className="md:hidden" />
+          <span className="hidden md:inline"> · </span>
+          <span className="opacity-70">A G&amp;T project from Milford, MI</span>
+        </span>
       </div>
     </footer>
   );
