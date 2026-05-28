@@ -3,7 +3,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { AuthShell } from "@/components/auth-shell";
-import { Field, Divider, GoogleIcon } from "./login";
+import { Field, Divider, GoogleIcon, AppleIcon } from "./login";
 import { Check, Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
