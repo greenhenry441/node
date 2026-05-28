@@ -3,26 +3,40 @@ import { Github } from "lucide-react";
 import { LaunchBanner } from "@/components/launch-banner";
 import { GITHUB_URL } from "@/lib/links";
 
-export function SiteHeader() {
+export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {}) {
+  const isDark = theme === "dark";
+  const navIdle = isDark ? "text-white/70" : "text-muted-foreground";
+  const navHover = isDark ? "hover:text-white" : "hover:text-ink";
+  const activeCls = isDark ? "text-white" : "text-ink";
+  const iconBorder = isDark ? "border-white/15 hover:bg-white/10" : "border-ink/10 hover:bg-ink/5";
+  const signInCls = isDark
+    ? "border-white/20 text-white hover:bg-white/10"
+    : "border-ink/10 hover:bg-ink/5";
+  const ctaCls = isDark
+    ? "bg-white text-[#06070d] hover:bg-white/90"
+    : "bg-ink text-surface hover:bg-ink/90";
+  const logoDot = isDark ? "bg-white" : "bg-ink";
+  const titleCls = isDark ? "text-white" : "";
+  const subCls = isDark ? "text-white/50" : "text-muted-foreground";
   return (
     <>
     <LaunchBanner />
-    <header className="w-full py-6 border-b border-border/60 relative z-10">
+    <header className="w-full py-6 relative z-10">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="size-5 bg-ink rounded-sm" />
+          <div className={`size-5 ${logoDot} rounded-sm`} />
           <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-tight">Node FMS</div>
-            <div className="text-[10px] text-muted-foreground -mt-0.5">A division of Node</div>
+            <div className={`text-sm font-semibold tracking-tight ${titleCls}`}>Node FMS</div>
+            <div className={`text-[10px] -mt-0.5 ${subCls}`}>A division of Node</div>
           </div>
         </Link>
-        <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-muted-foreground">
-          <Link to="/features" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">Features</Link>
-          <Link to="/pricing" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">Pricing</Link>
-          <Link to="/download" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">Download</Link>
-          <Link to="/security" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">Security</Link>
-          <Link to="/about" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">About</Link>
-          <Link to="/contact" activeProps={{ className: "text-ink" }} className="hover:text-ink transition-colors">Contact</Link>
+        <nav className={`hidden md:flex items-center gap-7 text-sm font-medium ${navIdle}`}>
+          <Link to="/features" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Features</Link>
+          <Link to="/pricing" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Pricing</Link>
+          <Link to="/download" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Download</Link>
+          <Link to="/security" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Security</Link>
+          <Link to="/about" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>About</Link>
+          <Link to="/contact" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Contact</Link>
         </nav>
         <div className="flex items-center gap-2">
           <a
@@ -30,14 +44,14 @@ export function SiteHeader() {
             target="_blank"
             rel="noreferrer"
             aria-label="Node FMS on GitHub"
-            className="hidden sm:inline-flex size-9 items-center justify-center rounded-full border border-ink/10 hover:bg-ink/5 transition-colors"
+            className={`hidden sm:inline-flex size-9 items-center justify-center rounded-full border transition-colors ${iconBorder} ${isDark ? "text-white" : ""}`}
           >
             <Github className="size-4" strokeWidth={1.75} />
           </a>
-          <Link to="/login" className="hidden sm:inline-flex text-sm font-medium px-4 py-2 border border-ink/10 rounded-full hover:bg-ink/5 transition-colors">
+          <Link to="/login" className={`hidden sm:inline-flex text-sm font-medium px-4 py-2 border rounded-full transition-colors ${signInCls}`}>
             Sign in
           </Link>
-          <Link to="/signup" className="bg-ink text-surface px-4 py-2 rounded-full text-sm font-medium hover:bg-ink/90 transition-colors">
+          <Link to="/signup" className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${ctaCls}`}>
             Get started
           </Link>
         </div>
@@ -46,3 +60,4 @@ export function SiteHeader() {
     </>
   );
 }
+
