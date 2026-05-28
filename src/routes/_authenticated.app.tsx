@@ -57,6 +57,45 @@ function AppPage() {
   const deleteFn = useServerFn(deleteFile);
   const setPlanFn = useServerFn(setPlan);
   const downloadFn = useServerFn(getDownloadUrl);
+  const getTextFn = useServerFn(getFileText);
+  const updateTextFn = useServerFn(updateFileText);
+
+  // Inline cloud editor
+  const [editor, setEditor] = useState<{
+    id: string; name: string; original: string; content: string; loading: boolean; saving: boolean;
+  } | null>(null);
+
+  const openEdit = async (f: StoredFile) => {
+    setEditor({ id: f.id, name: f.name, original: "", content: "", loading: true, saving: false });
+    try {
+      const r = await getTextFn({ data: { id: f.id } });
+      setEditor({ id: r.id, name: r.name, original: r.content, content: r.content, loading: false, saving: false });
+    } catch (e) {
+      toast.error((e as Error).message);
+      setEditor(null);
+    }
+  };
+
+  const saveEdit = async () => {
+    if (!editor || editor.saving) return;
+    setEditor({ ...editor, saving: true });
+    try {
+      await updateTextFn({ data: { id: editor.id, content: editor.content } });
+      toast.success(`Saved ${editor.name}`);
+      qc.invalidateQueries({ queryKey: ["files"] });
+      qc.invalidateQueries({ queryKey: ["storage-state"] });
+      setEditor({ ...editor, original: editor.content, saving: false });
+    } catch (e) {
+      toast.error((e as Error).message);
+      setEditor((s) => (s ? { ...s, saving: false } : s));
+    }
+  };
+
+  const closeEdit = () => {
+    if (editor && editor.content !== editor.original && !confirm("Discard unsaved changes?")) return;
+    setEditor(null);
+  };
+
 
   const stateQ = useQuery({ queryKey: ["storage-state"], queryFn: () => getStateFn() });
   const filesQ = useQuery({ queryKey: ["files"], queryFn: () => listFn() });
