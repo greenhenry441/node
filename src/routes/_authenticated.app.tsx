@@ -505,7 +505,7 @@ function EmptyState({ onClick, disabled }: { onClick: () => void; disabled: bool
 
 function FileList({
   files, stars, selected, allSelected,
-  onToggleAll, onToggleStar, onToggleSelect, onDelete, onDownload,
+  onToggleAll, onToggleStar, onToggleSelect, onDelete, onDownload, onOpen,
 }: {
   files: StoredFile[];
   stars: Set<string>;
@@ -516,7 +516,9 @@ function FileList({
   onToggleSelect: (id: string) => void;
   onDelete: (id: string) => void;
   onDownload: (id: string) => void;
+  onOpen: (f: StoredFile) => void;
 }) {
+
   return (
     <div className="bg-card rounded-xl ring-1 ring-black/5 overflow-hidden">
       <div className="grid grid-cols-12 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground border-b border-border bg-muted/40 items-center">
