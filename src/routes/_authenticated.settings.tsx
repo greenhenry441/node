@@ -31,6 +31,8 @@ function SettingsPage() {
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
+  const [joinCodeInput, setJoinCodeInput] = useState("");
+  const joinFn = useServerFn(joinWorkspaceByCode);
 
   const createMut = useMutation({
     mutationFn: (name: string) => createWsFn({ data: { name } }),
@@ -38,6 +40,17 @@ function SettingsPage() {
       toast.success(`Workspace "${ws.name}" created`);
       setNewName("");
       setActiveId(ws.id);
+      qc.invalidateQueries({ queryKey: ["my-workspaces"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const joinMut = useMutation({
+    mutationFn: (code: string) => joinFn({ data: { code: code.trim().toLowerCase() } }),
+    onSuccess: (r) => {
+      toast.success(`Joined "${r.name}"`);
+      setJoinCodeInput("");
+      setActiveId(r.workspace_id);
       qc.invalidateQueries({ queryKey: ["my-workspaces"] });
     },
     onError: (e: Error) => toast.error(e.message),
