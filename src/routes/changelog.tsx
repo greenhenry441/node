@@ -67,7 +67,7 @@ const releases: Release[] = [
   {
     version: "1.2.0",
     date: "May 28, 2026",
-    tags: ["Major"],
+    tags: ["Major", "LTS"],
     title: "Node becomes Node — three apps under one roof",
     highlights: [
       "Rebranded the platform to Node, with NodeFMS, Node Tasks, and Node Calendar as divisions",
@@ -228,7 +228,7 @@ const releases: Release[] = [
   {
     version: "0.2.0",
     date: "May 22, 2026",
-    tags: ["Minor", "Alpha"],
+    tags: ["Minor", "Alpha", "EOL"],
     highlights: [
       "Real authentication: sign up, sign in, Google OAuth",
       "Protected /app route behind sign-in",
@@ -238,7 +238,7 @@ const releases: Release[] = [
   {
     version: "0.1.0",
     date: "May 21, 2026",
-    tags: ["Pre-Release", "Pre-Alpha"],
+    tags: ["Pre-Release", "Pre-Alpha", "EOL"],
     highlights: [
       "Initial marketing site: Features, Pricing, Security",
       "Login, signup, and forgot-password pages",
