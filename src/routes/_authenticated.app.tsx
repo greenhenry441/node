@@ -573,13 +573,21 @@ function FileList({
                 className={`size-8 grid place-items-center rounded-md hover:bg-muted ${isStar ? "text-amber-500" : "text-muted-foreground hover:text-amber-500"}`}
                 title={isStar ? "Unstar" : "Star"}
               >
-                <Star className={`size-4 ${isStar ? "fill-amber-500" : ""}`} />
+              <button
+                onClick={() => onOpen(f)}
+                className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
+                title="Open & edit"
+              >
+                <Pencil className="size-4" />
               </button>
               <button
                 onClick={() => onDownload(f.id)}
                 className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
                 title="Download"
               >
+                <Download className="size-4" />
+              </button>
+
                 <Download className="size-4" />
               </button>
               <button
