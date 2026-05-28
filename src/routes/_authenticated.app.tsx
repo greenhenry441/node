@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   Folder, FileText, Image as ImageIcon, Film, Music, Archive, Upload, Trash2,
   Settings, ChevronRight, Download, LogOut, Loader2, AlertCircle, Crown, FileIcon,
+  Search, Star, X,
 } from "lucide-react";
 import {
   getStorageState, listFiles, deleteFile, setPlan, getDownloadUrl,
@@ -15,6 +16,27 @@ import {
 } from "@/lib/storage.functions";
 import { uploadAll } from "@/lib/upload-client";
 import { formatBytes, PLAN_LABEL } from "@/lib/storage-format";
+
+type TypeFilter = "all" | "image" | "video" | "audio" | "doc" | "archive" | "other";
+const TYPE_LABELS: Record<TypeFilter, string> = {
+  all: "All", image: "Images", video: "Video", audio: "Audio",
+  doc: "Documents", archive: "Archives", other: "Other",
+};
+function classify(mime: string | null, name: string): TypeFilter {
+  const m = mime ?? "";
+  if (m.startsWith("image/")) return "image";
+  if (m.startsWith("video/")) return "video";
+  if (m.startsWith("audio/")) return "audio";
+  if (m.includes("pdf") || m.includes("word") || m.includes("text") || m.includes("sheet") || m.includes("excel")) return "doc";
+  if (m.includes("zip") || m.includes("rar") || m.includes("tar") || /\.(zip|rar|tar|gz|7z)$/i.test(name)) return "archive";
+  return "other";
+}
+const STAR_KEY = "nodefms.starred.v1";
+function loadStars(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try { return new Set(JSON.parse(localStorage.getItem(STAR_KEY) ?? "[]")); } catch { return new Set(); }
+}
+
 
 export const Route = createFileRoute("/_authenticated/app")({
   head: () => ({ meta: [{ title: "Workspace — Node FMS" }] }),
@@ -28,6 +50,7 @@ function AppPage() {
   const fileInput = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const getStateFn = useServerFn(getStorageState);
+
   const listFn = useServerFn(listFiles);
   const deleteFn = useServerFn(deleteFile);
   const setPlanFn = useServerFn(setPlan);
@@ -35,6 +58,44 @@ function AppPage() {
 
   const stateQ = useQuery({ queryKey: ["storage-state"], queryFn: () => getStateFn() });
   const filesQ = useQuery({ queryKey: ["files"], queryFn: () => listFn() });
+
+  // Search / filter / star / multi-select
+  const [query, setQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
+  const [starredOnly, setStarredOnly] = useState(false);
+  const [stars, setStars] = useState<Set<string>>(() => loadStars());
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(STAR_KEY, JSON.stringify(Array.from(stars)));
+  }, [stars]);
+
+  const toggleStar = (id: string) =>
+    setStars((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleSelect = (id: string) =>
+    setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+  const visibleFiles = useMemo(() => {
+    const all = filesQ.data ?? [];
+    const q = query.trim().toLowerCase();
+    return all.filter((f) => {
+      if (q && !f.name.toLowerCase().includes(q)) return false;
+      if (typeFilter !== "all" && classify(f.mime_type, f.name) !== typeFilter) return false;
+      if (starredOnly && !stars.has(f.id)) return false;
+      return true;
+    });
+  }, [filesQ.data, query, typeFilter, starredOnly, stars]);
+
+  const allVisibleSelected = visibleFiles.length > 0 && visibleFiles.every((f) => selected.has(f.id));
+  const toggleSelectAll = () =>
+    setSelected((s) => {
+      const n = new Set(s);
+      if (allVisibleSelected) visibleFiles.forEach((f) => n.delete(f.id));
+      else visibleFiles.forEach((f) => n.add(f.id));
+      return n;
+    });
+  const clearSelection = () => setSelected(new Set());
 
   const planMut = useMutation({
     mutationFn: (plan: "free" | "starter" | "steady" | "suite") =>
@@ -54,6 +115,44 @@ function AppPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const bulkDelete = async () => {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    if (!confirm(`Delete ${ids.length} file${ids.length === 1 ? "" : "s"}? This cannot be undone.`)) return;
+    setBulkBusy(true);
+    let ok = 0, fail = 0;
+    for (const id of ids) {
+      try { await deleteFn({ data: { id } }); ok++; } catch { fail++; }
+    }
+    setBulkBusy(false);
+    clearSelection();
+    qc.invalidateQueries({ queryKey: ["files"] });
+    qc.invalidateQueries({ queryKey: ["storage-state"] });
+    if (fail === 0) toast.success(`Deleted ${ok} file${ok === 1 ? "" : "s"}`);
+    else toast.error(`Deleted ${ok}, failed ${fail}`);
+  };
+
+  const bulkDownload = async () => {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    for (const id of ids) {
+      try {
+        const { url } = await downloadFn({ data: { id } });
+        const a = document.createElement("a");
+        a.href = url; a.rel = "noopener"; a.target = "_blank";
+        document.body.appendChild(a); a.click(); a.remove();
+        await new Promise((r) => setTimeout(r, 250));
+      } catch (e) {
+        toast.error((e as Error).message);
+      }
+    }
+    setBulkBusy(false);
+  };
+
+
+
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -237,16 +336,95 @@ function AppPage() {
             handleFiles(e.dataTransfer.files);
           }}
         >
+          {filesQ.data && filesQ.data.length > 0 && (
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <div className="relative flex-1 min-w-[220px] max-w-md">
+                <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search files…"
+                  className="w-full pl-9 pr-9 py-2 text-sm bg-card rounded-md ring-1 ring-black/5 focus:ring-2 focus:ring-ink/20 outline-none"
+                />
+                {query && (
+                  <button onClick={() => setQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-ink">
+                    <X className="size-3.5" />
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {(Object.keys(TYPE_LABELS) as TypeFilter[]).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTypeFilter(t)}
+                    className={`px-2.5 py-1.5 rounded-md text-xs font-medium ${
+                      typeFilter === t ? "bg-ink text-surface" : "text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {TYPE_LABELS[t]}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setStarredOnly((v) => !v)}
+                className={`px-2.5 py-1.5 rounded-md text-xs font-medium inline-flex items-center gap-1 ${
+                  starredOnly ? "bg-amber-100 text-amber-800" : "text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                <Star className={`size-3.5 ${starredOnly ? "fill-amber-500 text-amber-500" : ""}`} />
+                Starred
+              </button>
+            </div>
+          )}
+
+          {selected.size > 0 && (
+            <div className="mb-4 flex items-center gap-3 px-4 py-2.5 bg-ink text-surface rounded-lg text-sm">
+              <span className="font-medium">{selected.size} selected</span>
+              <button
+                onClick={bulkDownload}
+                disabled={bulkBusy}
+                className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface/10 hover:bg-surface/20 disabled:opacity-50"
+              >
+                <Download className="size-3.5" /> Download
+              </button>
+              <button
+                onClick={bulkDelete}
+                disabled={bulkBusy}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-destructive hover:bg-destructive/90 disabled:opacity-50"
+              >
+                {bulkBusy ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />} Delete
+              </button>
+              <button onClick={clearSelection} className="px-2 py-1 rounded hover:bg-surface/10" title="Clear">
+                <X className="size-3.5" />
+              </button>
+            </div>
+          )}
+
           {filesQ.isLoading ? (
             <div className="text-center py-24 text-sm text-muted-foreground">
               <Loader2 className="size-5 animate-spin inline mr-2" /> Loading your files…
             </div>
           ) : !filesQ.data || filesQ.data.length === 0 ? (
             <EmptyState onClick={() => fileInput.current?.click()} disabled={overLimit} />
+          ) : visibleFiles.length === 0 ? (
+            <div className="text-center py-24 text-sm text-muted-foreground">
+              No files match your filters.
+            </div>
           ) : (
-            <FileList files={filesQ.data} onDelete={(id) => deleteMut.mutate(id)} onDownload={download} />
+            <FileList
+              files={visibleFiles}
+              stars={stars}
+              selected={selected}
+              allSelected={allVisibleSelected}
+              onToggleAll={toggleSelectAll}
+              onToggleStar={toggleStar}
+              onToggleSelect={toggleSelect}
+              onDelete={(id) => deleteMut.mutate(id)}
+              onDownload={download}
+            />
           )}
         </div>
+
 
         <footer className="border-t border-border px-8 py-3 text-xs text-muted-foreground">
           Per-file limit: {state ? formatBytes(state.maxFileBytes) : "—"}. Plan limit enforced on every upload.
@@ -274,30 +452,60 @@ function EmptyState({ onClick, disabled }: { onClick: () => void; disabled: bool
 }
 
 function FileList({
-  files, onDelete, onDownload,
+  files, stars, selected, allSelected,
+  onToggleAll, onToggleStar, onToggleSelect, onDelete, onDownload,
 }: {
   files: StoredFile[];
+  stars: Set<string>;
+  selected: Set<string>;
+  allSelected: boolean;
+  onToggleAll: () => void;
+  onToggleStar: (id: string) => void;
+  onToggleSelect: (id: string) => void;
   onDelete: (id: string) => void;
   onDownload: (id: string) => void;
 }) {
   return (
     <div className="bg-card rounded-xl ring-1 ring-black/5 overflow-hidden">
-      <div className="grid grid-cols-12 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground border-b border-border bg-muted/40">
-        <div className="col-span-7">Name</div>
+      <div className="grid grid-cols-12 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground border-b border-border bg-muted/40 items-center">
+        <div className="col-span-1">
+          <input
+            type="checkbox"
+            checked={allSelected}
+            onChange={onToggleAll}
+            className="size-3.5 accent-ink cursor-pointer"
+            aria-label="Select all"
+          />
+        </div>
+        <div className="col-span-6">Name</div>
         <div className="col-span-2">Uploaded</div>
         <div className="col-span-2">Size</div>
         <div className="col-span-1 text-right">Actions</div>
       </div>
       {files.map((f) => {
         const m = iconFor(f.mime_type, f.name);
+        const isSel = selected.has(f.id);
+        const isStar = stars.has(f.id);
         return (
-          <div key={f.id} className="grid grid-cols-12 items-center px-5 py-3 border-b border-border last:border-b-0 hover:bg-muted/40">
-            <div className="col-span-7 flex items-center gap-3 min-w-0">
+          <div key={f.id} className={`grid grid-cols-12 items-center px-5 py-3 border-b border-border last:border-b-0 ${isSel ? "bg-ink/[0.04]" : "hover:bg-muted/40"}`}>
+            <div className="col-span-1">
+              <input
+                type="checkbox"
+                checked={isSel}
+                onChange={() => onToggleSelect(f.id)}
+                className="size-3.5 accent-ink cursor-pointer"
+                aria-label={`Select ${f.name}`}
+              />
+            </div>
+            <div className="col-span-6 flex items-center gap-3 min-w-0">
               <div className={`size-9 rounded-md grid place-items-center ${m.cls}`}>
                 <m.Icon className="size-4" strokeWidth={1.75} />
               </div>
               <div className="min-w-0">
-                <div className="text-sm font-medium truncate">{f.name}</div>
+                <div className="text-sm font-medium truncate flex items-center gap-1.5">
+                  {f.name}
+                  {isStar && <Star className="size-3 fill-amber-500 text-amber-500 shrink-0" />}
+                </div>
                 <div className="text-xs text-muted-foreground truncate">{f.mime_type ?? "—"}</div>
               </div>
             </div>
@@ -306,6 +514,13 @@ function FileList({
             </div>
             <div className="col-span-2 text-sm text-muted-foreground">{formatBytes(f.size_bytes)}</div>
             <div className="col-span-1 flex justify-end gap-1">
+              <button
+                onClick={() => onToggleStar(f.id)}
+                className={`size-8 grid place-items-center rounded-md hover:bg-muted ${isStar ? "text-amber-500" : "text-muted-foreground hover:text-amber-500"}`}
+                title={isStar ? "Unstar" : "Star"}
+              >
+                <Star className={`size-4 ${isStar ? "fill-amber-500" : ""}`} />
+              </button>
               <button
                 onClick={() => onDownload(f.id)}
                 className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
@@ -327,6 +542,7 @@ function FileList({
     </div>
   );
 }
+
 
 function iconFor(mime: string | null, name: string) {
   const m = mime ?? "";
