@@ -231,6 +231,7 @@ const tagMeaning: Record<ReleaseTag, string> = {
   "Release Candidate": "Final candidate — shipping unless we find regressions",
   Stable: "Generally available, recommended for everyone",
   LTS: "Long-term support — extended maintenance window",
+  "LTS Maintenance/Security Release": "Maintenance or security-only update for an LTS version",
   EOL: "End of life — no longer supported, please upgrade",
   RTAO: "Release to Application Only — desktop app required",
 };
