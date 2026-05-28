@@ -46,6 +46,7 @@ type ReleaseTag =
   | "Release Candidate"
   | "Stable"
   | "LTS"
+  | "LTS Maintenance/Security Release"
   | "EOL"
   | "RTAO";
 
