@@ -6,10 +6,10 @@ import { CheckCircle2 } from "lucide-react";
 export const Route = createFileRoute("/status")({
   head: () => ({
     meta: [
-      { title: "Status — Node FMS" },
-      { name: "description", content: "Live operational status for Node File Management Suite services." },
-      { property: "og:title", content: "Status — Node FMS" },
-      { property: "og:description", content: "Live operational status for Node File Management Suite services." },
+      { title: "Status — Node" },
+      { name: "description", content: "Live status for Node — NodeFMS, Node Tasks, and Node Calendar." },
+      { property: "og:title", content: "Status — Node" },
+      { property: "og:description", content: "Live status for Node — NodeFMS, Node Tasks, and Node Calendar." },
       { property: "og:url", content: "https://nodefms.lovable.app/status" },
     ],
     links: [{ rel: "canonical", href: "https://nodefms.lovable.app/status" }],
@@ -17,11 +17,12 @@ export const Route = createFileRoute("/status")({
   component: StatusPage,
 });
 
+
 const systems = [
-  { name: "File storage & sync", uptime: "99.99%" },
-  { name: "Web app", uptime: "99.98%" },
-  { name: "Desktop sync clients", uptime: "99.97%" },
-  { name: "Mobile apps", uptime: "99.99%" },
+  { name: "NodeFMS — storage & sync", uptime: "99.99%" },
+  { name: "NodeFMS — web app", uptime: "99.98%" },
+  { name: "Node Tasks", uptime: "99.99%" },
+  { name: "Node Calendar sync", uptime: "99.97%" },
   { name: "Authentication", uptime: "100.00%" },
   { name: "Sharing & client portals", uptime: "99.98%" },
 ];
@@ -33,10 +34,11 @@ function StatusPage() {
       <section className="py-20 md:py-24">
         <div className="max-w-4xl mx-auto px-6">
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Status</span>
-          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight">All systems operational.</h1>
+          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight">All three apps are happy.</h1>
           <p className="mt-6 text-lg text-muted-foreground">
-            Updated continuously. 90-day rolling uptime per system.
+            Updated continuously. 90-day rolling uptime across NodeFMS, Node Tasks, and Node Calendar.
           </p>
+
 
           <div className="mt-12 divide-y divide-border/60 rounded-2xl bg-card ring-1 ring-black/5">
             {systems.map((s) => (

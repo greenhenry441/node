@@ -6,10 +6,10 @@ import { Check } from "lucide-react";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — Node FMS" },
-      { name: "description", content: "Simple, flat pricing for Node FMS. Start free, upgrade or cancel anytime." },
-      { property: "og:title", content: "Pricing — Node FMS" },
-      { property: "og:description", content: "Simple, flat pricing for Node FMS. Start free, upgrade or cancel anytime." },
+      { title: "Pricing — Node" },
+      { name: "description", content: "Honest, flat pricing for Node. Start free. The Node Suite tier bundles NodeFMS, Node Tasks, and Node Calendar." },
+      { property: "og:title", content: "Pricing — Node" },
+      { property: "og:description", content: "Free forever for basics. Node Suite bundles all three apps for one price." },
       { property: "og:url", content: "https://nodefms.lovable.app/pricing" },
     ],
     links: [{ rel: "canonical", href: "https://nodefms.lovable.app/pricing" }],
@@ -19,15 +19,15 @@ export const Route = createFileRoute("/pricing")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Product",
-          name: "Node FMS",
+          name: "Node",
           description:
-            "Secure file storage and team workspace from Node File Management Suite.",
+            "Node — three small apps for small businesses: NodeFMS for files, Node Tasks for work, Node Calendar for time.",
           brand: { "@type": "Brand", name: "Node" },
           offers: [
-            { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "500 GB storage" },
-            { "@type": "Offer", name: "Starter", price: "25.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "1 TB storage" },
-            { "@type": "Offer", name: "Steady", price: "50.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "5 TB storage" },
-            { "@type": "Offer", name: "Node Suite", price: "75.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "Unlimited storage" },
+            { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "NodeFMS basics, unlimited during launch week" },
+            { "@type": "Offer", name: "Starter", price: "25.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "NodeFMS for very small businesses" },
+            { "@type": "Offer", name: "Steady", price: "50.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "NodeFMS for small businesses" },
+            { "@type": "Offer", name: "Node Suite", price: "75.99", priceCurrency: "USD", url: "https://nodefms.lovable.app/pricing", description: "NodeFMS + Node Tasks + Node Calendar" },
           ],
         }),
       },
@@ -35,6 +35,7 @@ export const Route = createFileRoute("/pricing")({
   }),
   component: PricingPage,
 });
+
 
 const tiers = [
   {
@@ -73,11 +74,12 @@ const tiers = [
     per: "per month",
     useCase: "Small and medium businesses.",
     features: [
-      "Unlimited storage",
-      "All Node File Management",
-      "Node Task Management",
-      "Later: Node Intelligence features",
+      "Unlimited storage in NodeFMS",
+      "Full NodeFMS features",
+      "Full Node Tasks (List, Board, Calendar views)",
+      "Node Calendar with Google + Outlook sync",
     ],
+
     disabled: true,
   },
 ];
@@ -89,12 +91,20 @@ function PricingPage() {
       <SiteHeader />
       <section className="py-20 md:py-24">
         <div className="max-w-7xl mx-auto px-6 text-center">
+
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Node File Management
+            Node pricing
           </span>
-          <p className="mt-6 text-sm font-medium text-ink/80 max-w-[60ch] mx-auto bg-amber-100 border border-amber-200 rounded-full px-5 py-2">
-            Launch week: all paid plans are temporarily unavailable. Everyone gets unlimited storage on Free.
+          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-balance max-w-[22ch] mx-auto">
+            Pick what fits. Bundle when you're ready.
+          </h1>
+          <p className="mt-4 text-muted-foreground text-pretty max-w-[56ch] mx-auto">
+            The first three tiers are NodeFMS only. Node Suite adds Node Tasks and Node Calendar.
           </p>
+          <p className="mt-6 text-sm font-medium text-ink/80 max-w-[60ch] mx-auto bg-amber-100 border border-amber-200 rounded-full px-5 py-2">
+            Launch week: paid plans are paused while I shake out bugs. Free gets unlimited storage in the meantime.
+          </p>
+
 
           <div className="mt-12 grid md:grid-cols-2 xl:grid-cols-4 gap-6 text-left">
             {tiers.map((t) => (

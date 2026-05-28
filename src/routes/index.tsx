@@ -14,21 +14,25 @@ import {
   FileText,
   Image as ImageIcon,
   Film,
+  ListChecks,
+  CalendarDays,
+  HardDrive,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Node FMS — File Management Suite for small businesses" },
-      { name: "description", content: "Node File Management Suite — a division of Node. Secure file storage, syncing, and editing built for small businesses." },
-      { property: "og:title", content: "Node FMS — File Management Suite for small businesses" },
-      { property: "og:description", content: "Secure file storage, syncing, and editing built for small businesses." },
+      { title: "Node — Tools small businesses actually want to use" },
+      { name: "description", content: "Node is a small toolkit built by an 11-year-old in Milford, MI. Three pieces that work together: NodeFMS for files, Node Tasks for work, Node Calendar for time." },
+      { property: "og:title", content: "Node — Tools small businesses actually want to use" },
+      { property: "og:description", content: "NodeFMS, Node Tasks, and Node Calendar — three pieces of one simple workspace." },
       { property: "og:url", content: "https://nodefms.lovable.app/" },
     ],
     links: [{ rel: "canonical", href: "https://nodefms.lovable.app/" }],
   }),
   component: Index,
 });
+
 
 function Index() {
   return (
@@ -47,15 +51,16 @@ function Index() {
               <Reveal>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/[0.04] backdrop-blur text-[11px] font-mono uppercase tracking-[0.18em] text-white/70 mb-6">
                   <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  NODE_FMS // a division of Node
+                  NODE // built by an 11-year-old in Milford, MI
                 </div>
-                <h1 className="text-4xl md:text-6xl font-semibold leading-tight tracking-tight text-balance max-w-[22ch] mx-auto">
-                  The single source of truth for your business's files.
+                <h1 className="text-4xl md:text-6xl font-semibold leading-tight tracking-tight text-balance max-w-[24ch] mx-auto">
+                  One little toolkit for the way your business actually works.
                 </h1>
-                <p className="mt-8 text-lg md:text-xl text-white/70 text-pretty max-w-[56ch] mx-auto">
-                  Node FMS is secure cloud storage purpose-built for small businesses.
-                  Keep client deliverables, contracts, and brand libraries in one
-                  protected, organized space.
+                <p className="mt-8 text-lg md:text-xl text-white/70 text-pretty max-w-[58ch] mx-auto">
+                  Node is three small apps that play nicely together: <span className="text-white">NodeFMS</span> for files,
+                  {" "}<span className="text-white">Node Tasks</span> for the work, and
+                  {" "}<span className="text-white">Node Calendar</span> for the time. I'm Henry — I built it for my
+                  Gifted &amp; Talented project, and for small businesses who shouldn't need ten tabs open to get through the day.
                 </p>
               </Reveal>
               <Reveal delay={150}>
@@ -64,14 +69,15 @@ function Index() {
                     to="/app"
                     className="group bg-white text-[#06070d] px-5 py-2.5 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-white/90 transition-colors"
                   >
-                    Start free 14-day trial
+                    Try Node — it's free
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                   </Link>
-                  <a href="#features" className="px-5 py-2.5 text-sm font-medium text-white/60 hover:text-white transition-colors">
-                    See how it works
+                  <a href="#divisions" className="px-5 py-2.5 text-sm font-medium text-white/60 hover:text-white transition-colors">
+                    Meet the three apps
                   </a>
                 </div>
               </Reveal>
+
             </div>
           </div>
         </div>
@@ -157,16 +163,76 @@ function Index() {
         </div>
       </section>
 
+      <section id="divisions" className="py-24 border-t border-border/60">
+        <div className="max-w-7xl mx-auto px-6">
+          <Reveal>
+            <div className="max-w-[46ch]">
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">The three apps</span>
+              <h2 className="mt-3 text-3xl md:text-4xl font-semibold leading-tight text-balance">
+                One login. Three tools. Built to actually talk to each other.
+              </h2>
+              <p className="mt-4 text-muted-foreground text-pretty">
+                Each app is good on its own. Together they're the whole workspace — files attach to tasks, tasks land on the calendar,
+                and nothing lives in a fourth tool you have to pay extra for.
+              </p>
+            </div>
+          </Reveal>
+          <div className="mt-14 grid md:grid-cols-3 gap-6">
+            {[
+              {
+                tag: "NodeFMS",
+                title: "Files, finally organized",
+                body: "Secure cloud storage for client work, contracts, and brand libraries. Team folders, client portals, version history.",
+                href: "/app",
+                cta: "Open NodeFMS",
+                icon: HardDrive,
+              },
+              {
+                tag: "Node Tasks",
+                title: "Work, the way you actually plan it",
+                body: "Lists, statuses, priorities, assignees. Switch between List, Board, and Calendar views. Inspired by ClickUp, sized for a small team.",
+                href: "/tasks",
+                cta: "Open Node Tasks",
+                icon: ListChecks,
+              },
+              {
+                tag: "Node Calendar",
+                title: "Time that connects to everything",
+                body: "Plug into Google or Outlook. Your due dates and meetings live in one calendar so nothing slips through the cracks.",
+                href: "/integrations",
+                cta: "Connect Node Calendar",
+                icon: CalendarDays,
+              },
+            ].map((d, i) => (
+              <Reveal key={d.tag} delay={i * 80}>
+                <Link to={d.href} className="block p-6 bg-card rounded-2xl ring-1 ring-black/5 h-full hover:ring-ink/20 transition-all group">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground">{d.tag}</span>
+                    <d.icon className="size-5 text-ink" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="mt-6 text-xl font-semibold tracking-tight">{d.title}</h3>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{d.body}</p>
+                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink group-hover:gap-2.5 transition-all">
+                    {d.cta} <ArrowRight className="size-4" />
+                  </span>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="features" className="py-24 border-t border-border/60">
         <div className="max-w-7xl mx-auto px-6">
           <Reveal>
-            <div className="max-w-[40ch]">
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Built for SMBs</span>
+            <div className="max-w-[44ch]">
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Inside NodeFMS</span>
               <h2 className="mt-3 text-3xl md:text-4xl font-semibold leading-tight text-balance">
-                Everything your team needs. Nothing it doesn't.
+                The file side of Node, in detail.
               </h2>
             </div>
           </Reveal>
+
           <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { icon: FolderTree, title: "Team folders", body: "Organize by client, project, or department. Permissions inherit cleanly so onboarding takes seconds." },
@@ -192,13 +258,14 @@ function Index() {
         <div className="max-w-7xl mx-auto px-6">
           <Reveal>
             <div className="max-w-[44ch] mx-auto text-center">
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Node FMS Price List</span>
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Node pricing</span>
               <h2 className="mt-3 text-3xl md:text-4xl font-semibold leading-tight text-balance">
-                Pricing that scales with your business.
+                Honest pricing from a kid who doesn't believe in surprise fees.
               </h2>
               <p className="mt-4 text-muted-foreground text-pretty">
-                Upgrade or cancel anytime. Every plan includes file syncing and editing.
+                Start free. The Node Suite tier bundles NodeFMS, Node Tasks, and Node Calendar. Cancel anytime — I promise it's just a button.
               </p>
+
             </div>
           </Reveal>
           <div className="mt-8 max-w-[60ch] mx-auto">

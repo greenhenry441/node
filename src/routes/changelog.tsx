@@ -8,23 +8,25 @@ import { GITHUB_URL } from "@/lib/links";
 export const Route = createFileRoute("/changelog")({
   head: () => ({
     meta: [
-      { title: "Changelog — Node FMS" },
-      { name: "description", content: "Every Node FMS release, tracked with semantic versioning. New features, fixes, and what's coming next." },
-      { property: "og:title", content: "Changelog — Node FMS" },
-      { property: "og:description", content: "Every Node FMS release, tracked with semantic versioning." },
+      { title: "Changelog — Node" },
+
+      { name: "description", content: "Every Node release across NodeFMS, Node Tasks, and Node Calendar. Tracked with semantic versioning by Henry." },
+      { property: "og:title", content: "Changelog — Node" },
+      { property: "og:description", content: "Every Node release, tracked with semantic versioning." },
       { property: "og:url", content: "https://nodefms.lovable.app/changelog" },
     ],
     links: [{ rel: "canonical", href: "https://nodefms.lovable.app/changelog" }],
+
     scripts: [
       {
         type: "application/ld+json",
         children: JSON.stringify({
-          "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Node FMS Changelog",
-          description: "Semantic-versioned release history for Node FMS.",
+          name: "Node Changelog",
+          description: "Semantic-versioned release history for Node (NodeFMS, Node Tasks, Node Calendar).",
           url: "https://nodefms.lovable.app/changelog",
-          isPartOf: { "@type": "WebSite", name: "Node FMS", url: "https://nodefms.lovable.app" },
+          isPartOf: { "@type": "WebSite", name: "Node", url: "https://nodefms.lovable.app" },
+
         }),
       },
     ],
