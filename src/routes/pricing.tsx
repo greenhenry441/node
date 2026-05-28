@@ -103,7 +103,6 @@ function PricingPage() {
             Launch week: paid plans are paused while I shake out bugs. Free gets unlimited storage in the meantime.
           </p>
 
-          </p>
 
           <div className="mt-12 grid md:grid-cols-2 xl:grid-cols-4 gap-6 text-left">
             {tiers.map((t) => (
