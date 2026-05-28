@@ -67,7 +67,7 @@ const releases: Release[] = [
   {
     version: "1.2.0",
     date: "May 28, 2026",
-    tags: ["Major"],
+    tags: ["Major", "LTS"],
     title: "Node becomes Node — three apps under one roof",
     highlights: [
       "Rebranded the platform to Node, with NodeFMS, Node Tasks, and Node Calendar as divisions",
