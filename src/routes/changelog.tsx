@@ -46,7 +46,7 @@ type ReleaseTag =
   | "Release Candidate"
   | "Stable"
   | "LTS"
-  | "LTS Maintenance/Security Release"
+  | "LTS Patch"
   | "EOL"
   | "RTAO";
 
@@ -212,7 +212,7 @@ const tagStyles: Record<ReleaseTag, string> = {
   "Release Candidate": "bg-teal-100 text-teal-900",
   Stable: "bg-emerald-100 text-emerald-900",
   LTS: "bg-violet-100 text-violet-900",
-  "LTS Maintenance/Security Release": "bg-violet-50 text-violet-900",
+  "LTS Patch": "bg-violet-50 text-violet-900",
   EOL: "bg-zinc-800 text-zinc-100",
   RTAO: "bg-rose-100 text-rose-900",
 };
@@ -231,7 +231,7 @@ const tagMeaning: Record<ReleaseTag, string> = {
   "Release Candidate": "Final candidate — shipping unless we find regressions",
   Stable: "Generally available, recommended for everyone",
   LTS: "Long-term support — extended maintenance window",
-  "LTS Maintenance/Security Release": "Maintenance or security-only update for an LTS version",
+  "LTS Patch": "Maintenance or security-only update for an LTS version",
   EOL: "End of life — no longer supported, please upgrade",
   RTAO: "Release to Application Only — desktop app required",
 };
