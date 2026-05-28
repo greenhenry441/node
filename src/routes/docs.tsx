@@ -55,7 +55,8 @@ function DocsPage() {
           <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Documentation
           </div>
-          <h2 className="mt-2 text-lg font-semibold tracking-tight">Node FMS Handbook</h2>
+          <h2 className="mt-2 text-lg font-semibold tracking-tight">The Node Handbook</h2>
+
           <nav className="mt-6 flex flex-col gap-1 text-sm">
             {sections.map((s) => (
               <a
