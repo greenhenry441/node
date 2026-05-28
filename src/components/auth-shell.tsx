@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { WebGLBackground } from "@/components/webgl-background";
 
 export function AuthShell({
   title,
@@ -30,30 +31,29 @@ export function AuthShell({
         <div className="text-xs text-muted-foreground">© 2026 Node, Inc.</div>
       </div>
 
-      <aside className="hidden lg:flex relative bg-ink text-surface p-12 flex-col justify-between overflow-hidden">
-        <div className="text-xs font-semibold uppercase tracking-widest opacity-60">
-          A single source of truth
+      <aside className="hidden lg:flex relative bg-[#06070d] text-white p-12 flex-col justify-between overflow-hidden">
+        <WebGLBackground />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#06070d]/60 via-[#06070d]/30 to-[#06070d]/85 pointer-events-none" />
+        <div className="relative z-10 text-[11px] font-mono uppercase tracking-[0.18em] text-white/70 inline-flex items-center gap-2">
+          <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          NODE_FMS // a single source of truth
         </div>
-        <div className="space-y-6">
-          <blockquote className="text-2xl font-medium leading-snug text-balance">
-            "We moved our entire client archive into Node in an afternoon. Our team has never
-            been less worried about a missing file."
-          </blockquote>
-          <div className="flex items-center gap-3">
-            <div className="size-9 rounded-full bg-surface/15" />
-            <div className="text-sm">
-              <div className="font-semibold">Camille Okafor</div>
-              <div className="opacity-60">Operations Lead, Northstar Studio</div>
-            </div>
-          </div>
+        <div className="relative z-10 space-y-4 max-w-md">
+          <h2 className="text-3xl md:text-4xl font-semibold leading-tight tracking-tight text-balance">
+            The file system your business actually deserves.
+          </h2>
+          <p className="text-white/70 text-pretty">
+            Secure cloud storage, versioning, and client portals — purpose-built for
+            small teams. Launching June 1, 2026.
+          </p>
         </div>
-        <div className="grid grid-cols-3 gap-px bg-surface/10 rounded-xl overflow-hidden text-xs">
+        <div className="relative z-10 grid grid-cols-3 gap-px bg-white/10 rounded-xl overflow-hidden text-xs ring-1 ring-white/10">
           {[
             ["99.99%", "Uptime"],
             ["SOC 2", "Type II"],
             ["180d", "History"],
           ].map(([k, v]) => (
-            <div key={k} className="bg-ink p-4">
+            <div key={k} className="bg-[#06070d]/85 backdrop-blur p-4">
               <div className="font-semibold text-base">{k}</div>
               <div className="opacity-60">{v}</div>
             </div>
