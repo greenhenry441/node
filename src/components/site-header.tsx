@@ -23,7 +23,7 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
     <header className="w-full py-6 relative z-10">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src="/logo-icon.png" alt="Node" className="size-5" />
+          <img src="/node-dot-logo.png" alt="Node" className="size-5" />
           <div className="leading-tight">
             <div className={`text-sm font-semibold tracking-tight ${titleCls}`}>Node</div>
             <div className={`text-[10px] -mt-0.5 ${subCls}`}>Files · Tasks · Calendar</div>

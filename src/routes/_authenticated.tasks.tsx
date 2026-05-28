@@ -160,7 +160,7 @@ function TasksPage() {
       {/* Sidebar — lists */}
       <aside className="w-64 border-r border-border bg-card flex flex-col">
         <Link to="/" className="px-6 py-5 flex items-center gap-2 border-b border-border">
-          <img src="/logo-icon.png" alt="Node" className="size-5" />
+          <img src="/node-dot-logo.png" alt="Node" className="size-5" />
           <div className="leading-tight">
             <div className="text-sm font-semibold tracking-tight">Node Tasks</div>
             <div className="text-[10px] text-muted-foreground -mt-0.5">{ws.name}</div>
