@@ -260,7 +260,6 @@ function AppPage() {
           <img src="/logo-icon.png" alt="Node FMS" className="size-5" />
           <span className="text-sm font-semibold tracking-tight">Node FMS</span>
         </Link>
-        </Link>
 
         <div className="p-4 space-y-1 text-xs uppercase tracking-widest text-muted-foreground font-semibold">
           Plan
