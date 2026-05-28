@@ -362,7 +362,7 @@ function ChangelogPage() {
           <div className="mt-12 space-y-10">
             {releases.map((r, i) => (
               <Reveal key={r.version} delay={i * 50} as="article">
-                <div className="border-l-2 border-border pl-6 relative">
+                <div id={`v${r.version}`} className="border-l-2 border-border pl-6 relative">
                   <div className="absolute -left-[5px] top-1.5 size-2 rounded-full bg-ink" />
                   <div className="flex flex-wrap items-baseline gap-3">
                     <h2 className="text-2xl font-semibold tracking-tight">v{r.version}</h2>
@@ -375,6 +375,9 @@ function ChangelogPage() {
                   </div>
                   {r.title && (
                     <p className="mt-2 text-sm font-medium text-ink/70">{r.title}</p>
+                  )}
+                  {r.tags.includes("EOL") && latestLts && (
+                    <EolBanner latestVersion={latestLts.version} />
                   )}
                   <ul className="mt-4 space-y-2 text-sm text-ink/80">
                     {r.highlights.map((h) => (
