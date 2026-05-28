@@ -25,6 +25,7 @@ import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated.onboarding'
@@ -109,6 +110,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InviteCodeRoute = InviteCodeRouteImport.update({
+  id: '/invite/$code',
+  path: '/invite/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/invite/$code': typeof InviteCodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/invite/$code': typeof InviteCodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/invite/$code': typeof InviteCodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/settings'
     | '/auth/callback'
+    | '/invite/$code'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/settings'
     | '/auth/callback'
+    | '/invite/$code'
   id:
     | '__root__'
     | '/'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/settings'
     | '/auth/callback'
+    | '/invite/$code'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -280,6 +292,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  InviteCodeRoute: typeof InviteCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -396,6 +409,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invite/$code': {
+      id: '/invite/$code'
+      path: '/invite/$code'
+      fullPath: '/invite/$code'
+      preLoaderRoute: typeof InviteCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -461,6 +481,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  InviteCodeRoute: InviteCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
