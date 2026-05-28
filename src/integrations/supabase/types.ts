@@ -252,6 +252,33 @@ export type Database = {
           },
         ]
       }
+      user_connections: {
+        Row: {
+          connection_id: string
+          created_at: string
+          id: string
+          provider: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connection_id: string
+          created_at?: string
+          id?: string
+          provider: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connection_id?: string
+          created_at?: string
+          id?: string
+          provider?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_files: {
         Row: {
           created_at: string
