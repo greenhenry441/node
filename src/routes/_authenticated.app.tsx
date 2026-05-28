@@ -462,6 +462,7 @@ function AppPage() {
               onToggleSelect={toggleSelect}
               onDelete={(id) => deleteMut.mutate(id)}
               onDownload={download}
+              onOpen={openEdit}
             />
           )}
         </div>
@@ -471,9 +472,18 @@ function AppPage() {
           Per-file limit: {state ? formatBytes(state.maxFileBytes) : "—"}. Plan limit enforced on every upload.
         </footer>
       </main>
+
+      {editor && (
+        <EditorModal
+          editor={editor}
+          onChange={(content) => setEditor((s) => (s ? { ...s, content } : s))}
+          onSave={saveEdit}
+          onClose={closeEdit}
+        />
+      )}
     </div>
   );
-}
+
 
 function EmptyState({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
   return (
