@@ -89,13 +89,20 @@ function PricingPage() {
   return (
     <div className="min-h-screen bg-surface">
       <SiteHeader />
-      <section className="py-20 md:py-24">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Node File Management
+            Node pricing
           </span>
+          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-balance max-w-[22ch] mx-auto">
+            Pick what fits. Bundle when you're ready.
+          </h1>
+          <p className="mt-4 text-muted-foreground text-pretty max-w-[56ch] mx-auto">
+            The first three tiers are NodeFMS only. Node Suite adds Node Tasks and Node Calendar.
+          </p>
           <p className="mt-6 text-sm font-medium text-ink/80 max-w-[60ch] mx-auto bg-amber-100 border border-amber-200 rounded-full px-5 py-2">
-            Launch week: all paid plans are temporarily unavailable. Everyone gets unlimited storage on Free.
+            Launch week: paid plans are paused while I shake out bugs. Free gets unlimited storage in the meantime.
+          </p>
+
           </p>
 
           <div className="mt-12 grid md:grid-cols-2 xl:grid-cols-4 gap-6 text-left">
