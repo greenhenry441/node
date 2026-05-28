@@ -101,6 +101,7 @@ function OnboardingPage() {
   return (
     <div className="min-h-screen bg-surface">
       <header className="border-b border-border/60 px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
           <img src="/logo-icon.png" alt="Node FMS" className="size-5" />
           <div className="leading-tight">
             <div className="text-sm font-semibold tracking-tight">Node FMS</div>
