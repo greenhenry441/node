@@ -10,9 +10,10 @@ import {
   Settings, ChevronRight, Download, LogOut, Loader2, AlertCircle, Crown, FileIcon,
 } from "lucide-react";
 import {
-  getStorageState, listFiles, uploadFile, deleteFile, setPlan, getDownloadUrl,
+  getStorageState, listFiles, deleteFile, setPlan, getDownloadUrl,
   type StoredFile,
 } from "@/lib/storage.functions";
+import { uploadAll } from "@/lib/upload-client";
 import { formatBytes, PLAN_LABEL } from "@/lib/storage-format";
 
 export const Route = createFileRoute("/_authenticated/app")({
