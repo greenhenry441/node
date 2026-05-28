@@ -121,25 +121,48 @@ function SettingsPage() {
             ))}
           </div>
 
-          <form
-            onSubmit={(e) => { e.preventDefault(); if (newName.trim()) createMut.mutate(newName.trim()); }}
-            className="mt-4 flex gap-2 max-w-md"
-          >
-            <input
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              placeholder="New workspace name"
-              className="flex-1 px-3 py-2 rounded-md border border-border bg-card text-sm"
-            />
-            <button
-              disabled={createMut.isPending || !newName.trim()}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-ink text-surface text-sm font-medium hover:bg-ink/90 disabled:opacity-50"
+          <div className="mt-4 grid sm:grid-cols-2 gap-3 max-w-2xl">
+            <form
+              onSubmit={(e) => { e.preventDefault(); if (newName.trim()) createMut.mutate(newName.trim()); }}
+              className="flex gap-2"
             >
-              <Plus className="size-4" /> Create
-            </button>
-          </form>
+              <input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="New workspace name"
+                className="flex-1 px-3 py-2 rounded-md border border-border bg-card text-sm"
+              />
+              <button
+                disabled={createMut.isPending || !newName.trim()}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-ink text-surface text-sm font-medium hover:bg-ink/90 disabled:opacity-50"
+              >
+                <Plus className="size-4" /> Create
+              </button>
+            </form>
+            <form
+              onSubmit={(e) => { e.preventDefault(); if (joinCodeInput.trim()) joinMut.mutate(joinCodeInput); }}
+              className="flex gap-2"
+            >
+              <input
+                value={joinCodeInput}
+                onChange={(e) => setJoinCodeInput(e.target.value)}
+                placeholder="Join with workspace code"
+                className="flex-1 px-3 py-2 rounded-md border border-border bg-card text-sm font-mono"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+              />
+              <button
+                disabled={joinMut.isPending || !joinCodeInput.trim()}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md border border-border text-sm font-medium hover:bg-muted disabled:opacity-50"
+              >
+                <LogIn className="size-4" /> Join
+              </button>
+            </form>
+          </div>
 
           {active && <WorkspaceDetail key={active} workspaceId={active} />}
+        </section>
         </section>
       </main>
     </div>
