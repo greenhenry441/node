@@ -174,46 +174,37 @@ function ChangelogPage() {
               </div>
               <a
                 href={GITHUB_URL}
-const tagStyles: Record<ReleaseTag, string> = {
-  Revamp: "bg-fuchsia-100 text-fuchsia-900",
-  Major: "bg-emerald-100 text-emerald-900",
-  Minor: "bg-blue-100 text-blue-900",
-  Patch: "bg-zinc-100 text-zinc-700",
-  "Emergency Update": "bg-red-100 text-red-900",
-  "Pre-Release": "bg-amber-100 text-amber-900",
-  "Pre-Alpha": "bg-orange-100 text-orange-900",
-  Alpha: "bg-yellow-100 text-yellow-900",
-  "Open-Beta": "bg-sky-100 text-sky-900",
-  "Closed-Beta": "bg-indigo-100 text-indigo-900",
-  "Release Candidate": "bg-teal-100 text-teal-900",
-  Stable: "bg-emerald-100 text-emerald-900",
-  LTS: "bg-violet-100 text-violet-900",
-  EOL: "bg-zinc-800 text-zinc-100",
-  RTAO: "bg-rose-100 text-rose-900",
-};
-
-const tagMeaning: Record<ReleaseTag, string> = {
-  Revamp: "Full visual or architectural rewrite of an area",
-  Major: "Breaking changes — review before upgrading",
-  Minor: "New features, fully backwards compatible",
-  Patch: "Bug fixes and small polish, no new features",
-  "Emergency Update": "Hot-shipped fix for a critical or security issue",
-  "Pre-Release": "Shipped before general availability — expect rough edges",
-  "Pre-Alpha": "Earliest internal builds, things will break",
-  Alpha: "Feature-incomplete preview for early testers",
-  "Open-Beta": "Public beta, anyone can opt in",
-  "Closed-Beta": "Beta limited to invited testers and design partners",
-  "Release Candidate": "Final candidate — shipping unless we find regressions",
-  Stable: "Generally available, recommended for everyone",
-  LTS: "Long-term support — extended maintenance window",
-  EOL: "End of life — no longer supported, please upgrade",
-  RTAO: "Release to Application Only — desktop app required",
-};
-                  {t}
-                </span>
-              ))}
+                target="_blank"
+                rel="noreferrer"
+                className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-ink/10 text-sm font-medium hover:bg-ink/5 transition-colors"
+              >
+                <Github className="size-4" /> View on GitHub
+              </a>
+            </div>
+            <p className="mt-6 text-lg text-muted-foreground text-pretty">
+              We use{" "}
+              <a href="https://semver.org" target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                semantic versioning
+              </a>
+              . Every publish ships here with the features, fixes, and changes it includes.
+            </p>
+            <div className="mt-8 rounded-2xl border border-border bg-card p-5">
+              <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                What each label means
+              </div>
+              <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2.5">
+                {(Object.keys(tagStyles) as ReleaseTag[]).map((t) => (
+                  <li key={t} className="flex items-start gap-2.5 text-sm">
+                    <span className={`shrink-0 mt-0.5 text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full ${tagStyles[t]}`}>
+                      {t}
+                    </span>
+                    <span className="text-muted-foreground">{tagMeaning[t]}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </Reveal>
+
 
           <div className="mt-12 space-y-10">
             {releases.map((r, i) => (
