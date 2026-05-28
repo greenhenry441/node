@@ -198,9 +198,9 @@ function AppPage() {
               {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
               {uploading ? "Uploading…" : "Upload"}
             </button>
-            <button className="size-9 grid place-items-center rounded-md hover:bg-muted" title="Settings">
+            <Link to="/settings" className="size-9 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink" title="Settings">
               <Settings className="size-4" />
-            </button>
+            </Link>
             <button
               onClick={signOut}
               className="size-9 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
