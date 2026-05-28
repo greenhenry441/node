@@ -17,7 +17,6 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeaturesRouteImport } from './routes/features'
-import { Route as EditorRouteImport } from './routes/editor'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChangelogRouteImport } from './routes/changelog'
@@ -28,6 +27,7 @@ import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated.onboarding'
+import { Route as AuthenticatedEditorRouteImport } from './routes/_authenticated.editor'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated.app'
 
 const StatusRoute = StatusRouteImport.update({
@@ -68,11 +68,6 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const FeaturesRoute = FeaturesRouteImport.update({
   id: '/features',
   path: '/features',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EditorRoute = EditorRouteImport.update({
-  id: '/editor',
-  path: '/editor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DownloadRoute = DownloadRouteImport.update({
@@ -124,6 +119,11 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedEditorRoute = AuthenticatedEditorRouteImport.update({
+  id: '/editor',
+  path: '/editor',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
@@ -136,7 +136,6 @@ export interface FileRoutesByFullPath {
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
   '/download': typeof DownloadRoute
-  '/editor': typeof EditorRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -146,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/app': typeof AuthenticatedAppRoute
+  '/editor': typeof AuthenticatedEditorRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -157,7 +157,6 @@ export interface FileRoutesByTo {
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
   '/download': typeof DownloadRoute
-  '/editor': typeof EditorRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -167,6 +166,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/app': typeof AuthenticatedAppRoute
+  '/editor': typeof AuthenticatedEditorRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -180,7 +180,6 @@ export interface FileRoutesById {
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
   '/download': typeof DownloadRoute
-  '/editor': typeof EditorRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -190,6 +189,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/editor': typeof AuthenticatedEditorRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -203,7 +203,6 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/contact'
     | '/download'
-    | '/editor'
     | '/features'
     | '/forgot-password'
     | '/login'
@@ -213,6 +212,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/status'
     | '/app'
+    | '/editor'
     | '/onboarding'
     | '/settings'
     | '/auth/callback'
@@ -224,7 +224,6 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/contact'
     | '/download'
-    | '/editor'
     | '/features'
     | '/forgot-password'
     | '/login'
@@ -234,6 +233,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/status'
     | '/app'
+    | '/editor'
     | '/onboarding'
     | '/settings'
     | '/auth/callback'
@@ -246,7 +246,6 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/contact'
     | '/download'
-    | '/editor'
     | '/features'
     | '/forgot-password'
     | '/login'
@@ -256,6 +255,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/status'
     | '/_authenticated/app'
+    | '/_authenticated/editor'
     | '/_authenticated/onboarding'
     | '/_authenticated/settings'
     | '/auth/callback'
@@ -269,7 +269,6 @@ export interface RootRouteChildren {
   ChangelogRoute: typeof ChangelogRoute
   ContactRoute: typeof ContactRoute
   DownloadRoute: typeof DownloadRoute
-  EditorRoute: typeof EditorRoute
   FeaturesRoute: typeof FeaturesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
@@ -338,13 +337,6 @@ declare module '@tanstack/react-router' {
       path: '/features'
       fullPath: '/features'
       preLoaderRoute: typeof FeaturesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/editor': {
-      id: '/editor'
-      path: '/editor'
-      fullPath: '/editor'
-      preLoaderRoute: typeof EditorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/download': {
@@ -417,6 +409,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/editor': {
+      id: '/_authenticated/editor'
+      path: '/editor'
+      fullPath: '/editor'
+      preLoaderRoute: typeof AuthenticatedEditorRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/app': {
       id: '/_authenticated/app'
       path: '/app'
@@ -429,12 +428,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedEditorRoute: typeof AuthenticatedEditorRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedEditorRoute: AuthenticatedEditorRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
 }
@@ -450,7 +451,6 @@ const rootRouteChildren: RootRouteChildren = {
   ChangelogRoute: ChangelogRoute,
   ContactRoute: ContactRoute,
   DownloadRoute: DownloadRoute,
-  EditorRoute: EditorRoute,
   FeaturesRoute: FeaturesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
