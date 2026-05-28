@@ -62,6 +62,22 @@ type Release = {
 // release labels declared in `ReleaseTag` above.
 const releases: Release[] = [
   {
+    version: "0.8.0",
+    date: "May 28, 2026",
+    tags: ["Major", "RTAO"],
+    title: "Real desktop apps — Mac, Windows, and Linux",
+    highlights: [
+      "Shipped real, runnable native desktop clients for macOS (Apple Silicon and Intel), Windows x64, and Linux x64",
+      "Native OS window with proper menu bar, keyboard shortcuts (Cmd/Ctrl+R reload, Cmd/Ctrl+H home), and full-screen support",
+      "External links open in the user's default browser; in-app navigation stays inside the desktop window",
+      "Desktop client signs in to the same Node FMS workspace as Cloud — files, members, and invites stay in sync",
+      "Hosted on GitHub Releases — download from /download and launch",
+      "/download page rewritten with per-platform install steps for macOS, Windows, and Linux",
+      "RTAO pipeline opened: future Release-To-Application-Only updates will ship to the desktop client first",
+    ],
+  },
+  {
+
     version: "0.7.1",
     date: "May 28, 2026",
     tags: ["Patch"],
