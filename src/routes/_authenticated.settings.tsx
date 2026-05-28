@@ -174,6 +174,7 @@ function WorkspaceDetail({ workspaceId }: { workspaceId: string }) {
   const inviteFn = useServerFn(createInvite);
   const revokeFn = useServerFn(revokeInvite);
   const removeFn = useServerFn(removeMember);
+  const regenFn = useServerFn(regenerateJoinCode);
 
   const dq = useQuery({
     queryKey: ["workspace", workspaceId],
