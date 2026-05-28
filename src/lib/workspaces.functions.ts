@@ -11,6 +11,7 @@ export type Workspace = {
   slug: string;
   owner_id: string;
   role: WorkspaceRole;
+  join_code: string;
   created_at: string;
 };
 
