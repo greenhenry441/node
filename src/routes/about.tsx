@@ -51,7 +51,6 @@ function AboutPage() {
 
           <h2 className="mt-16 text-2xl font-semibold tracking-tight">What we believe</h2>
           <ul className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
-            <li><span className="text-ink font-medium">Security is table stakes.</span> SOC 2, SSO, audit logs — included, not upsold.</li>
             <li><span className="text-ink font-medium">Pricing should be honest.</span> Flat tiers, no per-seat surprises, cancel anytime.</li>
             <li><span className="text-ink font-medium">Speed matters.</span> Sync, search, and sharing should feel instant on a small-team laptop.</li>
           </ul>

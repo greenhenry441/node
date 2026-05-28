@@ -14,10 +14,9 @@ export function SiteFooter() {
           <Link to="/features" className="hover:text-ink">Features</Link>
           <Link to="/pricing" className="hover:text-ink">Pricing</Link>
           <Link to="/download" className="hover:text-ink">Download</Link>
-          <Link to="/security" className="hover:text-ink">Security</Link>
+          <Link to="/editor" className="hover:text-ink">Editor</Link>
           <Link to="/about" className="hover:text-ink">About</Link>
           <Link to="/contact" className="hover:text-ink">Contact</Link>
-          <Link to="/privacy" className="hover:text-ink">Privacy</Link>
           <Link to="/status" className="hover:text-ink">Status</Link>
           <Link to="/changelog" className="hover:text-ink">Changelog</Link>
           <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="hover:text-ink inline-flex items-center gap-1">
