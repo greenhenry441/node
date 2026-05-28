@@ -483,6 +483,7 @@ function AppPage() {
       )}
     </div>
   );
+}
 
 
 function EmptyState({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
