@@ -268,7 +268,7 @@ function Index() {
 }
 
 function PricingCard({
-  tier, price, cadence, useCase, features, cta, featured = false,
+  tier, price, cadence, useCase, features, cta, featured = false, disabled = false,
 }: {
   tier: string;
   price: string;
@@ -277,32 +277,49 @@ function PricingCard({
   features: string[];
   cta: string;
   featured?: boolean;
+  disabled?: boolean;
 }) {
+  const useFeatured = featured && !disabled;
   return (
-    <div className={`p-8 rounded-2xl flex flex-col h-full ${featured ? "bg-ink text-surface ring-1 ring-ink" : "bg-card ring-1 ring-black/5"}`}>
-      <span className={`text-xs font-semibold uppercase tracking-wider ${featured ? "opacity-60" : "text-muted-foreground"}`}>{tier}</span>
+    <div className={`p-8 rounded-2xl flex flex-col h-full relative ${
+      disabled ? "bg-card/60 ring-1 ring-black/5 opacity-70" :
+      useFeatured ? "bg-ink text-surface ring-1 ring-ink" : "bg-card ring-1 ring-black/5"
+    }`}>
+      {disabled && (
+        <span className="absolute top-4 right-4 text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-zinc-200 text-zinc-700">
+          Coming soon
+        </span>
+      )}
+      <span className={`text-xs font-semibold uppercase tracking-wider ${useFeatured ? "opacity-60" : "text-muted-foreground"}`}>{tier}</span>
       <div className="mt-4 flex items-baseline gap-1">
         <span className="text-3xl font-semibold">{price}</span>
-        <span className={`text-sm ${featured ? "opacity-60" : "text-muted-foreground"}`}>{cadence}</span>
+        <span className={`text-sm ${useFeatured ? "opacity-60" : "text-muted-foreground"}`}>{cadence}</span>
       </div>
-      <p className={`mt-4 text-xs uppercase tracking-wider ${featured ? "opacity-70" : "text-muted-foreground"}`}>Use case</p>
-      <p className={`mt-1 text-sm ${featured ? "opacity-90" : "text-ink/80"}`}>{useCase}</p>
-      <ul className={`mt-5 space-y-2 text-sm flex-1 ${featured ? "opacity-90" : "text-ink/80"}`}>
+      <p className={`mt-4 text-xs uppercase tracking-wider ${useFeatured ? "opacity-70" : "text-muted-foreground"}`}>Use case</p>
+      <p className={`mt-1 text-sm ${useFeatured ? "opacity-90" : "text-ink/80"}`}>{useCase}</p>
+      <ul className={`mt-5 space-y-2 text-sm flex-1 ${useFeatured ? "opacity-90" : "text-ink/80"}`}>
         {features.map((f) => (
           <li key={f} className="flex items-start gap-2">
-            <CheckCircle2 className={`size-4 mt-0.5 shrink-0 ${featured ? "opacity-80" : "text-ink/60"}`} strokeWidth={1.5} />
+            <CheckCircle2 className={`size-4 mt-0.5 shrink-0 ${useFeatured ? "opacity-80" : "text-ink/60"}`} strokeWidth={1.5} />
             <span>{f}</span>
           </li>
         ))}
       </ul>
-      <Link
-        to="/signup"
-        className={`mt-8 w-full py-2.5 px-4 rounded-full text-sm font-medium text-center transition-colors ${
-          featured ? "bg-surface text-ink hover:bg-zinc-100" : "border border-ink/10 hover:bg-ink hover:text-surface"
-        }`}
-      >
-        {cta}
-      </Link>
+      {disabled ? (
+        <button disabled className="mt-8 w-full py-2.5 px-4 rounded-full text-sm font-medium text-center bg-zinc-200 text-zinc-500 cursor-not-allowed">
+          {cta}
+        </button>
+      ) : (
+        <Link
+          to="/signup"
+          className={`mt-8 w-full py-2.5 px-4 rounded-full text-sm font-medium text-center transition-colors ${
+            useFeatured ? "bg-surface text-ink hover:bg-zinc-100" : "border border-ink/10 hover:bg-ink hover:text-surface"
+          }`}
+        >
+          {cta}
+        </Link>
+      )}
     </div>
   );
 }
+
