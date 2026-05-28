@@ -257,8 +257,9 @@ function AppPage() {
     <div className="min-h-screen bg-surface text-ink flex">
       <aside className="w-64 border-r border-border bg-card flex flex-col">
         <Link to="/" className="px-6 py-5 flex items-center gap-2 border-b border-border">
-          <div className="size-5 bg-ink rounded-sm" />
+          <img src="/logo-icon.png" alt="Node FMS" className="size-5" />
           <span className="text-sm font-semibold tracking-tight">Node FMS</span>
+        </Link>
         </Link>
 
         <div className="p-4 space-y-1 text-xs uppercase tracking-widest text-muted-foreground font-semibold">
