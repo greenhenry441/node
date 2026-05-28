@@ -258,13 +258,14 @@ function Index() {
         <div className="max-w-7xl mx-auto px-6">
           <Reveal>
             <div className="max-w-[44ch] mx-auto text-center">
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Node FMS Price List</span>
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Node pricing</span>
               <h2 className="mt-3 text-3xl md:text-4xl font-semibold leading-tight text-balance">
-                Pricing that scales with your business.
+                Honest pricing from a kid who doesn't believe in surprise fees.
               </h2>
               <p className="mt-4 text-muted-foreground text-pretty">
-                Upgrade or cancel anytime. Every plan includes file syncing and editing.
+                Start free. The Node Suite tier bundles NodeFMS, Node Tasks, and Node Calendar. Cancel anytime — I promise it's just a button.
               </p>
+
             </div>
           </Reveal>
           <div className="mt-8 max-w-[60ch] mx-auto">
