@@ -25,6 +25,7 @@ import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ForumIndexRouteImport } from './routes/forum.index'
 import { Route as InviteCodeRouteImport } from './routes/invite.$code'
 import { Route as ForumIdRouteImport } from './routes/forum.$id'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -114,6 +115,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForumIndexRoute = ForumIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ForumRoute,
+} as any)
 const InviteCodeRoute = InviteCodeRouteImport.update({
   id: '/invite/$code',
   path: '/invite/$code',
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/forum/$id': typeof ForumIdRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/forum/': typeof ForumIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -196,7 +203,6 @@ export interface FileRoutesByTo {
   '/download': typeof DownloadRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/forum': typeof ForumRouteWithChildren
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -212,6 +218,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/forum/$id': typeof ForumIdRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/forum': typeof ForumIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -240,6 +247,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/forum/$id': typeof ForumIdRoute
   '/invite/$code': typeof InviteCodeRoute
+  '/forum/': typeof ForumIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -268,6 +276,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/forum/$id'
     | '/invite/$code'
+    | '/forum/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -278,7 +287,6 @@ export interface FileRouteTypes {
     | '/download'
     | '/features'
     | '/forgot-password'
-    | '/forum'
     | '/login'
     | '/pricing'
     | '/reset-password'
@@ -294,6 +302,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/forum/$id'
     | '/invite/$code'
+    | '/forum'
   id:
     | '__root__'
     | '/'
@@ -321,6 +330,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/forum/$id'
     | '/invite/$code'
+    | '/forum/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -458,6 +468,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forum/': {
+      id: '/forum/'
+      path: '/'
+      fullPath: '/forum/'
+      preLoaderRoute: typeof ForumIndexRouteImport
+      parentRoute: typeof ForumRoute
+    }
     '/invite/$code': {
       id: '/invite/$code'
       path: '/invite/$code'
@@ -548,10 +565,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 interface ForumRouteChildren {
   ForumIdRoute: typeof ForumIdRoute
+  ForumIndexRoute: typeof ForumIndexRoute
 }
 
 const ForumRouteChildren: ForumRouteChildren = {
   ForumIdRoute: ForumIdRoute,
+  ForumIndexRoute: ForumIndexRoute,
 }
 
 const ForumRouteWithChildren = ForumRoute._addFileChildren(ForumRouteChildren)
@@ -579,13 +598,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
