@@ -25,6 +25,9 @@ const schema = z.object({
 
 function LoginPage() {
   const navigate = useNavigate();
+  const redirectTo = typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search).get("redirect") || "/app"
+    : "/app";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -50,13 +53,13 @@ function LoginPage() {
       return;
     }
     toast.success("Welcome back");
-    navigate({ to: "/app" });
+    window.location.href = redirectTo;
   };
 
   const signInWithGoogle = async () => {
     setGoogleLoading(true);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/app",
+      redirect_uri: window.location.origin + `/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
     });
     if (result.error) {
       setGoogleLoading(false);
@@ -64,13 +67,13 @@ function LoginPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/app" });
+    window.location.href = redirectTo;
   };
 
   const signInWithApple = async () => {
     setAppleLoading(true);
     const result = await lovable.auth.signInWithOAuth("apple", {
-      redirect_uri: window.location.origin + "/app",
+      redirect_uri: window.location.origin + `/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
     });
     if (result.error) {
       setAppleLoading(false);
@@ -78,7 +81,7 @@ function LoginPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/app" });
+    window.location.href = redirectTo;
   };
 
   return (

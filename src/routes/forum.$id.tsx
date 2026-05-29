@@ -52,7 +52,7 @@ function TopicPage() {
     e.preventDefault();
     if (!me) {
       toast.info("Sign in to reply");
-      router.navigate({ to: "/login" });
+      window.location.href = `/login?redirect=${encodeURIComponent(`/forum/${id}`)}`;
       return;
     }
     if (reply.trim().length < 1) return;
@@ -174,12 +174,12 @@ function TopicPage() {
                       Checking session…
                     </button>
                   ) : (
-                    <Link
-                      to="/login"
+                    <a
+                      href={`/login?redirect=${encodeURIComponent(`/forum/${id}`)}`}
                       className="px-4 py-2 rounded-full text-sm font-medium bg-ink text-surface hover:bg-ink/90"
                     >
                       Sign in
-                    </Link>
+                    </a>
                   )}
                 </div>
               </form>

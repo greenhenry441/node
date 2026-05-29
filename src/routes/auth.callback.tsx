@@ -27,7 +27,9 @@ function AuthCallback() {
     const run = async () => {
       const url = new URL(window.location.href);
       const code = url.searchParams.get("code");
+      const redirect = url.searchParams.get("redirect");
       const errDesc = url.searchParams.get("error_description") || url.hash.match(/error_description=([^&]+)/)?.[1];
+      const destination = redirect && redirect.startsWith("/") ? redirect : "/onboarding";
 
       if (errDesc) {
         setError(decodeURIComponent(errDesc.replace(/\+/g, " ")));
@@ -41,7 +43,7 @@ function AuthCallback() {
           setError(error.message);
           return;
         }
-        finish("/onboarding");
+        if (!cancelled) window.location.href = destination;
         return;
       }
 
@@ -49,7 +51,11 @@ function AuthCallback() {
       // Give it a tick, then check the session.
       await new Promise((r) => setTimeout(r, 50));
       const { data } = await supabase.auth.getSession();
-      finish(data.session ? "/onboarding" : "/login");
+      if (data.session) {
+        if (!cancelled) window.location.href = destination;
+      } else {
+        finish("/login");
+      }
     };
 
     run();
