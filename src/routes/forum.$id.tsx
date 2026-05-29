@@ -1,11 +1,11 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import {
   getForumTopic,
   createForumReply,
@@ -40,13 +40,8 @@ function TopicPage() {
   const deleteTopic = useServerFn(deleteForumTopic);
   const [reply, setReply] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [me, setMe] = useState<string | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setMe(data.session?.user.id ?? null));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setMe(s?.user.id ?? null));
-    return () => sub.subscription.unsubscribe();
-  }, []);
+  const { user, loading } = useAuth();
+  const me = user?.id ?? null;
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["forum-topic", id],
@@ -57,7 +52,7 @@ function TopicPage() {
     e.preventDefault();
     if (!me) {
       toast.info("Sign in to reply");
-      router.navigate({ to: "/login" });
+      window.location.href = `/login?redirect=${encodeURIComponent(`/forum/${id}`)}`;
       return;
     }
     if (reply.trim().length < 1) return;
@@ -170,13 +165,21 @@ function TopicPage() {
                     >
                       {submitting ? "Posting…" : "Post reply"}
                     </button>
+                  ) : loading ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="px-4 py-2 rounded-full text-sm font-medium bg-ink text-surface opacity-60"
+                    >
+                      Checking session…
+                    </button>
                   ) : (
-                    <Link
-                      to="/login"
+                    <a
+                      href={`/login?redirect=${encodeURIComponent(`/forum/${id}`)}`}
                       className="px-4 py-2 rounded-full text-sm font-medium bg-ink text-surface hover:bg-ink/90"
                     >
                       Sign in
-                    </Link>
+                    </a>
                   )}
                 </div>
               </form>
