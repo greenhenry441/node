@@ -195,7 +195,9 @@ export const setPlan = createServerFn({ method: "POST" })
 
 export const getDownloadUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .inputValidator((input) =>
+    z.object({ id: z.string().uuid(), download: z.boolean().optional() }).parse(input),
+  )
   .handler(async ({ data, context }) => {
     const { userId } = context;
     const { data: row, error } = await supabaseAdmin
@@ -206,12 +208,16 @@ export const getDownloadUrl = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!row || row.user_id !== userId) throw new Error("Not found");
 
-    const { data: signed, error: signErr } = await supabaseAdmin.storage
-      .from("user-files")
-      .createSignedUrl(row.storage_path, 60, { download: row.name });
+    const wantsDownload = data.download ?? true;
+    const { data: signed, error: signErr } = wantsDownload
+      ? await supabaseAdmin.storage
+          .from("user-files")
+          .createSignedUrl(row.storage_path, 60, { download: row.name })
+      : await supabaseAdmin.storage
+          .from("user-files")
+          .createSignedUrl(row.storage_path, 3600);
     if (signErr) throw new Error(signErr.message);
     return { url: signed.signedUrl };
-    return { url: signed!.signedUrl };
 
   });
 

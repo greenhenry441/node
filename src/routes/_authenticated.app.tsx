@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   Folder, FileText, Image as ImageIcon, Film, Music, Archive, Upload, Trash2,
   Settings, ChevronRight, Download, LogOut, Loader2, AlertCircle, Crown, FileIcon,
-  Search, Star, X, Pencil, Save as SaveIcon, MessageSquare,
+  Search, Star, X, Pencil, Save as SaveIcon, MessageSquare, MessageCircle,
 } from "lucide-react";
 import { listMyWorkspaces } from "@/lib/workspaces.functions";
 import { WorkspaceChat } from "@/components/workspace-chat";
@@ -34,6 +34,31 @@ function classify(mime: string | null, name: string): TypeFilter {
   if (m.includes("pdf") || m.includes("word") || m.includes("text") || m.includes("sheet") || m.includes("excel")) return "doc";
   if (m.includes("zip") || m.includes("rar") || m.includes("tar") || /\.(zip|rar|tar|gz|7z)$/i.test(name)) return "archive";
   return "other";
+}
+
+type ViewerKind = "text" | "image" | "video" | "audio" | "pdf" | "binary";
+
+function detectViewerKind(mime: string | null, name: string): ViewerKind {
+  const m = (mime ?? "").toLowerCase();
+  const lower = name.toLowerCase();
+  if (m.startsWith("image/") || /\.(png|jpe?g|gif|webp|avif|bmp|ico|svg)$/i.test(lower)) return "image";
+  if (m.startsWith("video/") || /\.(mp4|webm|mov|mkv|avi|m4v)$/i.test(lower)) return "video";
+  if (m.startsWith("audio/") || /\.(mp3|wav|ogg|m4a|flac|aac)$/i.test(lower)) return "audio";
+  if (m === "application/pdf" || /\.pdf$/i.test(lower)) return "pdf";
+  if (
+    m.startsWith("text/") ||
+    /(json|xml|yaml|javascript|typescript|csv|html|sql|toml|markdown|x-sh)/.test(m) ||
+    /\.(txt|md|markdown|json|yaml|yml|xml|html|htm|css|scss|sass|less|js|jsx|ts|tsx|mjs|cjs|csv|tsv|log|sh|bash|zsh|sql|toml|ini|env|conf|gitignore|py|rb|go|rs|java|kt|c|h|cpp|hpp|php|svelte|vue|astro)$/i.test(lower)
+  ) {
+    return "text";
+  }
+  return "binary";
+}
+
+function viewerTitle(kind: ViewerKind) {
+  if (kind === "text") return "Open & edit";
+  if (kind === "binary") return "Download";
+  return "Open preview";
 }
 const STAR_KEY = "nodefms.starred.v1";
 function loadStars(): Set<string> {
@@ -70,8 +95,23 @@ function AppPage() {
   const [editor, setEditor] = useState<{
     id: string; name: string; original: string; content: string; loading: boolean; saving: boolean;
   } | null>(null);
+  const [viewer, setViewer] = useState<{
+    id: string; name: string; mime: string | null; kind: ViewerKind; url: string; loading: boolean;
+  } | null>(null);
 
   const openEdit = async (f: StoredFile) => {
+    const kind = detectViewerKind(f.mime_type, f.name);
+    if (kind !== "text") {
+      setViewer({ id: f.id, name: f.name, mime: f.mime_type, kind, url: "", loading: true });
+      try {
+        const { url } = await downloadFn({ data: { id: f.id, download: false } });
+        setViewer({ id: f.id, name: f.name, mime: f.mime_type, kind, url, loading: false });
+      } catch (e) {
+        toast.error((e as Error).message);
+        setViewer(null);
+      }
+      return;
+    }
     setEditor({ id: f.id, name: f.name, original: "", content: "", loading: true, saving: false });
     try {
       const r = await getTextFn({ data: { id: f.id } });
@@ -101,6 +141,8 @@ function AppPage() {
     if (editor && editor.content !== editor.original && !confirm("Discard unsaved changes?")) return;
     setEditor(null);
   };
+
+  const closeViewer = () => setViewer(null);
 
 
   const stateQ = useQuery({ queryKey: ["storage-state"], queryFn: () => getStateFn() });
@@ -357,6 +399,9 @@ function AppPage() {
                 <MessageSquare className="size-4" /> Chat
               </button>
             )}
+            <Link to="/forum" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-md border border-border hover:bg-muted" title="Forum">
+              <MessageCircle className="size-4" /> Forum
+            </Link>
             <Link to="/tasks" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-md border border-border hover:bg-muted" title="Node Tasks">
               Tasks
             </Link>
@@ -525,6 +570,8 @@ function AppPage() {
           onClose={closeEdit}
         />
       )}
+
+      {viewer && <FileViewerModal viewer={viewer} onClose={closeViewer} />}
     </div>
   );
 }
@@ -617,10 +664,12 @@ function FileList({
                 className={`size-8 grid place-items-center rounded-md hover:bg-muted ${isStar ? "text-amber-500" : "text-muted-foreground hover:text-amber-500"}`}
                 title={isStar ? "Unstar" : "Star"}
               >
+                <Star className={`size-4 ${isStar ? "fill-amber-500" : ""}`} />
+              </button>
               <button
                 onClick={() => onOpen(f)}
                 className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
-                title="Open & edit"
+                title={viewerTitle(detectViewerKind(f.mime_type, f.name))}
               >
                 <Pencil className="size-4" />
               </button>
@@ -629,9 +678,6 @@ function FileList({
                 className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
                 title="Download"
               >
-                <Download className="size-4" />
-              </button>
-
                 <Download className="size-4" />
               </button>
               <button
@@ -727,6 +773,85 @@ function EditorModal({
               spellCheck={false}
               className="w-full h-full resize-none bg-transparent p-5 font-mono text-sm leading-relaxed outline-none"
             />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FileViewerModal({
+  viewer,
+  onClose,
+}: {
+  viewer: { id: string; name: string; mime: string | null; kind: ViewerKind; url: string; loading: boolean };
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8" onClick={onClose}>
+      <div
+        className="bg-card rounded-2xl ring-1 ring-black/10 shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="px-5 py-3 border-b border-border flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-semibold truncate">{viewer.name}</div>
+            <div className="text-[11px] text-muted-foreground">
+              {viewer.loading ? "Loading preview…" : viewer.mime ?? viewer.kind}
+            </div>
+          </div>
+          {viewer.url && (
+            <a
+              href={viewer.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md border border-border hover:bg-muted"
+            >
+              <Download className="size-3.5" /> Open in new tab
+            </a>
+          )}
+          <button
+            onClick={onClose}
+            className="size-8 grid place-items-center rounded-md hover:bg-muted text-muted-foreground hover:text-ink"
+            title="Close (Esc)"
+          >
+            <X className="size-4" />
+          </button>
+        </header>
+        <div className="flex-1 min-h-0 bg-surface p-4">
+          {viewer.loading ? (
+            <div className="h-full grid place-items-center text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-2"><Loader2 className="size-4 animate-spin" /> Loading preview…</span>
+            </div>
+          ) : viewer.kind === "image" ? (
+            <div className="h-full rounded-xl bg-card ring-1 ring-black/5 grid place-items-center overflow-auto">
+              <img src={viewer.url} alt={viewer.name} className="max-w-full max-h-full object-contain" />
+            </div>
+          ) : viewer.kind === "video" ? (
+            <div className="h-full rounded-xl bg-black grid place-items-center overflow-hidden">
+              <video src={viewer.url} controls className="max-w-full max-h-full" />
+            </div>
+          ) : viewer.kind === "audio" ? (
+            <div className="h-full rounded-xl bg-card ring-1 ring-black/5 grid place-items-center p-6">
+              <audio src={viewer.url} controls className="w-full max-w-xl" />
+            </div>
+          ) : viewer.kind === "pdf" ? (
+            <iframe src={viewer.url} title={viewer.name} className="w-full h-full rounded-xl bg-card ring-1 ring-black/5" />
+          ) : (
+            <div className="h-full rounded-xl bg-card ring-1 ring-black/5 grid place-items-center p-6 text-center">
+              <div>
+                <div className="text-base font-semibold">Preview isn’t available for this file type.</div>
+                <p className="mt-2 text-sm text-muted-foreground">Use the button above to open or download it.</p>
+              </div>
+            </div>
           )}
         </div>
       </div>
