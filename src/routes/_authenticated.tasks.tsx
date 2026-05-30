@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
   LayoutList, KanbanSquare, CalendarDays, Plus, Trash2, X, ChevronLeft, ChevronRight,
-  Flag, Clock, Loader2, Folder, Settings, LogOut, SlidersHorizontal, User as UserIcon,
+  Flag, Clock, Loader2, Folder, Settings, LogOut, SlidersHorizontal,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
