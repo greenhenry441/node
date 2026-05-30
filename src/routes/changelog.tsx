@@ -65,6 +65,18 @@ type Release = {
 // release labels declared in `ReleaseTag` above.
 const releases: Release[] = [
   {
+    version: "1.2.1",
+    date: "May 30, 2026",
+    tags: ["LTS Patch"],
+    title: "Forum reply fixes and file viewer improvements",
+    highlights: [
+      "Fixed forum reply functionality — topic detail pages now render correctly instead of being swallowed by the index",
+      "Fixed auth flow for forum replies — sign-in now redirects back to the topic you were reading",
+      "In-app file viewer now supports inline previews for images, videos, audio, and PDFs",
+      "Workspace files no longer show a generic 'not text' error — they open in the correct viewer automatically",
+    ],
+  },
+  {
     version: "1.2.0",
     date: "May 28, 2026",
     tags: ["Major", "LTS"],
