@@ -399,3 +399,40 @@ export const deleteWorkspaceMessage = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ---------- List workspace members (lightweight, for assignment) ----------
+
+export const listWorkspaceMembers = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ workspace_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }): Promise<WorkspaceMember[]> => {
+    const { supabase, userId } = context;
+
+    const { data: membership } = await supabase
+      .from("workspace_members")
+      .select("role")
+      .eq("workspace_id", data.workspace_id)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!membership) throw new Error("Not a member of this workspace");
+
+    const { data: rawMembers, error } = await supabase
+      .from("workspace_members")
+      .select("id, user_id, role, created_at")
+      .eq("workspace_id", data.workspace_id);
+    if (error) throw new Error(error.message);
+
+    const userIds = (rawMembers ?? []).map((m) => m.user_id);
+    const emails = new Map<string, string | null>();
+    if (userIds.length) {
+      const { data: usersData } = await supabaseAdmin.auth.admin.listUsers({ perPage: 200 });
+      for (const u of usersData?.users ?? []) {
+        if (userIds.includes(u.id)) emails.set(u.id, u.email ?? null);
+      }
+    }
+    return (rawMembers ?? []).map((m) => ({
+      ...m,
+      email: emails.get(m.user_id) ?? null,
+      role: m.role as WorkspaceRole,
+    }));
+  });
