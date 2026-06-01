@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { Reveal } from "@/components/reveal";
 import { GITHUB_URL } from "@/lib/links";
 
-const RELEASES_URL = `${GITHUB_URL}/releases/latest`;
+const DOWNLOAD_BASE = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/downloads`;
 
 export const Route = createFileRoute("/download")({
   head: () => ({
@@ -157,7 +157,7 @@ function DownloadPage() {
 }
 
 function DownloadCard({ build }: { build: Build }) {
-  const href = `${RELEASES_URL}/download/${build.asset}`;
+  const href = `${DOWNLOAD_BASE}/${build.asset}`;
   const Icon = build.icon;
   return (
     <div className="group relative p-7 rounded-2xl bg-card ring-1 ring-black/5 text-left overflow-hidden">
