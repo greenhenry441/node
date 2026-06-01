@@ -65,6 +65,20 @@ type Release = {
 // release labels declared in `ReleaseTag` above.
 const releases: Release[] = [
   {
+    version: "1.3.0",
+    date: "June 1, 2026",
+    tags: ["Minor"],
+    title: "Custom statuses, Calendar, Invest & Donate, and real desktop downloads",
+    highlights: [
+      "Custom task statuses per workspace — create, edit, and reorder your own columns in Board view",
+      "Node Calendar launches with workspace-scoped events, day/week/month views, and drag-to-create",
+      "New /invest and /donate pages — reach out directly to support the project",
+      "Desktop downloads are now real, built apps for macOS (Apple Silicon & Intel), Windows, and Linux",
+      "Download files are hosted on Cloud storage with direct public links — buttons actually work",
+      "Task assignment now pulls from workspace members; calendar events are shared across the workspace",
+    ],
+  },
+  {
     version: "1.2.1",
     date: "May 30, 2026",
     tags: ["LTS Patch"],
