@@ -30,10 +30,10 @@ type Build = {
 };
 
 const builds: Build[] = [
-  { icon: Apple, platform: "macOS — Apple Silicon", detail: "M1 / M2 / M3 / M4 · 12+", asset: "NodeFMS-macOS-AppleSilicon.zip", size: "≈ 290 MB" },
-  { icon: Apple, platform: "macOS — Intel", detail: "x64 · 12+", asset: "NodeFMS-macOS-Intel.zip", size: "≈ 303 MB" },
-  { icon: MonitorDown, platform: "Windows", detail: "x64 · 10 & 11", asset: "NodeFMS-Windows-x64.zip", size: "≈ 117 MB" },
-  { icon: Terminal, platform: "Linux", detail: "x64 · glibc 2.28+", asset: "NodeFMS-Linux-x64.tar.gz", size: "≈ 108 MB" },
+  { icon: Apple, platform: "macOS — Apple Silicon", detail: "M1 / M2 / M3 / M4 · 12+", asset: "NodeFMS-macOS-AppleSilicon.zip", size: "≈ 332 MB" },
+  { icon: Apple, platform: "macOS — Intel", detail: "x64 · 12+", asset: "NodeFMS-macOS-Intel.zip", size: "≈ 348 MB" },
+  { icon: MonitorDown, platform: "Windows", detail: "x64 · 10 & 11", asset: "NodeFMS-Windows-x64.zip", size: "≈ 138 MB" },
+  { icon: Terminal, platform: "Linux", detail: "x64 · glibc 2.28+", asset: "NodeFMS-Linux-x64.tar.gz", size: "≈ 114 MB" },
 ];
 
 function DownloadPage() {
