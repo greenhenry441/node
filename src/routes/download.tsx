@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { Reveal } from "@/components/reveal";
 import { GITHUB_URL } from "@/lib/links";
 
-const RELEASES_URL = `${GITHUB_URL}/releases/latest`;
+const DOWNLOAD_BASE = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/downloads`;
 
 export const Route = createFileRoute("/download")({
   head: () => ({
@@ -30,10 +30,10 @@ type Build = {
 };
 
 const builds: Build[] = [
-  { icon: Apple, platform: "macOS — Apple Silicon", detail: "M1 / M2 / M3 / M4 · 12+", asset: "NodeFMS-macOS-AppleSilicon.zip", size: "≈ 290 MB" },
-  { icon: Apple, platform: "macOS — Intel", detail: "x64 · 12+", asset: "NodeFMS-macOS-Intel.zip", size: "≈ 303 MB" },
-  { icon: MonitorDown, platform: "Windows", detail: "x64 · 10 & 11", asset: "NodeFMS-Windows-x64.zip", size: "≈ 117 MB" },
-  { icon: Terminal, platform: "Linux", detail: "x64 · glibc 2.28+", asset: "NodeFMS-Linux-x64.tar.gz", size: "≈ 108 MB" },
+  { icon: Apple, platform: "macOS — Apple Silicon", detail: "M1 / M2 / M3 / M4 · 12+", asset: "NodeFMS-macOS-AppleSilicon.zip", size: "≈ 332 MB" },
+  { icon: Apple, platform: "macOS — Intel", detail: "x64 · 12+", asset: "NodeFMS-macOS-Intel.zip", size: "≈ 348 MB" },
+  { icon: MonitorDown, platform: "Windows", detail: "x64 · 10 & 11", asset: "NodeFMS-Windows-x64.zip", size: "≈ 138 MB" },
+  { icon: Terminal, platform: "Linux", detail: "x64 · glibc 2.28+", asset: "NodeFMS-Linux-x64.tar.gz", size: "≈ 114 MB" },
 ];
 
 function DownloadPage() {
@@ -157,7 +157,7 @@ function DownloadPage() {
 }
 
 function DownloadCard({ build }: { build: Build }) {
-  const href = `${RELEASES_URL}/download/${build.asset}`;
+  const href = `${DOWNLOAD_BASE}/${build.asset}`;
   const Icon = build.icon;
   return (
     <div className="group relative p-7 rounded-2xl bg-card ring-1 ring-black/5 text-left overflow-hidden">
@@ -176,12 +176,13 @@ function DownloadCard({ build }: { build: Build }) {
       </div>
       <a
         href={href}
+        download={build.asset}
         className="mt-6 w-full block text-center py-2.5 rounded-full bg-ink text-surface text-sm font-medium hover:bg-ink/90 transition-colors"
       >
         Download
       </a>
       <div className="mt-2 text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground text-center">
-        Hosted on GitHub Releases
+        Direct download · v1.2.0
       </div>
     </div>
   );
