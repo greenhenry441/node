@@ -15,10 +15,12 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as InvestRouteImport } from './routes/invest'
 import { Route as ForumRouteImport } from './routes/forum'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as DownloadRouteImport } from './routes/download'
+import { Route as DonateRouteImport } from './routes/donate'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChangelogRouteImport } from './routes/changelog'
@@ -66,6 +68,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvestRoute = InvestRouteImport.update({
+  id: '/invest',
+  path: '/invest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForumRoute = ForumRouteImport.update({
   id: '/forum',
   path: '/forum',
@@ -84,6 +91,11 @@ const FeaturesRoute = FeaturesRouteImport.update({
 const DownloadRoute = DownloadRouteImport.update({
   id: '/download',
   path: '/download',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DonateRoute = DonateRouteImport.update({
+  id: '/donate',
+  path: '/donate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsRoute = DocsRouteImport.update({
@@ -173,10 +185,12 @@ export interface FileRoutesByFullPath {
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
+  '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/forum': typeof ForumRouteWithChildren
+  '/invest': typeof InvestRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -200,9 +214,11 @@ export interface FileRoutesByTo {
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
+  '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/invest': typeof InvestRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -228,10 +244,12 @@ export interface FileRoutesById {
   '/changelog': typeof ChangelogRoute
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
+  '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
   '/features': typeof FeaturesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/forum': typeof ForumRouteWithChildren
+  '/invest': typeof InvestRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -257,10 +275,12 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/contact'
     | '/docs'
+    | '/donate'
     | '/download'
     | '/features'
     | '/forgot-password'
     | '/forum'
+    | '/invest'
     | '/login'
     | '/pricing'
     | '/reset-password'
@@ -284,9 +304,11 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/contact'
     | '/docs'
+    | '/donate'
     | '/download'
     | '/features'
     | '/forgot-password'
+    | '/invest'
     | '/login'
     | '/pricing'
     | '/reset-password'
@@ -311,10 +333,12 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/contact'
     | '/docs'
+    | '/donate'
     | '/download'
     | '/features'
     | '/forgot-password'
     | '/forum'
+    | '/invest'
     | '/login'
     | '/pricing'
     | '/reset-password'
@@ -340,10 +364,12 @@ export interface RootRouteChildren {
   ChangelogRoute: typeof ChangelogRoute
   ContactRoute: typeof ContactRoute
   DocsRoute: typeof DocsRoute
+  DonateRoute: typeof DonateRoute
   DownloadRoute: typeof DownloadRoute
   FeaturesRoute: typeof FeaturesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ForumRoute: typeof ForumRouteWithChildren
+  InvestRoute: typeof InvestRoute
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -398,6 +424,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invest': {
+      id: '/invest'
+      path: '/invest'
+      fullPath: '/invest'
+      preLoaderRoute: typeof InvestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/forum': {
       id: '/forum'
       path: '/forum'
@@ -424,6 +457,13 @@ declare module '@tanstack/react-router' {
       path: '/download'
       fullPath: '/download'
       preLoaderRoute: typeof DownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/donate': {
+      id: '/donate'
+      path: '/donate'
+      fullPath: '/donate'
+      preLoaderRoute: typeof DonateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docs': {
@@ -582,10 +622,12 @@ const rootRouteChildren: RootRouteChildren = {
   ChangelogRoute: ChangelogRoute,
   ContactRoute: ContactRoute,
   DocsRoute: DocsRoute,
+  DonateRoute: DonateRoute,
   DownloadRoute: DownloadRoute,
   FeaturesRoute: FeaturesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   ForumRoute: ForumRouteWithChildren,
+  InvestRoute: InvestRoute,
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
