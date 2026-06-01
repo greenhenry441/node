@@ -176,12 +176,13 @@ function DownloadCard({ build }: { build: Build }) {
       </div>
       <a
         href={href}
+        download={build.asset}
         className="mt-6 w-full block text-center py-2.5 rounded-full bg-ink text-surface text-sm font-medium hover:bg-ink/90 transition-colors"
       >
         Download
       </a>
       <div className="mt-2 text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground text-center">
-        Hosted on GitHub Releases
+        Direct download · v1.2.0
       </div>
     </div>
   );
