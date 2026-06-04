@@ -87,15 +87,25 @@ export const getStorageState = createServerFn({ method: "GET" })
 
 export const listFiles = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<StoredFile[]> => {
+  .inputValidator((input) =>
+    z.object({ workspace_id: z.string().uuid().nullish() }).optional().parse(input),
+  )
+  .handler(async ({ data, context }): Promise<StoredFile[]> => {
     const { supabase, userId } = context;
-    const { data, error } = await supabase
+    const wsId = data?.workspace_id ?? null;
+
+    let query = supabase
       .from("user_files")
-      .select("id, name, size_bytes, mime_type, storage_path, created_at")
-      .eq("user_id", userId)
+      .select("id, name, size_bytes, mime_type, storage_path, created_at, workspace_id, user_id")
       .order("created_at", { ascending: false });
+
+    query = wsId
+      ? query.eq("workspace_id", wsId)
+      : query.eq("user_id", userId).is("workspace_id", null);
+
+    const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
-    return (data ?? []).map((r) => ({
+    return (rows ?? []).map((r) => ({
       ...r,
       size_bytes: Number(r.size_bytes),
     }));
