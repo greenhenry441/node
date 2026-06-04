@@ -86,7 +86,7 @@ function AppPage() {
   const [scope, setScope] = useState<string | null>(null);
   const workspaces = wsQ.data ?? [];
   const activeWs = scope ? workspaces.find((w) => w.id === scope) : undefined;
-  const scopeLabel = activeWs ? activeWs.name : "My files";
+  
 
   const listFn = useServerFn(listFiles);
   const deleteFn = useServerFn(deleteFile);
