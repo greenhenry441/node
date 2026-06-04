@@ -30,7 +30,28 @@ export type StoredFile = {
   mime_type: string | null;
   storage_path: string;
   created_at: string;
+  workspace_id: string | null;
+  user_id: string;
 };
+
+// Authorize access to a file row: owner, or a member of the file's workspace.
+async function canAccessRow(
+  row: { user_id: string; workspace_id: string | null },
+  userId: string,
+): Promise<boolean> {
+  if (row.user_id === userId) return true;
+  if (row.workspace_id) {
+    const { data } = await supabaseAdmin
+      .from("workspace_members")
+      .select("user_id")
+      .eq("workspace_id", row.workspace_id)
+      .eq("user_id", userId)
+      .maybeSingle();
+    return !!data;
+  }
+  return false;
+}
+
 
 // ---------- Read state ----------
 
@@ -57,15 +78,25 @@ export const getStorageState = createServerFn({ method: "GET" })
 
 export const listFiles = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<StoredFile[]> => {
+  .inputValidator((input) =>
+    z.object({ workspace_id: z.string().uuid().nullish() }).optional().parse(input),
+  )
+  .handler(async ({ data, context }): Promise<StoredFile[]> => {
     const { supabase, userId } = context;
-    const { data, error } = await supabase
+    const wsId = data?.workspace_id ?? null;
+
+    let query = supabase
       .from("user_files")
-      .select("id, name, size_bytes, mime_type, storage_path, created_at")
-      .eq("user_id", userId)
+      .select("id, name, size_bytes, mime_type, storage_path, created_at, workspace_id, user_id")
       .order("created_at", { ascending: false });
+
+    query = wsId
+      ? query.eq("workspace_id", wsId)
+      : query.eq("user_id", userId).is("workspace_id", null);
+
+    const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
-    return (data ?? []).map((r) => ({
+    return (rows ?? []).map((r) => ({
       ...r,
       size_bytes: Number(r.size_bytes),
     }));
@@ -133,7 +164,7 @@ export const uploadFile = createServerFn({ method: "POST" })
         size_bytes: size,
         mime_type: file.type || null,
       })
-      .select("id, name, size_bytes, mime_type, storage_path, created_at")
+      .select("id, name, size_bytes, mime_type, storage_path, created_at, workspace_id, user_id")
       .single();
 
     if (insErr) {
@@ -161,12 +192,12 @@ export const deleteFile = createServerFn({ method: "POST" })
 
     const { data: row, error } = await supabaseAdmin
       .from("user_files")
-      .select("id, storage_path, user_id")
+      .select("id, storage_path, user_id, workspace_id")
       .eq("id", data.id)
       .maybeSingle();
 
     if (error) throw new Error(error.message);
-    if (!row || row.user_id !== userId) throw new Error("Not found");
+    if (!row || !(await canAccessRow(row, userId))) throw new Error("Not found");
 
     await supabaseAdmin.storage.from("user-files").remove([row.storage_path]);
     const { error: delErr } = await supabaseAdmin.from("user_files").delete().eq("id", row.id);
@@ -202,11 +233,11 @@ export const getDownloadUrl = createServerFn({ method: "POST" })
     const { userId } = context;
     const { data: row, error } = await supabaseAdmin
       .from("user_files")
-      .select("storage_path, user_id, name")
+      .select("storage_path, user_id, workspace_id, name")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!row || row.user_id !== userId) throw new Error("Not found");
+    if (!row || !(await canAccessRow(row, userId))) throw new Error("Not found");
 
     const wantsDownload = data.download ?? true;
     const { data: signed, error: signErr } = wantsDownload
@@ -240,11 +271,11 @@ export const getFileText = createServerFn({ method: "POST" })
     const { userId } = context;
     const { data: row, error } = await supabaseAdmin
       .from("user_files")
-      .select("id, name, mime_type, size_bytes, storage_path, user_id")
+      .select("id, name, mime_type, size_bytes, storage_path, user_id, workspace_id")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!row || row.user_id !== userId) throw new Error("Not found");
+    if (!row || !(await canAccessRow(row, userId))) throw new Error("Not found");
     if (Number(row.size_bytes) > MAX_EDITABLE_BYTES) {
       throw new Error(`Files larger than ${Math.round(MAX_EDITABLE_BYTES / 1024 / 1024)} MB can't be opened in the editor.`);
     }
@@ -266,11 +297,11 @@ export const updateFileText = createServerFn({ method: "POST" })
     const { userId } = context;
     const { data: row, error } = await supabaseAdmin
       .from("user_files")
-      .select("id, storage_path, size_bytes, mime_type, name, user_id")
+      .select("id, storage_path, size_bytes, mime_type, name, user_id, workspace_id")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!row || row.user_id !== userId) throw new Error("Not found");
+    if (!row || !(await canAccessRow(row, userId))) throw new Error("Not found");
     if (!isLikelyText(row.mime_type, row.name)) {
       throw new Error("This file type can't be edited as text.");
     }

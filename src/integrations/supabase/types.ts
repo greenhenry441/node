@@ -367,6 +367,7 @@ export type Database = {
           size_bytes: number
           storage_path: string
           user_id: string
+          workspace_id: string | null
         }
         Insert: {
           created_at?: string
@@ -376,6 +377,7 @@ export type Database = {
           size_bytes: number
           storage_path: string
           user_id: string
+          workspace_id?: string | null
         }
         Update: {
           created_at?: string
@@ -385,6 +387,7 @@ export type Database = {
           size_bytes?: number
           storage_path?: string
           user_id?: string
+          workspace_id?: string | null
         }
         Relationships: []
       }

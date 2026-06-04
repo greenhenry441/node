@@ -82,7 +82,11 @@ function AppPage() {
   const listWsFn = useServerFn(listMyWorkspaces);
   const wsQ = useQuery({ queryKey: ["my-workspaces"], queryFn: () => listWsFn() });
   const [chatOpen, setChatOpen] = useState(false);
-  const activeWs = wsQ.data?.[0];
+  // null = personal "My files"; otherwise a workspace id whose files are shared
+  const [scope, setScope] = useState<string | null>(null);
+  const workspaces = wsQ.data ?? [];
+  const activeWs = scope ? workspaces.find((w) => w.id === scope) : undefined;
+  
 
   const listFn = useServerFn(listFiles);
   const deleteFn = useServerFn(deleteFile);
@@ -146,7 +150,10 @@ function AppPage() {
 
 
   const stateQ = useQuery({ queryKey: ["storage-state"], queryFn: () => getStateFn() });
-  const filesQ = useQuery({ queryKey: ["files"], queryFn: () => listFn() });
+  const filesQ = useQuery({
+    queryKey: ["files", scope],
+    queryFn: () => listFn({ data: { workspace_id: scope } }),
+  });
 
   // Search / filter / star / multi-select
   const [query, setQuery] = useState("");
@@ -269,7 +276,7 @@ function AppPage() {
       await uploadAll(files, 4, (f, ok, err) => {
         if (ok) toast.success(`Uploaded ${f.name}`);
         else toast.error(`${f.name}: ${err ?? "upload failed"}`);
-      });
+      }, scope);
       qc.invalidateQueries({ queryKey: ["files"] });
       qc.invalidateQueries({ queryKey: ["storage-state"] });
     } finally {
@@ -368,11 +375,35 @@ function AppPage() {
 
       <main className="flex-1 flex flex-col min-w-0">
         <header className="h-16 border-b border-border flex items-center justify-between px-8 gap-6">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Workspace</span>
-            <ChevronRight className="size-3.5" />
-            <span className="text-ink font-medium">My files</span>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+            <span className="hidden sm:inline">Files</span>
+            <ChevronRight className="size-3.5 hidden sm:inline" />
+            <div className="relative">
+              <select
+                value={scope ?? ""}
+                onChange={(e) => {
+                  setScope(e.target.value || null);
+                  clearSelection();
+                }}
+                className="appearance-none text-ink font-medium bg-card border border-border rounded-md pl-3 pr-8 py-1.5 text-sm hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ink/20"
+                title="Switch between your personal files and a shared workspace"
+              >
+                <option value="">My files (personal)</option>
+                {workspaces.length > 0 && (
+                  <optgroup label="Shared workspaces">
+                    {workspaces.map((w) => (
+                      <option key={w.id} value={w.id}>{w.name}</option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+              <ChevronRight className="size-3.5 rotate-90 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground" />
+            </div>
+            {activeWs && (
+              <span className="hidden md:inline text-[11px] uppercase tracking-wider rounded-full bg-muted px-2 py-0.5">Shared</span>
+            )}
           </div>
+
           <div className="flex items-center gap-2">
             <input
               ref={fileInput}
