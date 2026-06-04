@@ -173,7 +173,7 @@ export const uploadFile = createServerFn({ method: "POST" })
         size_bytes: size,
         mime_type: file.type || null,
       })
-      .select("id, name, size_bytes, mime_type, storage_path, created_at")
+      .select("id, name, size_bytes, mime_type, storage_path, created_at, workspace_id, user_id")
       .single();
 
     if (insErr) {
