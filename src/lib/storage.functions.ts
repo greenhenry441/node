@@ -52,15 +52,6 @@ async function canAccessRow(
   return false;
 }
 
-async function assertWorkspaceMember(workspaceId: string, userId: string) {
-  const { data } = await supabaseAdmin
-    .from("workspace_members")
-    .select("user_id")
-    .eq("workspace_id", workspaceId)
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (!data) throw new Error("You are not a member of this workspace.");
-}
 
 // ---------- Read state ----------
 
