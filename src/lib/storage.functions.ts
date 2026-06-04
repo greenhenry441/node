@@ -30,7 +30,37 @@ export type StoredFile = {
   mime_type: string | null;
   storage_path: string;
   created_at: string;
+  workspace_id: string | null;
+  user_id: string;
 };
+
+// Authorize access to a file row: owner, or a member of the file's workspace.
+async function canAccessRow(
+  row: { user_id: string; workspace_id: string | null },
+  userId: string,
+): Promise<boolean> {
+  if (row.user_id === userId) return true;
+  if (row.workspace_id) {
+    const { data } = await supabaseAdmin
+      .from("workspace_members")
+      .select("user_id")
+      .eq("workspace_id", row.workspace_id)
+      .eq("user_id", userId)
+      .maybeSingle();
+    return !!data;
+  }
+  return false;
+}
+
+async function assertWorkspaceMember(workspaceId: string, userId: string) {
+  const { data } = await supabaseAdmin
+    .from("workspace_members")
+    .select("user_id")
+    .eq("workspace_id", workspaceId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (!data) throw new Error("You are not a member of this workspace.");
+}
 
 // ---------- Read state ----------
 
