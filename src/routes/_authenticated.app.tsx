@@ -82,7 +82,11 @@ function AppPage() {
   const listWsFn = useServerFn(listMyWorkspaces);
   const wsQ = useQuery({ queryKey: ["my-workspaces"], queryFn: () => listWsFn() });
   const [chatOpen, setChatOpen] = useState(false);
-  const activeWs = wsQ.data?.[0];
+  // null = personal "My files"; otherwise a workspace id whose files are shared
+  const [scope, setScope] = useState<string | null>(null);
+  const workspaces = wsQ.data ?? [];
+  const activeWs = scope ? workspaces.find((w) => w.id === scope) : undefined;
+  const scopeLabel = activeWs ? activeWs.name : "My files";
 
   const listFn = useServerFn(listFiles);
   const deleteFn = useServerFn(deleteFile);
