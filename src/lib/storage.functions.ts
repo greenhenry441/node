@@ -280,11 +280,11 @@ export const getFileText = createServerFn({ method: "POST" })
     const { userId } = context;
     const { data: row, error } = await supabaseAdmin
       .from("user_files")
-      .select("id, name, mime_type, size_bytes, storage_path, user_id")
+      .select("id, name, mime_type, size_bytes, storage_path, user_id, workspace_id")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!row || row.user_id !== userId) throw new Error("Not found");
+    if (!row || !(await canAccessRow(row, userId))) throw new Error("Not found");
     if (Number(row.size_bytes) > MAX_EDITABLE_BYTES) {
       throw new Error(`Files larger than ${Math.round(MAX_EDITABLE_BYTES / 1024 / 1024)} MB can't be opened in the editor.`);
     }
