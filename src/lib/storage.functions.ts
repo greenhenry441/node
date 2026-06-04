@@ -201,12 +201,12 @@ export const deleteFile = createServerFn({ method: "POST" })
 
     const { data: row, error } = await supabaseAdmin
       .from("user_files")
-      .select("id, storage_path, user_id")
+      .select("id, storage_path, user_id, workspace_id")
       .eq("id", data.id)
       .maybeSingle();
 
     if (error) throw new Error(error.message);
-    if (!row || row.user_id !== userId) throw new Error("Not found");
+    if (!row || !(await canAccessRow(row, userId))) throw new Error("Not found");
 
     await supabaseAdmin.storage.from("user-files").remove([row.storage_path]);
     const { error: delErr } = await supabaseAdmin.from("user_files").delete().eq("id", row.id);
