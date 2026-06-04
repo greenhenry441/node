@@ -276,7 +276,7 @@ function AppPage() {
       await uploadAll(files, 4, (f, ok, err) => {
         if (ok) toast.success(`Uploaded ${f.name}`);
         else toast.error(`${f.name}: ${err ?? "upload failed"}`);
-      });
+      }, scope);
       qc.invalidateQueries({ queryKey: ["files"] });
       qc.invalidateQueries({ queryKey: ["storage-state"] });
     } finally {
