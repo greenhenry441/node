@@ -17,6 +17,16 @@ function sanitize(name: string) {
   return name.replace(/[^\w.\-]+/g, "_").slice(0, 200) || "file";
 }
 
+async function assertWorkspaceMember(workspaceId: string, userId: string) {
+  const { data } = await supabaseAdmin
+    .from("workspace_members")
+    .select("user_id")
+    .eq("workspace_id", workspaceId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (!data) throw new Error("You are not a member of this workspace.");
+}
+
 /**
  * Step 1: client requests a signed upload URL. Server checks plan cap.
  * Client then PUTs the file bytes directly to storage — no 15 GB request
@@ -29,10 +39,15 @@ export const createUploadUrl = createServerFn({ method: "POST" })
       name: z.string().min(1).max(255),
       size: z.number().int().positive().max(MAX_FILE_BYTES),
       mime_type: z.string().max(200).optional(),
+      workspace_id: z.string().uuid().nullish(),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { userId } = context;
+
+    if (data.workspace_id) {
+      await assertWorkspaceMember(data.workspace_id, userId);
+    }
 
     const [{ data: sub }, { data: usage }] = await Promise.all([
       supabaseAdmin.from("user_subscriptions").select("plan").eq("user_id", userId).maybeSingle(),
@@ -45,7 +60,8 @@ export const createUploadUrl = createServerFn({ method: "POST" })
       throw new Error("Upload would exceed your plan's storage limit.");
     }
 
-    const path = `${userId}/${crypto.randomUUID()}-${sanitize(data.name)}`;
+    const prefix = data.workspace_id ? `ws/${data.workspace_id}` : userId;
+    const path = `${prefix}/${crypto.randomUUID()}-${sanitize(data.name)}`;
     const { data: signed, error } = await supabaseAdmin.storage
       .from(BUCKET)
       .createSignedUploadUrl(path);
@@ -71,24 +87,33 @@ export const registerUpload = createServerFn({ method: "POST" })
       name: z.string().min(1).max(255),
       size: z.number().int().positive().max(MAX_FILE_BYTES),
       mime_type: z.string().max(200).optional(),
+      workspace_id: z.string().uuid().nullish(),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
     const { userId } = context;
-    // Path must belong to this user
-    if (!data.path.startsWith(`${userId}/`)) {
+
+    // Path must belong to this user, or to the target workspace folder.
+    if (data.workspace_id) {
+      await assertWorkspaceMember(data.workspace_id, userId);
+      if (!data.path.startsWith(`ws/${data.workspace_id}/`)) {
+        throw new Error("Invalid upload path");
+      }
+    } else if (!data.path.startsWith(`${userId}/`)) {
       throw new Error("Invalid upload path");
     }
+
     const { data: row, error } = await supabaseAdmin
       .from("user_files")
       .insert({
         user_id: userId,
+        workspace_id: data.workspace_id ?? null,
         storage_path: data.path,
         name: data.name.slice(0, 200),
         size_bytes: data.size,
         mime_type: data.mime_type ?? null,
       })
-      .select("id, name, size_bytes, mime_type, storage_path, created_at")
+      .select("id, name, size_bytes, mime_type, storage_path, created_at, workspace_id, user_id")
       .single();
 
     if (error) {
