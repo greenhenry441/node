@@ -12,9 +12,10 @@ const BUCKET = "user-files";
 export async function uploadDirect(
   file: File,
   onProgress?: (pct: number) => void,
+  workspaceId?: string | null,
 ): Promise<{ id: string; name: string; size_bytes: number; mime_type: string | null; storage_path: string; created_at: string }> {
   const reserved = await createUploadUrl({
-    data: { name: file.name, size: file.size, mime_type: file.type || undefined },
+    data: { name: file.name, size: file.size, mime_type: file.type || undefined, workspace_id: workspaceId ?? null },
   });
 
   // Use Supabase JS — it handles the signed token + correct upsert semantics.
@@ -34,20 +35,21 @@ export async function uploadDirect(
       name: file.name,
       size: file.size,
       mime_type: file.type || undefined,
+      workspace_id: workspaceId ?? null,
     },
   });
   return row;
 }
 
 /** Run uploads in parallel, capped to N concurrent connections. */
-export async function uploadAll(files: File[], concurrency = 4, onEach?: (f: File, ok: boolean, err?: string) => void) {
+export async function uploadAll(files: File[], concurrency = 4, onEach?: (f: File, ok: boolean, err?: string) => void, workspaceId?: string | null) {
   const queue = [...files];
   const results: Array<{ file: File; ok: boolean; err?: string }> = [];
   async function worker() {
     while (queue.length) {
       const f = queue.shift()!;
       try {
-        await uploadDirect(f);
+        await uploadDirect(f, undefined, workspaceId);
         results.push({ file: f, ok: true });
         onEach?.(f, true);
       } catch (e) {
