@@ -306,11 +306,11 @@ export const updateFileText = createServerFn({ method: "POST" })
     const { userId } = context;
     const { data: row, error } = await supabaseAdmin
       .from("user_files")
-      .select("id, storage_path, size_bytes, mime_type, name, user_id")
+      .select("id, storage_path, size_bytes, mime_type, name, user_id, workspace_id")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!row || row.user_id !== userId) throw new Error("Not found");
+    if (!row || !(await canAccessRow(row, userId))) throw new Error("Not found");
     if (!isLikelyText(row.mime_type, row.name)) {
       throw new Error("This file type can't be edited as text.");
     }
