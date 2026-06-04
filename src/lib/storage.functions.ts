@@ -242,11 +242,11 @@ export const getDownloadUrl = createServerFn({ method: "POST" })
     const { userId } = context;
     const { data: row, error } = await supabaseAdmin
       .from("user_files")
-      .select("storage_path, user_id, name")
+      .select("storage_path, user_id, workspace_id, name")
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!row || row.user_id !== userId) throw new Error("Not found");
+    if (!row || !(await canAccessRow(row, userId))) throw new Error("Not found");
 
     const wantsDownload = data.download ?? true;
     const { data: signed, error: signErr } = wantsDownload
