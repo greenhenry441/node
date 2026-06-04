@@ -150,7 +150,10 @@ function AppPage() {
 
 
   const stateQ = useQuery({ queryKey: ["storage-state"], queryFn: () => getStateFn() });
-  const filesQ = useQuery({ queryKey: ["files"], queryFn: () => listFn() });
+  const filesQ = useQuery({
+    queryKey: ["files", scope],
+    queryFn: () => listFn({ data: { workspace_id: scope } }),
+  });
 
   // Search / filter / star / multi-select
   const [query, setQuery] = useState("");
