@@ -30,17 +30,24 @@ export function WorkspaceChat({ workspaceId }: { workspaceId: string }) {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [q.data?.length]);
 
-  // Realtime subscription — live collab
+  // Realtime subscription — live collab (private channel; access gated by realtime RLS)
   useEffect(() => {
-    const ch = supabase
-      .channel(`ws-messages-${workspaceId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "workspace_messages", filter: `workspace_id=eq.${workspaceId}` },
-        () => qc.invalidateQueries({ queryKey: key }),
-      )
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    let ch: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+    (async () => {
+      // Attach the user's auth token so realtime can authorize private channels.
+      await supabase.realtime.setAuth();
+      if (cancelled) return;
+      ch = supabase
+        .channel(`ws-messages-${workspaceId}`, { config: { private: true } })
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "workspace_messages", filter: `workspace_id=eq.${workspaceId}` },
+          () => qc.invalidateQueries({ queryKey: key }),
+        )
+        .subscribe();
+    })();
+    return () => { cancelled = true; if (ch) supabase.removeChannel(ch); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workspaceId]);
 
