@@ -284,7 +284,7 @@ function EditorPage() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, save, saveAs, newFile]);
+  }, [open, save, saveAs, newFile, kind]);
 
   const stats = useMemo(() => {
     if (kind === "text") {
