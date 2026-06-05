@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { listMyWorkspaces } from "@/lib/workspaces.functions";
 import { WorkspaceChat } from "@/components/workspace-chat";
+import { CommandPalette } from "@/components/command-palette";
 import {
   getStorageState, listFiles, deleteFile, setPlan, getDownloadUrl,
   getFileText, updateFileText,
