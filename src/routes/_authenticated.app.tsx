@@ -407,6 +407,15 @@ function AppPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => window.dispatchEvent(new Event("open-command-palette"))}
+              className="hidden md:inline-flex items-center gap-2 text-sm text-muted-foreground px-3 py-2 rounded-md border border-border hover:bg-muted"
+              title="Command palette"
+            >
+              <Search className="size-4" />
+              <span className="hidden lg:inline">Search</span>
+              <kbd className="text-[10px] font-mono border border-border rounded px-1 py-0.5">⌘K</kbd>
+            </button>
             <input
               ref={fileInput}
               type="file"
