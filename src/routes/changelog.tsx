@@ -65,6 +65,19 @@ type Release = {
 // release labels declared in `ReleaseTag` above.
 const releases: Release[] = [
   {
+    version: "1.4.0",
+    date: "June 5, 2026",
+    tags: ["Minor"],
+    title: "Command palette, editor find & replace, and Markdown preview",
+    highlights: [
+      "New command palette — press ⌘K (Ctrl+K) anywhere in the workspace to jump to files, editor, tasks, settings, and more",
+      "Editor now has a direct link in the workspace header so you can open it in one click",
+      "Find & Replace in the editor — press ⌘F to search and replace across any text or code file",
+      "Live Markdown preview — toggle a side-by-side rendered view when editing .md files",
+      "Quick Search button added to the workspace header for discoverability",
+    ],
+  },
+  {
     version: "1.3.0",
     date: "June 1, 2026",
     tags: ["Minor"],
