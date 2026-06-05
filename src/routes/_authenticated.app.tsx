@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { listMyWorkspaces } from "@/lib/workspaces.functions";
 import { WorkspaceChat } from "@/components/workspace-chat";
+import { CommandPalette } from "@/components/command-palette";
 import {
   getStorageState, listFiles, deleteFile, setPlan, getDownloadUrl,
   getFileText, updateFileText,
@@ -304,6 +305,7 @@ function AppPage() {
 
   return (
     <div className="min-h-screen bg-surface text-ink flex">
+      <CommandPalette onUpload={() => fileInput.current?.click()} onSignOut={signOut} />
       <aside className="w-64 border-r border-border bg-card flex flex-col">
         <Link to="/" className="px-6 py-5 flex items-center gap-2 border-b border-border">
           <img src="/node-dot-logo.png" alt="Node FMS" className="size-5" />
@@ -405,6 +407,15 @@ function AppPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => window.dispatchEvent(new Event("open-command-palette"))}
+              className="hidden md:inline-flex items-center gap-2 text-sm text-muted-foreground px-3 py-2 rounded-md border border-border hover:bg-muted"
+              title="Command palette"
+            >
+              <Search className="size-4" />
+              <span className="hidden lg:inline">Search</span>
+              <kbd className="text-[10px] font-mono border border-border rounded px-1 py-0.5">⌘K</kbd>
+            </button>
             <input
               ref={fileInput}
               type="file"
@@ -432,6 +443,9 @@ function AppPage() {
             )}
             <Link to="/forum" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-md border border-border hover:bg-muted" title="Forum">
               <MessageCircle className="size-4" /> Forum
+            </Link>
+            <Link to="/editor" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-md border border-border hover:bg-muted" title="Open the file editor">
+              <Pencil className="size-4" /> Editor
             </Link>
             <Link to="/tasks" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium px-3 py-2 rounded-md border border-border hover:bg-muted" title="Node Tasks">
               Tasks

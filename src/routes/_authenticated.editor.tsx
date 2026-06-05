@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FilePlus2, FolderOpen, Save, Download, Monitor, Globe, FileText, Image as ImageIcon, FileAudio, FileVideo, FileArchive, File as FileIcon } from "lucide-react";
+import { FilePlus2, FolderOpen, Save, Download, Monitor, Globe, FileText, Image as ImageIcon, FileAudio, FileVideo, FileArchive, File as FileIcon, Search, Eye, EyeOff } from "lucide-react";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 import { SiteHeader } from "@/components/site-header";
 
 export const Route = createFileRoute("/_authenticated/editor")({
@@ -88,6 +90,35 @@ function EditorPage() {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("Ready");
   const taRef = useRef<HTMLTextAreaElement>(null);
+
+  // Find & Replace
+  const [findOpen, setFindOpen] = useState(false);
+  const [findText, setFindText] = useState("");
+  const [replaceText, setReplaceText] = useState("");
+
+  // Markdown preview
+  const [showPreview, setShowPreview] = useState(false);
+  const isMarkdown = ["md", "markdown"].includes(extOf(name));
+
+  const matchCount = useMemo(() => {
+    if (!findText) return 0;
+    return content.split(findText).length - 1;
+  }, [content, findText]);
+
+  const replaceAll = useCallback(() => {
+    if (!findText) return;
+    setContent((c) => c.split(findText).join(replaceText));
+    setStatus(`Replaced ${matchCount} match${matchCount === 1 ? "" : "es"}`);
+  }, [findText, replaceText, matchCount]);
+
+  const previewHtml = useMemo(() => {
+    if (!showPreview) return "";
+    try {
+      return DOMPurify.sanitize(marked.parse(content, { async: false }) as string);
+    } catch {
+      return "";
+    }
+  }, [showPreview, content]);
 
   const dirty = kind === "text" && content !== savedContent;
 
@@ -249,10 +280,11 @@ function EditorPage() {
       if (k === "s") { e.preventDefault(); e.shiftKey ? saveAs() : save(); }
       else if (k === "o") { e.preventDefault(); open(); }
       else if (k === "n") { e.preventDefault(); newFile(); }
+      else if (k === "f" && kind === "text") { e.preventDefault(); setFindOpen(true); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, save, saveAs, newFile]);
+  }, [open, save, saveAs, newFile, kind]);
 
   const stats = useMemo(() => {
     if (kind === "text") {
@@ -286,11 +318,46 @@ function EditorPage() {
           <div className="flex flex-wrap items-center gap-2">
             <Btn onClick={newFile} icon={FilePlus2} label="New" kbd="⌘N" />
             <Btn onClick={open} icon={FolderOpen} label="Open" kbd="⌘O" />
+            {kind === "text" && <Btn onClick={() => setFindOpen((v) => !v)} icon={Search} label="Find" kbd="⌘F" />}
+            {kind === "text" && isMarkdown && (
+              <Btn onClick={() => setShowPreview((v) => !v)} icon={showPreview ? EyeOff : Eye} label={showPreview ? "Hide preview" : "Preview"} />
+            )}
             <Btn onClick={save} icon={Save} label={kind === "text" ? "Save" : "Download"} kbd="⌘S" primary />
             {kind === "text" && <Btn onClick={saveAs} icon={Download} label="Save As" kbd="⇧⌘S" />}
           </div>
         </div>
       </section>
+
+      {findOpen && kind === "text" && (
+        <section className="border-b border-border/60 bg-card">
+          <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center gap-2">
+            <input
+              value={findText}
+              onChange={(e) => setFindText(e.target.value)}
+              placeholder="Find…"
+              autoFocus
+              className="px-3 py-1.5 rounded-lg bg-surface ring-1 ring-black/10 text-sm outline-none focus:ring-2 focus:ring-ink/30 w-48"
+            />
+            <input
+              value={replaceText}
+              onChange={(e) => setReplaceText(e.target.value)}
+              placeholder="Replace with…"
+              className="px-3 py-1.5 rounded-lg bg-surface ring-1 ring-black/10 text-sm outline-none focus:ring-2 focus:ring-ink/30 w-48"
+            />
+            <button
+              onClick={replaceAll}
+              disabled={!findText || matchCount === 0}
+              className="px-3 py-1.5 rounded-lg bg-ink text-surface text-sm font-medium hover:bg-ink/90 disabled:opacity-40"
+            >
+              Replace all
+            </button>
+            <span className="text-xs text-muted-foreground">
+              {findText ? `${matchCount} match${matchCount === 1 ? "" : "es"}` : "Type to search"}
+            </span>
+            <button onClick={() => setFindOpen(false)} className="ml-auto text-xs text-muted-foreground hover:text-ink">Close</button>
+          </div>
+        </section>
+      )}
 
       {!isDesktop && (
         <div className="bg-amber-50 border-b border-amber-200 text-amber-900 text-sm">
@@ -307,14 +374,22 @@ function EditorPage() {
       <section className="flex-1">
         <div className="max-w-7xl mx-auto px-6 py-6 h-full">
           {kind === "text" && (
-            <textarea
-              ref={taRef}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              spellCheck={false}
-              placeholder="Start typing, drop a file anywhere, or press ⌘O to open one…"
-              className="w-full h-[60vh] md:h-[68vh] resize-none rounded-2xl bg-card ring-1 ring-black/5 p-5 font-mono text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ink/30"
-            />
+            <div className={showPreview ? "grid md:grid-cols-2 gap-4" : ""}>
+              <textarea
+                ref={taRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                spellCheck={false}
+                placeholder="Start typing, drop a file anywhere, or press ⌘O to open one…"
+                className="w-full h-[60vh] md:h-[68vh] resize-none rounded-2xl bg-card ring-1 ring-black/5 p-5 font-mono text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ink/30"
+              />
+              {showPreview && (
+                <div
+                  className="prose prose-sm max-w-none h-[60vh] md:h-[68vh] overflow-auto rounded-2xl bg-card ring-1 ring-black/5 p-5"
+                  dangerouslySetInnerHTML={{ __html: previewHtml }}
+                />
+              )}
+            </div>
           )}
 
           {kind === "image" && blobUrl && (
