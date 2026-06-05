@@ -318,11 +318,46 @@ function EditorPage() {
           <div className="flex flex-wrap items-center gap-2">
             <Btn onClick={newFile} icon={FilePlus2} label="New" kbd="⌘N" />
             <Btn onClick={open} icon={FolderOpen} label="Open" kbd="⌘O" />
+            {kind === "text" && <Btn onClick={() => setFindOpen((v) => !v)} icon={Search} label="Find" kbd="⌘F" />}
+            {kind === "text" && isMarkdown && (
+              <Btn onClick={() => setShowPreview((v) => !v)} icon={showPreview ? EyeOff : Eye} label={showPreview ? "Hide preview" : "Preview"} />
+            )}
             <Btn onClick={save} icon={Save} label={kind === "text" ? "Save" : "Download"} kbd="⌘S" primary />
             {kind === "text" && <Btn onClick={saveAs} icon={Download} label="Save As" kbd="⇧⌘S" />}
           </div>
         </div>
       </section>
+
+      {findOpen && kind === "text" && (
+        <section className="border-b border-border/60 bg-card">
+          <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center gap-2">
+            <input
+              value={findText}
+              onChange={(e) => setFindText(e.target.value)}
+              placeholder="Find…"
+              autoFocus
+              className="px-3 py-1.5 rounded-lg bg-surface ring-1 ring-black/10 text-sm outline-none focus:ring-2 focus:ring-ink/30 w-48"
+            />
+            <input
+              value={replaceText}
+              onChange={(e) => setReplaceText(e.target.value)}
+              placeholder="Replace with…"
+              className="px-3 py-1.5 rounded-lg bg-surface ring-1 ring-black/10 text-sm outline-none focus:ring-2 focus:ring-ink/30 w-48"
+            />
+            <button
+              onClick={replaceAll}
+              disabled={!findText || matchCount === 0}
+              className="px-3 py-1.5 rounded-lg bg-ink text-surface text-sm font-medium hover:bg-ink/90 disabled:opacity-40"
+            >
+              Replace all
+            </button>
+            <span className="text-xs text-muted-foreground">
+              {findText ? `${matchCount} match${matchCount === 1 ? "" : "es"}` : "Type to search"}
+            </span>
+            <button onClick={() => setFindOpen(false)} className="ml-auto text-xs text-muted-foreground hover:text-ink">Close</button>
+          </div>
+        </section>
+      )}
 
       {!isDesktop && (
         <div className="bg-amber-50 border-b border-amber-200 text-amber-900 text-sm">
