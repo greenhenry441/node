@@ -280,6 +280,7 @@ function EditorPage() {
       if (k === "s") { e.preventDefault(); e.shiftKey ? saveAs() : save(); }
       else if (k === "o") { e.preventDefault(); open(); }
       else if (k === "n") { e.preventDefault(); newFile(); }
+      else if (k === "f" && kind === "text") { e.preventDefault(); setFindOpen(true); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
