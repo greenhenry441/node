@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FilePlus2, FolderOpen, Save, Download, Monitor, Globe, FileText, Image as ImageIcon, FileAudio, FileVideo, FileArchive, File as FileIcon } from "lucide-react";
+import { FilePlus2, FolderOpen, Save, Download, Monitor, Globe, FileText, Image as ImageIcon, FileAudio, FileVideo, FileArchive, File as FileIcon, Search, Eye, EyeOff } from "lucide-react";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 import { SiteHeader } from "@/components/site-header";
 
 export const Route = createFileRoute("/_authenticated/editor")({
