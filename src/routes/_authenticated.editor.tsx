@@ -91,6 +91,35 @@ function EditorPage() {
   const [status, setStatus] = useState<string>("Ready");
   const taRef = useRef<HTMLTextAreaElement>(null);
 
+  // Find & Replace
+  const [findOpen, setFindOpen] = useState(false);
+  const [findText, setFindText] = useState("");
+  const [replaceText, setReplaceText] = useState("");
+
+  // Markdown preview
+  const [showPreview, setShowPreview] = useState(false);
+  const isMarkdown = ["md", "markdown"].includes(extOf(name));
+
+  const matchCount = useMemo(() => {
+    if (!findText) return 0;
+    return content.split(findText).length - 1;
+  }, [content, findText]);
+
+  const replaceAll = useCallback(() => {
+    if (!findText) return;
+    setContent((c) => c.split(findText).join(replaceText));
+    setStatus(`Replaced ${matchCount} match${matchCount === 1 ? "" : "es"}`);
+  }, [findText, replaceText, matchCount]);
+
+  const previewHtml = useMemo(() => {
+    if (!showPreview) return "";
+    try {
+      return DOMPurify.sanitize(marked.parse(content, { async: false }) as string);
+    } catch {
+      return "";
+    }
+  }, [showPreview, content]);
+
   const dirty = kind === "text" && content !== savedContent;
 
   // Revoke any previous object URL when it changes/unmounts.
