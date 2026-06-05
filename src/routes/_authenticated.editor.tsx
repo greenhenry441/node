@@ -374,14 +374,22 @@ function EditorPage() {
       <section className="flex-1">
         <div className="max-w-7xl mx-auto px-6 py-6 h-full">
           {kind === "text" && (
-            <textarea
-              ref={taRef}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              spellCheck={false}
-              placeholder="Start typing, drop a file anywhere, or press ⌘O to open one…"
-              className="w-full h-[60vh] md:h-[68vh] resize-none rounded-2xl bg-card ring-1 ring-black/5 p-5 font-mono text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ink/30"
-            />
+            <div className={showPreview ? "grid md:grid-cols-2 gap-4" : ""}>
+              <textarea
+                ref={taRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                spellCheck={false}
+                placeholder="Start typing, drop a file anywhere, or press ⌘O to open one…"
+                className="w-full h-[60vh] md:h-[68vh] resize-none rounded-2xl bg-card ring-1 ring-black/5 p-5 font-mono text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ink/30"
+              />
+              {showPreview && (
+                <div
+                  className="prose prose-sm max-w-none h-[60vh] md:h-[68vh] overflow-auto rounded-2xl bg-card ring-1 ring-black/5 p-5"
+                  dangerouslySetInnerHTML={{ __html: previewHtml }}
+                />
+              )}
+            </div>
           )}
 
           {kind === "image" && blobUrl && (
