@@ -38,11 +38,12 @@ function Index() {
   return (
     <div className="min-h-screen bg-surface text-ink">
       {/* Dark, WebGL-backed hero */}
-      <section className="relative overflow-hidden bg-[#06070d] text-white">
+      <section className="relative overflow-hidden bg-[#141210] text-white">
         <WebGLBackground />
         {/* Contrast scrim: keeps WebGL visible while guaranteeing legible text */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#06070d]/70 via-[#06070d]/40 to-[#06070d]/85 pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(6,7,13,0.55)_70%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#141210]/70 via-[#141210]/40 to-[#141210]/90 pointer-events-none" />
+        <div className="absolute inset-0 ember-glow pointer-events-none" />
+        <div className="absolute inset-0 grid-ember opacity-40 pointer-events-none" />
         <div className="relative z-10">
           <SiteHeader theme="dark" />
 
