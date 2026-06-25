@@ -157,7 +157,7 @@ function DownloadPage() {
 }
 
 function DownloadCard({ build }: { build: Build }) {
-  const href = `${DOWNLOAD_BASE}/${build.asset}`;
+  const href = `${DOWNLOAD_BASE}/${build.asset}?download=${encodeURIComponent(build.asset)}`;
   const Icon = build.icon;
   return (
     <div className="group relative p-7 rounded-2xl bg-card ring-1 ring-black/5 text-left overflow-hidden">

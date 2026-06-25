@@ -12,9 +12,7 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
   const signInCls = isDark
     ? "border-white/20 text-white hover:bg-white/10"
     : "border-ink/10 hover:bg-ink/5";
-  const ctaCls = isDark
-    ? "bg-white text-[#06070d] hover:bg-white/90"
-    : "bg-ink text-surface hover:bg-ink/90";
+  const ctaCls = "bg-ember text-ember-foreground hover:bg-ember/90 shadow-ember";
   const titleCls = isDark ? "text-white" : "";
   const subCls = isDark ? "text-white/50" : "text-muted-foreground";
   return (
@@ -22,10 +20,10 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
     <LaunchBanner />
     <header className="w-full py-6 relative z-10">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <img src="/node-dot-logo.png" alt="Node" className="size-5" />
+        <Link to="/" className="flex items-center gap-2.5">
+          <img src="/node-logo.png" alt="Node" className="size-7" />
           <div className="leading-tight">
-            <div className={`text-sm font-semibold tracking-tight ${titleCls}`}>Node</div>
+            <div className={`text-sm font-semibold tracking-tight font-mono ${titleCls}`}>node</div>
             <div className={`text-[10px] -mt-0.5 ${subCls}`}>Files · Tasks · Calendar</div>
           </div>
         </Link>

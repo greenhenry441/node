@@ -11,6 +11,14 @@ import { useEffect } from "react";
 import { Toaster } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/500.css";
+import "@fontsource/jetbrains-mono/700.css";
+import "@fontsource/work-sans/300.css";
+import "@fontsource/work-sans/400.css";
+import "@fontsource/work-sans/500.css";
+import "@fontsource/work-sans/600.css";
+
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -88,10 +96,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f59096c4-43c8-4b55-b26a-25ebf90804b5/id-preview-eb8fd9d7--3f1dc442-ea37-427f-8121-aee5a504dcde.lovable.app-1779225861727.png" },
     ],
     links: [
-      { rel: "icon", type: "image/png", href: "/node-dot-logo.png" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" },
+      { rel: "icon", type: "image/png", href: "/node-logo.png" },
+      { rel: "apple-touch-icon", href: "/node-logo.png" },
       { rel: "stylesheet", href: appCss },
     ],
     scripts: [

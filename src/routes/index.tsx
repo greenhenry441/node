@@ -38,23 +38,24 @@ function Index() {
   return (
     <div className="min-h-screen bg-surface text-ink">
       {/* Dark, WebGL-backed hero */}
-      <section className="relative overflow-hidden bg-[#06070d] text-white">
+      <section className="relative overflow-hidden bg-[#141210] text-white">
         <WebGLBackground />
         {/* Contrast scrim: keeps WebGL visible while guaranteeing legible text */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#06070d]/70 via-[#06070d]/40 to-[#06070d]/85 pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(6,7,13,0.55)_70%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#141210]/70 via-[#141210]/40 to-[#141210]/90 pointer-events-none" />
+        <div className="absolute inset-0 ember-glow pointer-events-none" />
+        <div className="absolute inset-0 grid-ember opacity-40 pointer-events-none" />
         <div className="relative z-10">
           <SiteHeader theme="dark" />
 
           <div className="py-20 md:py-32">
             <div className="max-w-7xl mx-auto px-6 text-center">
               <Reveal>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/[0.04] backdrop-blur text-[11px] font-mono uppercase tracking-[0.18em] text-white/70 mb-6">
-                  <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  NODE // built by an 11-year-old in Milford, MI
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-ember/30 bg-ember/[0.08] backdrop-blur text-[11px] font-mono uppercase tracking-[0.18em] text-ember mb-6">
+                  <span className="size-1.5 rounded-full bg-ember animate-pulse" />
+                  node // built by an 11-year-old in Milford, MI
                 </div>
-                <h1 className="text-4xl md:text-6xl font-semibold leading-tight tracking-tight text-balance max-w-[24ch] mx-auto">
-                  One little toolkit for the way your business actually works.
+                <h1 className="text-4xl md:text-7xl font-semibold leading-[1.05] tracking-tight text-balance max-w-[18ch] mx-auto font-mono">
+                  Connect your <span className="text-ember">files</span>, work and time.
                 </h1>
                 <p className="mt-8 text-lg md:text-xl text-white/70 text-pretty max-w-[58ch] mx-auto">
                   Node is three small apps that play nicely together: <span className="text-white">NodeFMS</span> for files,
@@ -67,7 +68,7 @@ function Index() {
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link
                     to="/app"
-                    className="group bg-white text-[#06070d] px-5 py-2.5 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-white/90 transition-colors"
+                    className="group bg-ember text-ember-foreground px-5 py-2.5 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-ember/90 transition-colors shadow-ember"
                   >
                     Try Node — it's free
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
