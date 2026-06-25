@@ -68,7 +68,7 @@ function Index() {
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link
                     to="/app"
-                    className="group bg-white text-[#06070d] px-5 py-2.5 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-white/90 transition-colors"
+                    className="group bg-ember text-ember-foreground px-5 py-2.5 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-ember/90 transition-colors shadow-ember"
                   >
                     Try Node — it's free
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
