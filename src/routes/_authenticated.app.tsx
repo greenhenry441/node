@@ -308,7 +308,7 @@ function AppPage() {
       <CommandPalette onUpload={() => fileInput.current?.click()} onSignOut={signOut} />
       <aside className="w-64 border-r border-border bg-card flex flex-col">
         <Link to="/" className="px-6 py-5 flex items-center gap-2 border-b border-border">
-          <img src="/node-dot-logo.png" alt="Node FMS" className="size-5" />
+          <img src="/node-logo.png" alt="Node FMS" className="size-5" />
           <span className="text-sm font-semibold tracking-tight">Node FMS</span>
         </Link>
 
