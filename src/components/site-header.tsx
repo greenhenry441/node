@@ -12,9 +12,7 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
   const signInCls = isDark
     ? "border-white/20 text-white hover:bg-white/10"
     : "border-ink/10 hover:bg-ink/5";
-  const ctaCls = isDark
-    ? "bg-white text-[#06070d] hover:bg-white/90"
-    : "bg-ink text-surface hover:bg-ink/90";
+  const ctaCls = "bg-ember text-ember-foreground hover:bg-ember/90 shadow-ember";
   const titleCls = isDark ? "text-white" : "";
   const subCls = isDark ? "text-white/50" : "text-muted-foreground";
   return (
