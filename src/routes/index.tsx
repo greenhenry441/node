@@ -50,12 +50,12 @@ function Index() {
           <div className="py-20 md:py-32">
             <div className="max-w-7xl mx-auto px-6 text-center">
               <Reveal>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/[0.04] backdrop-blur text-[11px] font-mono uppercase tracking-[0.18em] text-white/70 mb-6">
-                  <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  NODE // built by an 11-year-old in Milford, MI
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-ember/30 bg-ember/[0.08] backdrop-blur text-[11px] font-mono uppercase tracking-[0.18em] text-ember mb-6">
+                  <span className="size-1.5 rounded-full bg-ember animate-pulse" />
+                  node // built by an 11-year-old in Milford, MI
                 </div>
-                <h1 className="text-4xl md:text-6xl font-semibold leading-tight tracking-tight text-balance max-w-[24ch] mx-auto">
-                  One little toolkit for the way your business actually works.
+                <h1 className="text-4xl md:text-7xl font-semibold leading-[1.05] tracking-tight text-balance max-w-[18ch] mx-auto font-mono">
+                  Connect your <span className="text-ember">files</span>, work and time.
                 </h1>
                 <p className="mt-8 text-lg md:text-xl text-white/70 text-pretty max-w-[58ch] mx-auto">
                   Node is three small apps that play nicely together: <span className="text-white">NodeFMS</span> for files,
