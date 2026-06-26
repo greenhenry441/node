@@ -65,6 +65,16 @@ type Release = {
 // release labels declared in `ReleaseTag` above.
 const releases: Release[] = [
   {
+    version: "1.4.1",
+    date: "June 6, 2026",
+    tags: ["Patch"],
+    title: "Instatus widget and external status page link",
+    highlights: [
+      "Added Instatus embed widget for real-time status updates across the site",
+      "Status links in header and footer now point to node-software-studio.instatus.com",
+    ],
+  },
+  {
     version: "1.4.0",
     date: "June 5, 2026",
     tags: ["Minor"],
