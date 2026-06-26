@@ -37,6 +37,7 @@ export function SiteHeader({ theme = "light" }: { theme?: "light" | "dark" } = {
           <Link to="/invest" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Invest</Link>
           <Link to="/donate" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Donate</Link>
           <Link to="/contact" activeProps={{ className: activeCls }} className={`${navHover} transition-colors`}>Contact</Link>
+          <a href="https://node-software-studio.instatus.com" target="_blank" rel="noreferrer" className={`${navHover} transition-colors`}>Status</a>
         </nav>
         <div className="flex items-center gap-2">
           <a

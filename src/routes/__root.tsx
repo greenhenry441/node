@@ -114,6 +114,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             "Node File Management Suite (Node FMS), a division of Node — secure file storage and team workspace built for small businesses.",
         }),
       },
+      {
+        src: "https://api.dashboard.instatus.com/widget?host=node-software-studio.instatus.com&code=0313ab83&locale=en",
+        async: true,
+      },
     ],
   }),
   shellComponent: RootShell,
