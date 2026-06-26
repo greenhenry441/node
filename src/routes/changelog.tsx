@@ -65,6 +65,18 @@ type Release = {
 // release labels declared in `ReleaseTag` above.
 const releases: Release[] = [
   {
+    version: "1.5.0",
+    date: "June 26, 2026",
+    tags: ["Revamp", "Minor"],
+    title: "Node engine revamp — unified search & faster internals",
+    highlights: [
+      "New unified global search (⌘K) instantly finds files, tasks, lists, calendar events, and forum topics in one place — scoped securely to what you can access",
+      "Command palette now returns live results as you type, with type badges and one-tap jump-to",
+      "Fixed the live status widget so it no longer causes a page hydration glitch on load",
+      "Reworked the inner data layer for snappier cross-app navigation",
+    ],
+  },
+  {
     version: "1.4.1",
     date: "June 6, 2026",
     tags: ["Patch"],
