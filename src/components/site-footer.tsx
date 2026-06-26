@@ -20,7 +20,7 @@ export function SiteFooter() {
           <Link to="/invest" className="hover:text-ink">Invest</Link>
           <Link to="/donate" className="hover:text-ink">Donate</Link>
           <Link to="/contact" className="hover:text-ink">Contact</Link>
-          <Link to="/status" className="hover:text-ink">Status</Link>
+          <a href="https://node-software-studio.instatus.com" target="_blank" rel="noreferrer" className="hover:text-ink">Status</a>
           <Link to="/changelog" className="hover:text-ink">Changelog</Link>
           <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="hover:text-ink inline-flex items-center gap-1">
             <Github className="size-3" /> GitHub
